@@ -1,0 +1,31 @@
+
+DOCUMENTATION:
+http://en.wikipedia.org/wiki/JSDoc
+http://usejsdoc.org/
+    http://usejsdoc.org/tags-param.html
+    https://code.google.com/p/jsdoc-toolkit/wiki/TagParam
+    
+    
+    
+    
+Clipboard
+
+
+        
+        /**  Stream Abstraction
+        * @class
+        * @classdesc This class scan an input stream and convert it to an token input */
+        var stream = (function()
+        {
+            function stream (inpt)
+            {
+                this.inpt = inpt;
+            }
+            
+            stream.prototype.getAll = function() {
+                return inpt;
+            }
+            
+            return stream;
+        })();
+        

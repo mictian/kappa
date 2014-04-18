@@ -1,0 +1,23 @@
+{
+  "name": "kappa",
+  "version": "0.0.1",
+  "description": "A just for fun LALR parser",
+  "main": "src\\init.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Mictian/kappa.git"
+  },
+  "devDependencies": {
+    "bower": "~1.3.2"
+  },
+  "keywords": [
+    "parser",
+    "LALR",
+    "fun"
+  ],
+  "author": "Mictian",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Mictian/kappa/issues"
+  }
+}

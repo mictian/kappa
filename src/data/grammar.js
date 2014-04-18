@@ -1,37 +1,12 @@
-(function() {
-    //NAMESPACE DEFINITION
-    var k = {};
-
-    //OBJECT UTILS
-    k.utils = {};
-    k.utils.obj = (function(){
-
-         /*
-        * @func Util function used to apply "Inheritance"
-        *
-        * @param {Object} superType Object to inherit from
-        * @param {Object} subType Enhanced Object
-        */
-        var __extends = this.__extends || function (subType, superType) {
-            for (var p in superType)
-                if (superType.hasOwnProperty(p))
-                    subType[p] = superType[p];
-            function __() {
-                this.constructor = subType;
-            }
-            __.prototype = superType.prototype;
-            subType.prototype = new __();
-        };
-
-        return {
-            extends: __extends
-        };
-    })();
-
-
-    //GRAMMAR DEFINITION
-    k.data = (function()
+define(['../utils/obj'],  function(k)
+{
+	k.data = (function()
     {
+		/**
+		* Enum for any special Symbol
+		* @readonly
+		* @enum {String}
+		*/
         var specialSymbol = {
             EMPTY: 'EMPTY',
             EOF : 'EOF'
@@ -99,6 +74,9 @@
             return nonTerminal;
         })(symbol);
 
+		/** Terminal
+        * @class
+        * @classdesc Use this class to repsent Termianls (like 'a', 'B', 'Hola', etc.) */
         var terminal = (function(_super)
         {
             k.utils.obj.extends(terminal, _super);
@@ -188,7 +166,7 @@
                 return result;
             };
 
-             /** @function Array of all grammar's terminals'
+             /** @function Compute an Array of all grammar's terminals'
              * @param {[rule]} rules Array grammatical rules of the current grammar
              * @returns An ordered array of object containg the terminals and the rules that define them */
             grammar.prototype._getTerminals = function(rules)
@@ -221,124 +199,5 @@
 
     })();
 
-    //TODO: Implement a REAL lexer. This one is just a temporal one!
-    /**  Lexer
-    * @class
-    * @classdesc This class scan an input stream and convert it to an token input */
-    k.lexer = (function()
-    {
-        /*
-        * Initialize a new Lexer
-        *
-        * @constructor
-        * @param {k.grammar} grammar Grammar used to control the scan process
-        * @param {String} stream Input Stream (Generally a String)
-        */
-        function lexer (grammar, stream)
-        {
-            this.index = 0;
-            this.grammar = grammar;
-            this.inputStream = stream;
-            this.stringTokens = this.inputStream.split(' ');
-        }
-
-        lexer.getNext = function()
-        {
-            var result = {
-				length: -1
-            },
-				currentString = this.stringTokens[this.index++],
-				terminals =this.grammar.terminals,
-				body;
-
-            if  (!currentString)
-            {
-				result = {
-					length: -1,
-					terminal: new k.data.symbol({name: k.data.specialSymbol.EOF, isSpecial:true})
-				};
-            }
-            else
-            {
-				for (var i = 0; i < terminals.length; i++)
-				{
-					body = terminals[i].body;
-					if (body instanceof RegExp && body.test(currentString))
-					{
-						//find the largest match
-						var matches = body.exec(currentString),
-							selectedMatch = '';
-
-						for (var m = 0; m < matches.length; m++)
-						{
-							if (matches[m].length > selectedMatch)
-							{
-								selectedMatch = matches[m];
-							}
-						}
-
-						if (result.length < selectedMatch.length)
-						{
-							result = {
-								length: selectedMatch.length,
-								string: selectedMatch,
-								rule: terminals[i].rule,
-								terminal: terminals[i].rule.tail[0]
-							};
-						}
-					}
-					else if (toString.call(body) === "[object String]" && body === currentString && result.length < currentString.length)
-					{
-						result = {
-							length: currentString.length,
-							string: currentString,
-							rule: terminals[i].rule,
-							terminal: terminals[i].rule.tail[0]
-						};
-					}
-				}
-            }
-
-            return result;
-        };
-
-        return lexer;
-	})();
-
-
-    //TESTS
-    debugger;
-
-    var S = new k.data.rule({
-			head: 'S',
-			tail: k.data.nonTerminal.fromArray(['OPAREN','EXPS','CPAREN'])
-		}),
-
-		EXPS1 = new k.data.rule({
-			head: 'EXPS',
-			tail: k.data.nonTerminal.fromArray(['EXPS','EXP'])
-		}),
-
-		EXPS2 = new k.data.rule({
-			head: 'EXPS',
-		}),
-
-		EXP = new k.data.rule({
-			head: 'EXP',
-			tail: [new k.data.terminal({name:'id', body: /[a-z]+/})]
-		}),
-
-		OPAREN = new k.data.rule({
-			head: 'OPAREN',
-			tail: [new k.data.terminal({name:'id', body: /\(/})]
-		}),
-
-		CPAREN = new k.data.rule({
-			head: 'CPAREN',
-			tail: [new k.data.terminal({name:'id', body: /\)/})]
-		});
-
-    var g = new k.data.grammar('S', [S,EXPS1,EXPS2, EXP, OPAREN, CPAREN]);
-
-
-})();
+    return k;
+});

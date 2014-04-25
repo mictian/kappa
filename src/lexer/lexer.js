@@ -1,12 +1,12 @@
-define(['../core'], function(k)
+define(['../data/grammar'], function(k)
 {
-
+	'use strict';
 	//TODO: Implement a REAL lexer. This one is just a temporal one!
 
     /**  Lexer
     * @class
     * @classdesc This class scan an input stream and convert it to an token input */
-    k.lexer = (function()
+    k.Lexer = (function()
     {
         /*
         * Initialize a new Lexer
@@ -38,7 +38,7 @@ define(['../core'], function(k)
             {
 				result = {
 					length: -1,
-					terminal: new k.data.symbol({name: k.data.specialSymbol.EOF, isSpecial:true})
+					terminal: new k.data.Symbol({name: k.data.specialSymbol.EOF, isSpecial:true})
 				};
             }
             else

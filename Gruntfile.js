@@ -29,12 +29,20 @@ module.exports = function(grunt) {
 				src: ['bower_components/jasmine/dist/jasmine-standalone-2.0.0.zip'],
 				dest: 'lib/jasmine'
 			}
+		},
+		jshint:
+		{
+			all: ['Gruntfile.js', 'src/**/*.js', 'src/*.js', 'test/**/*.js'],
+			options: {
+				"-W040":true //Remove "Possible Strict violation warning"
+			}
 		}
 	});
 
 	//Load tasks
 	grunt.loadNpmTasks('grunt-zip');
 	grunt.loadNpmTasks("grunt-bower-install-simple");
+	grunt.loadNpmTasks('grunt-contrib-jshint');
 
 
 	grunt.task.registerTask('handleFiles', 'Manage Files and directories to just have the necessarry ones', function()

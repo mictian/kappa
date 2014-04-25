@@ -1,5 +1,7 @@
 define(['../utils/obj'],  function(k)
 {
+	'use strict';
+
 	k.data = (function()
     {
 		/**
@@ -15,7 +17,7 @@ define(['../utils/obj'],  function(k)
          /** Symbol
         * @class
         * @classdesc This class represent any simbol in the entire system */
-        var symbol = (function ()
+        var Symbol = (function ()
         {
             /*
             * Creates of a Symbol (This class represent non Temrinals, Terminals and Special symbols)
@@ -41,7 +43,7 @@ define(['../utils/obj'],  function(k)
         /** Non Terminal
         * @class
         * @classdesc Use this class to create new instance of non Termianls */
-        var nonTerminal = (function(_super)
+        var NonTerminal = (function(_super)
         {
             k.utils.obj.extends(nonTerminal, _super);
             /*
@@ -63,7 +65,7 @@ define(['../utils/obj'],  function(k)
                 var result = [];
                 for (var i = 0; i < arr.length; i++)
                 {
-                    result[i] = new nonTerminal({
+                    result[i] = new NonTerminal({
                         name: arr[i]
                     });
                 }
@@ -72,12 +74,12 @@ define(['../utils/obj'],  function(k)
             };
 
             return nonTerminal;
-        })(symbol);
+        })(Symbol);
 
 		/** Terminal
         * @class
         * @classdesc Use this class to repsent Termianls (like 'a', 'B', 'Hola', etc.) */
-        var terminal = (function(_super)
+        var Terminal = (function(_super)
         {
             k.utils.obj.extends(terminal, _super);
             /*
@@ -96,12 +98,12 @@ define(['../utils/obj'],  function(k)
             }
 
             return terminal;
-        })(symbol);
+        })(Symbol);
 
          /**  Grammatical Rules
         * @class
         * @classdesc Use this class to create new instance of non Termianls */
-        var rule = (function()
+        var Rule = (function()
         {
              /*
             * Initialize a new Grammatical Rule
@@ -118,9 +120,9 @@ define(['../utils/obj'],  function(k)
                     throw new Error('Invalid initialization values, please provide a head for the rule');
                 }
 
-                if (!(options.head instanceof nonTerminal))
+                if (!(options.head instanceof NonTerminal))
                 {
-                    this.head = new nonTerminal({
+                    this.head = new NonTerminal({
                        name: options.head.toString()
                     });
                 } else {
@@ -128,7 +130,7 @@ define(['../utils/obj'],  function(k)
                 }
 
 
-                this.tail = options.tail ? options.tail : [new symbol({name: specialSymbol.EMPTY, isSpecial: true})];
+                this.tail = options.tail ? options.tail : [new Symbol({name: specialSymbol.EMPTY, isSpecial: true})];
             }
 
             return rule;
@@ -137,7 +139,7 @@ define(['../utils/obj'],  function(k)
          /**  Grammar
         * @class
         * @classdesc This class is used to represent grammars */
-        var grammar = (function ()
+        var Grammar = (function ()
         {
             /*
             * Initialize a new Grammar
@@ -160,8 +162,10 @@ define(['../utils/obj'],  function(k)
             grammar.prototype._getIndexByNonTerminals = function(rules)
             {
                 var result = {};
-                for (var i = 0; i < rules.length; i++) {
-                    result[rules[i].head.name] ? result[rules[i].head.name].push(rules[i]) : result[rules[i].head.name] = [rules[i]];
+                for (var i = 0; i < rules.length; i++)
+                {
+					/* jshint expr:true */
+                    result[rules[i].head.name] ? result[rules[i].head.name].push(rules[i]) : result[rules[i].head.name] = new Array(rules[i]);
                 }
                 return result;
             };
@@ -189,11 +193,11 @@ define(['../utils/obj'],  function(k)
         })();
 
 		return {
-            symbol: symbol,
-            nonTerminal: nonTerminal,
-            terminal: terminal,
-            rule: rule,
-            grammar: grammar,
+            Symbol: Symbol,
+            NonTerminal: NonTerminal,
+            Terminal: Terminal,
+            Rule: Rule,
+            Grammar: Grammar,
             specialSymbol: specialSymbol
         };
 

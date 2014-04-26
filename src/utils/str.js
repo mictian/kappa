@@ -39,7 +39,7 @@ define(['../core'], function(k)
         */
 		var __ltrim = function(str) {
 			return str.replace(/^\s+/,'');
-		}
+		};
 
 		/*
         * @func Util function used to remove ending spaces

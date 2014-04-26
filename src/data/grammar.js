@@ -2,7 +2,7 @@ define(['../utils/obj'],  function(k)
 {
 	'use strict';
 
-	k.data = (function()
+	k.data = k.utils.obj.extend(k.data || {}, (function()
     {
 		/**
 		* Enum for any special Symbol
@@ -20,16 +20,16 @@ define(['../utils/obj'],  function(k)
         var Symbol = (function ()
         {
             /*
-            * Creates of a Symbol (This class represent non Temrinals, Terminals and Special symbols)
+            * Creates an instance of a Symbol (This class represent non Temrinals, Terminals and Special symbols)
             *
             * @constructor
             * @param {String} options.name The name or denatation of the non terminal
             */
-            function symbol (options)
+            var symbol = function (options)
             {
                 this.name = options.name;
-                this.isSpecial = options.isSpecial || false;
-            }
+                this.isSpecial = !!options.isSpecial;
+            };
 
             /** @function Shows the rule's name
             * @returns this.name */
@@ -110,9 +110,10 @@ define(['../utils/obj'],  function(k)
             *
             * @constructor
             * @param {nonTerminal} options.head The name or denatation of the non terminal
-            * @param {[terminal|nonTerminal]} [options.tail] Array of terminals and nonTerminals that represnt tail ofthe rule. If is not present an empty tail will be created.
+            * @param {[terminal|nonTerminal]} [options.tail] Array of terminals and nonTerminals that represent the tail of the rule.
+            * If is not present an empty tail will be created.
             */
-            function rule(options) {
+            var rule = function (options) {
                 this.index = -1;
 
                 if (!options.head)
@@ -129,9 +130,9 @@ define(['../utils/obj'],  function(k)
                     this.head = options.head;
                 }
 
-
+                //TODO Validtae that tail is an Array
                 this.tail = options.tail ? options.tail : [new Symbol({name: specialSymbol.EMPTY, isSpecial: true})];
-            }
+            };
 
             return rule;
         })();
@@ -148,13 +149,13 @@ define(['../utils/obj'],  function(k)
             * @param {nonTerminal} startSymbol Start symbol of the grammar
             * @param {[rule]} rules Array of grammatical rules
             */
-            function grammar (startSymbol, rules)
+            var grammar = function (startSymbol, rules)
             {
                 this.startSymbol = startSymbol;
                 this.rules = rules;
                 this.rulesByHeader = this._getIndexByNonTerminals(this.rules);
                 this.terminals = this._getTerminals(this.rules);
-            }
+            };
 
              /** @function Index all grammatical rules by its header non terminal
              * @param {[rule]} rules Array grammatical rules of the current grammar
@@ -164,6 +165,7 @@ define(['../utils/obj'],  function(k)
                 var result = {};
                 for (var i = 0; i < rules.length; i++)
                 {
+					rules[i].index = i;
 					/* jshint expr:true */
                     result[rules[i].head.name] ? result[rules[i].head.name].push(rules[i]) : result[rules[i].head.name] = new Array(rules[i]);
                 }
@@ -189,6 +191,14 @@ define(['../utils/obj'],  function(k)
                 return result;
             };
 
+             /** @function Returns the list of rules that start with the specified symbols as the head
+             * @param {Symbol} symbol Symbol used as the head of the requested rules
+             * @returns Array of rules */
+            grammar.prototype.getRulesFromNonTerminal = function(symbol)
+            {
+                return this.rulesByHeader[symbol.name];
+            };
+
             return grammar;
         })();
 
@@ -201,7 +211,7 @@ define(['../utils/obj'],  function(k)
             specialSymbol: specialSymbol
         };
 
-    })();
+    })());
 
     return k;
 });

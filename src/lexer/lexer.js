@@ -10,7 +10,7 @@ define(['../utils/str', '../data/grammar'], function(k)
     {
     	var defaultOptions = {
     		notIgnoreSpaces : false
-    	}
+    	};
 
         /*
         * Initialize a new Lexer

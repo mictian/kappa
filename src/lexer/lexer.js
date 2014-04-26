@@ -1,4 +1,4 @@
-define(['../data/grammar'], function(k)
+define(['../utils/str', '../data/grammar'], function(k)
 {
 	'use strict';
 	//TODO: Implement a REAL lexer. This one is just a temporal one!
@@ -8,19 +8,23 @@ define(['../data/grammar'], function(k)
     * @classdesc This class scan an input stream and convert it to an token input */
     k.Lexer = (function()
     {
+    	var defaultOptions = {
+    		notIgnoreSpaces : false
+    	}
+
         /*
         * Initialize a new Lexer
         *
         * @constructor
         * @param {k.grammar} grammar Grammar used to control the scan process
         * @param {String} stream Input Stream (Generally a String)
+        * @param {Boolean} options.notIgnoreSpaces If true spaces are not ignored. False by default
         */
-        function lexer (grammar, stream)
+        function lexer (grammar, stream, options)
         {
-            this.index = 0;
+        	this.options = k.utils.obj.extend(options || {}, defaultOptions);
             this.grammar = grammar;
-            this.inputStream = stream;
-            this.stringTokens = this.inputStream.split(' ');
+			this.inputStream = !this.options.notIgnoreSpaces ? k.utils.str.ltrim(stream) : stream;
         }
 
 		/** @function Get next input token
@@ -28,13 +32,12 @@ define(['../data/grammar'], function(k)
         lexer.prototype.getNext = function()
         {
             var result = {
-				length: -1
-            },
-				currentString = this.stringTokens[this.index++],
+					length: -1
+				},
 				terminals =this.grammar.terminals,
 				body;
 
-            if  (!currentString)
+            if  (!this.inputStream)
             {
 				result = {
 					length: -1,
@@ -46,38 +49,26 @@ define(['../data/grammar'], function(k)
 				for (var i = 0; i < terminals.length; i++)
 				{
 					body = terminals[i].body;
-					//If it's reg exp check if match
-					if (body instanceof RegExp && body.test(currentString))
+					//If it's reg exp and match
+					if (body instanceof RegExp && !this.inputStream.search(body))
 					{
-						//TODO IS THIS OK? Should I take the hold string?
-						//find the largest match
-						var matches = body.exec(currentString),
-							selectedMatch = '';
-
-						for (var m = 0; m < matches.length; m++)
-						{
-							if (matches[m].length > selectedMatch)
-							{
-								selectedMatch = matches[m];
-							}
-						}
-
-						if (result.length < selectedMatch.length)
+						var match = body.exec(this.inputStream)[0];
+						if (result.length < match.length)
 						{
 							result = {
-								length: selectedMatch.length,
-								string: selectedMatch,
+								length: match.length,
+								string: match,
 								rule: terminals[i].rule,
 								terminal: terminals[i].rule.tail[0]
 							};
 						}
 					}
 					//if it is a string check if there are the same
-					else if (toString.call(body) === "[object String]" && body === currentString && result.length < currentString.length)
+					else if (toString.call(body) === "[object String]" && k.utils.str.startsWith(this.inputStream, body) && result.length < body.length)
 					{
 						result = {
-							length: currentString.length,
-							string: currentString,
+							length: body.length,
+							string: body,
 							rule: terminals[i].rule,
 							terminal: terminals[i].rule.tail[0]
 						};
@@ -86,11 +77,21 @@ define(['../data/grammar'], function(k)
 
 				if (result.length === -1)
 				{
-					//if there is no valid match, we return the current string
+					//if there is no valid match, we return the current input stream
 					result = {
-						length: currentString.length,
-						string: currentString
+						length: this.inputStream.length,
+						string: this.inputStream
 					};
+				}
+				else
+				{
+					//If there is a match
+					this.inputStream = this.inputStream.substr(result.length);
+					if (!this.options.notIgnoreSpaces)
+					{
+						this.inputStream = k.utils.str.ltrim(this.inputStream);
+					}
+
 				}
             }
 

@@ -1,31 +1,42 @@
-require.config({
-    paths:
-    {
-        'jasmine': '../lib/jasmine/jasmine',
-        'jasmine-html': '../lib/jasmine/jasmine-html'
-    },
-    shim:
-    {
-        jasmine: {
-            exports: 'jasmine'
-        },
-        'jasmine-html': {
-            deps: ['jasmine'],
-            exports: 'jasmine'
-        }
-    }
-});
+(function()
+{
+	'use strict';
+
+	require.config({
+		baseUrl: "../src",
+		paths:
+		{
+			'jasmine': '../lib/jasmine/jasmine',
+			'jasmine-html': '../lib/jasmine/jasmine-html',
+			'boot': '../lib/jasmine/boot'
+		},
+		shim:
+		{
+			'jasmine': {
+				exports: 'window.jasmineRequire'
+			},
+			'jasmine-html': {
+				deps: ['jasmine'],
+				exports: 'window.jasmineRequire'
+			},
+			'boot': {
+				deps: ['jasmine', 'jasmine-html'],
+				exports: 'window.jasmineRequire'
+			}
+		}
+	});
 
 
-(function(){
-	var jasmineEnv = jasmine.getEnv();
-    //jasmineEnv.updateInterval = 1000;
+	require(['boot'], function(jasmine)
+	{
+		var testRootPath = '../tests/specs/',
+			specs = [];
 
-    var specs = [];
-    specs.push('./specs/grammar');
-    specs.push('./specs/lexer');
+		specs.push(testRootPath + 'grammar');
+		specs.push(testRootPath + 'lexer');
 
-    require(specs, function (spec) {
-        jasmineEnv.execute();
-    });
+		require(specs, function (spec) {
+			window.onload();
+		});
+	});
 })();

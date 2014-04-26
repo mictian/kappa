@@ -45,7 +45,7 @@ define(['../utils/obj'],  function(k)
         * @classdesc Use this class to create new instance of non Termianls */
         var NonTerminal = (function(_super)
         {
-            k.utils.obj.extends(nonTerminal, _super);
+            k.utils.obj.inherit(nonTerminal, _super);
             /*
             * Creates an instance of a new Non Termianl
             *
@@ -81,7 +81,7 @@ define(['../utils/obj'],  function(k)
         * @classdesc Use this class to repsent Termianls (like 'a', 'B', 'Hola', etc.) */
         var Terminal = (function(_super)
         {
-            k.utils.obj.extends(terminal, _super);
+            k.utils.obj.inherit(terminal, _super);
             /*
             * Creates an instance of a new Termianl
             *

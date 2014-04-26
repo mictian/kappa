@@ -1,4 +1,4 @@
-define(['../core'], function(k)
+define(['../utils/obj'], function(k)
 {
 	'use strict';
 
@@ -18,7 +18,7 @@ define(['../core'], function(k)
         var ItemRule = function(options)
         {
             this.rule = options.rule;
-            this.dotLocation = options.dotLocation;
+            this.dotLocation = options.dotLocation || 0;
         };
 
         /** @function Convert the current item rule to its string representation
@@ -34,13 +34,16 @@ define(['../core'], function(k)
             return aux;
         };
 
-        /** @function Returns the right next symbol to the dot location ()
+        /** @function Returns the right next symbol to the dot location
         * @returns Next symbol or null if there is not next symbol */
         ItemRule.prototype.getCurrentSymbol = function ()
         {
             return this.dotLocation < (this.rule.tail.length + 1) ? this.rule.tail[this.dotLocation] : null;
         };
 
+        /** @function Create an array of item rules from an array of rules
+        * @param {[Rule]} rules Array of rules used to create the item rules. Each new item rule will have 0 as dot location
+        * @returns array of new Item Rules */
         ItemRule.newFromRules = function(rules)
         {
             var itemRules = [];
@@ -51,6 +54,7 @@ define(['../core'], function(k)
                     dotLocation:0
                 }));
             }
+            return itemRules;
         };
 
         return ItemRule;

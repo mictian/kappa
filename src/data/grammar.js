@@ -134,6 +134,15 @@ define(['../utils/obj'],  function(k)
                 this.tail = options.tail ? options.tail : [new Symbol({name: specialSymbol.EMPTY, isSpecial: true})];
             };
 
+            rule.prototype.toString = function()
+            {
+                var strResult = this.head.toString() + '-->';
+                for (var i = 0; i < this.tail.length; i++) {
+                    strResult += this.tail[i].toString();
+                }
+                return strResult;
+            };
+
             return rule;
         })();
 

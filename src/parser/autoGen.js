@@ -5,14 +5,14 @@ define(['../data/grammar', '../data/itemRule'], function(k)
 	function expandItem(grammar, currentState)
 	{
         // Se agrega la relga inicial y luego se llama a este method!
-        var currrentSymbol,
+        var currentSymbol,
             currentItem = currentState.getNextItem();
 
         while (currentItem) {
-            currrentSymbol = currentItem.getCurrentSymbol();
+            currentSymbol = currentItem.getCurrentSymbol();
 
-            if (currrentSymbol instanceof k.data.NonTerminal)
-                currentState.addItems(k.data.ItemRule.newFromRules(grammar.getRulesFromNonTerminal(currrentSymbol)));
+            if (currentSymbol instanceof k.data.NonTerminal)
+                currentState.addItems(k.data.ItemRule.newFromRules(grammar.getRulesFromNonTerminal(currentSymbol)));
 
             currentItem = currentState.getNextItem();
         }

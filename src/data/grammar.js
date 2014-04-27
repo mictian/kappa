@@ -31,7 +31,7 @@ define(['../utils/obj'],  function(k)
                 this.isSpecial = !!options.isSpecial;
             };
 
-            /** @function Shows the rule's name
+            /** @function Shows the symbol's name
             * @returns this.name */
             symbol.prototype.toString = function() {
                 return this.name;
@@ -97,6 +97,12 @@ define(['../utils/obj'],  function(k)
                 this.isTerminal = true;
             }
 
+            /** @function Shows the terminal's name between < and >
+            * @returns Fromatted stirng */
+            terminal.prototype.toString = function() {
+                return '<' + this.name + '>';
+            };
+
             return terminal;
         })(Symbol);
 
@@ -134,6 +140,8 @@ define(['../utils/obj'],  function(k)
                 this.tail = options.tail ? options.tail : [new Symbol({name: specialSymbol.EMPTY, isSpecial: true})];
             };
 
+            /** @function Convert a Rule to its pritty string representation
+            * @returns Formatted string */
             rule.prototype.toString = function()
             {
                 var strResult = this.head.toString() + '-->';
@@ -151,15 +159,19 @@ define(['../utils/obj'],  function(k)
         * @classdesc This class is used to represent grammars */
         var Grammar = (function ()
         {
+            var defaultOptions = {
+                name: ''
+            };
             /*
             * Initialize a new Grammar
             *
             * @constructor
-            * @param {nonTerminal} startSymbol Start symbol of the grammar
-            * @param {[rule]} rules Array of grammatical rules
+            * @param {NonTerminal} startSymbol Start symbol of the grammar
+            * @param {[Rule]} rules Array of grammatical rules
             */
-            var grammar = function (startSymbol, rules)
+            var grammar = function (startSymbol, rules, options)
             {
+                this.options = k.utils.obj.extend(options || {}, defaultOptions);
                 this.startSymbol = startSymbol;
                 this.rules = rules;
                 this.rulesByHeader = this._getIndexByNonTerminals(this.rules);
@@ -206,6 +218,18 @@ define(['../utils/obj'],  function(k)
             grammar.prototype.getRulesFromNonTerminal = function(symbol)
             {
                 return this.rulesByHeader[symbol.name];
+            };
+
+            /** @function Convert a Grammar to its pritty string representation
+            * @returns Formatted string */
+            grammar.prototype.toString = function() {
+                var strResult = this.name ? 'Name: ' + this.name : '';
+                strResult += 'Start Symbol: ' + this.startSymbol.name +'\n';
+
+                for (var i = 0; i < this.rules.length; i++) {
+                    strResult += i +': '+ this.rules[i] + '\n';
+                }
+                return strResult;
             };
 
             return grammar;

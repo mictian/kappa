@@ -8,9 +8,9 @@ define(['../utils/str', '../data/grammar'], function(k)
     * @classdesc This class scan an input stream and convert it to an token input */
     k.Lexer = (function()
     {
-    	var defaultOptions = {
-    		notIgnoreSpaces : false
-    	};
+        var defaultOptions = {
+            notIgnoreSpaces : false
+        };
 
         /*
         * Initialize a new Lexer
@@ -20,9 +20,9 @@ define(['../utils/str', '../data/grammar'], function(k)
         * @param {String} stream Input Stream (Generally a String)
         * @param {Boolean} options.notIgnoreSpaces If true spaces are not ignored. False by default
         */
-        function lexer (grammar, stream, options)
+        var lexer = function (grammar, stream, options)
         {
-        	this.options = k.utils.obj.extend(options || {}, defaultOptions);
+            this.options = k.utils.obj.extendInNew(defaultOptions, options || {});
             this.grammar = grammar;
 			this.inputStream = !this.options.notIgnoreSpaces ? k.utils.str.ltrim(stream) : stream;
         }

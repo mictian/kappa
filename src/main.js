@@ -2,7 +2,7 @@ require.config({
     baseUrl: "./src"
  });
 
-require(['./parser/autoGen', './data/state', , './lexer/lexer'], function (k)
+require(['./parser/automataLR0Generator', './data/state', , './lexer/lexer'], function (k)
 {
 	//TESTS
 	var S = new k.data.Rule({
@@ -30,16 +30,22 @@ require(['./parser/autoGen', './data/state', , './lexer/lexer'], function (k)
 		tail: [new k.data.Terminal({name:'NUMBER', body: /\d/})]
 	});
 
-	var g = new k.data.Grammar('S', [S,E1, E2, Q, F]);
+	var g = new k.data.Grammar(S.head, [S, E1, E2, Q, F]);
 	var l = new k.Lexer(g, "1/2");
 
 	var sItem = new k.data.ItemRule({rule:S});
 
 	var s = new k.data.State({
-	    items: [sItem]
+        items: [sItem]
 	});
 
-    debugger;
-    k.expandItem(g,s);
+    //debugger;
+    var automataGenerator = new k.AutomataLR0Generator({
+        grammar: g
+    });
+
+    var a = automataGenerator.generateAutomata();
+
+    var newState = automataGenerator.expandItem(s);
 
 });

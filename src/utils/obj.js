@@ -16,9 +16,11 @@ define(['../core'], function(k)
         * @param {Object} subType Enhanced Object
         */
         var __inherit = function (subType, superType) {
-            for (var p in superType)
-                if (superType.hasOwnProperty(p))
+            for (var p in superType) {
+                if (superType.hasOwnProperty(p)) {
                     subType[p] = superType[p];
+                }
+            }
 
             function __() {
                 this.constructor = subType;
@@ -72,11 +74,41 @@ define(['../core'], function(k)
 			return resOjb;
 		};
 
+        /*
+        * @func Util function to determine if an object is or not an array
+        * @param {Object} o object to check its type
+        * @returns {Boolean} True if the object passed in is an Array or false otherwise
+        */
+		var __isArray = function(o) {
+            return Object.prototype.toString.call(o) === '[object Array]';
+		};
+
+		/*
+        * @func Util function to determine if an object is or not a String
+        * @param {Object} s object to check its type
+        * @returns {Boolean} True if the object passed in is a String or false otherwise
+        */
+		var __isString = function(s) {
+            return Object.prototype.toString.call(s) === '[object String]';
+		};
+
+        /*
+        * @func Util function to determine if an object is or not a Regular Expression
+        * @param {Object} s object to check its type
+        * @returns {Boolean} True if the object passed in is a Regular Expresion or false otherwise
+        */
+		var __isRegExp = function(r) {
+            return Object.prototype.toString.call(r) === '[object RegExp]';
+		};
+
         return {
             inherit: __inherit,
             extend: __extend,
             extendInNew: __extendInNew,
-            clone: __clone
+            clone: __clone,
+            isArray: __isArray,
+            isString: __isString,
+            isRegExp: __isRegExp
         };
 
     })();

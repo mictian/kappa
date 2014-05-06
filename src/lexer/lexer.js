@@ -1,12 +1,13 @@
-define(['../utils/str', '../data/grammar'], function(k)
+/*global toString: true*/
+define(['../utils/str', '../utils/obj', '../data/grammar'], function(k)
 {
 	'use strict';
 	//TODO: Implement a REAL lexer. This one is just a temporal one!
 
-    /**  Lexer
+    /* Lexer
     * @class
     * @classdesc This class scan an input stream and convert it to an token input */
-    k.Lexer = (function()
+    var Lexer = (function()
     {
         var defaultOptions = {
             notIgnoreSpaces : false
@@ -25,7 +26,7 @@ define(['../utils/str', '../data/grammar'], function(k)
             this.options = k.utils.obj.extendInNew(defaultOptions, options || {});
             this.grammar = grammar;
 			this.inputStream = !this.options.notIgnoreSpaces ? k.utils.str.ltrim(stream) : stream;
-        }
+        };
 
 		/** @function Get next input token
          * @returns An object representing the current finded token. The object can not have a rule associated if there is any match */
@@ -49,7 +50,7 @@ define(['../utils/str', '../data/grammar'], function(k)
 				for (var i = 0; i < terminals.length; i++)
 				{
 					body = terminals[i].body;
-					//If it's reg exp and match
+					//If it's reg exp and match (this.inputStream.search(body) returns the index of matching which evals to false so !)
 					if (body instanceof RegExp && !this.inputStream.search(body))
 					{
 						var match = body.exec(this.inputStream)[0];
@@ -64,7 +65,7 @@ define(['../utils/str', '../data/grammar'], function(k)
 						}
 					}
 					//if it is a string check if there are the same
-					else if (toString.call(body) === "[object String]" && k.utils.str.startsWith(this.inputStream, body) && result.length < body.length)
+					else if (toString.call(body) === '[object String]' && k.utils.str.startsWith(this.inputStream, body) && result.length < body.length)
 					{
 						result = {
 							length: body.length,
@@ -100,6 +101,10 @@ define(['../utils/str', '../data/grammar'], function(k)
 
         return lexer;
 	})();
+
+	k.lexer = k.utils.obj.extend(k.lexer || {}, {
+        Lexer: Lexer
+	});
 
 	return k;
 });

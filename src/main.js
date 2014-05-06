@@ -1,9 +1,11 @@
 require.config({
-    baseUrl: "./src"
+    baseUrl: './src'
  });
 
 require(['./parser/automataLR0Generator', './data/state', , './lexer/lexer'], function (k)
 {
+    'use strict';
+
 	//TESTS
 	var S = new k.data.Rule({
 		head: 'S',
@@ -31,7 +33,7 @@ require(['./parser/automataLR0Generator', './data/state', , './lexer/lexer'], fu
 	});
 
 	var g = new k.data.Grammar(S.head, [S, E1, E2, Q, F]);
-	var l = new k.Lexer(g, "1/2");
+	var l = new k.Lexer(g, '1/2');
 
 	var sItem = new k.data.ItemRule({rule:S});
 

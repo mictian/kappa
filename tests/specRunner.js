@@ -1,9 +1,10 @@
+/* global window: true, beforeEach: true */
 (function()
 {
 	'use strict';
 
 	require.config({
-		baseUrl: "../src",
+		baseUrl: '../src',
 		paths:
 		{
 			'jasmine': '../lib/jasmine/jasmine',
@@ -13,30 +14,57 @@
 		shim:
 		{
 			'jasmine': {
-				exports: 'window.jasmineRequire'
+				exports: 'window.jasmine' //jasmineRequire
 			},
 			'jasmine-html': {
 				deps: ['jasmine'],
-				exports: 'window.jasmineRequire'
+				exports: 'window.jasmine'
 			},
 			'boot': {
-				deps: ['jasmine', 'jasmine-html'],
-				exports: 'window.jasmineRequire'
+				deps: ['jasmine-html', 'jasmine'],
+				exports: 'window.jasmine'
 			}
 		}
 	});
 
+	function addMatchers(jasmine)
+	{
+		beforeEach(function() {
+            jasmine.addMatchers({
+
+                toBeInstanceOf: function(util, customEqualityTesters)
+                {
+                    return  {
+                        compare: function(actual, expected)
+                        {
+                            return {
+                                pass: actual instanceof expected,
+                                message: (actual instanceof expected) ? 'OK' : 'Expected ' + actual.constructor.name + ' is instance of ' + expected.name
+                            };
+                        }
+                    };
+                }
+            });
+        });
+	}
 
 	require(['boot'], function(jasmine)
 	{
 		var testRootPath = '../tests/specs/',
 			specs = [];
 
-		specs.push(testRootPath + 'grammar');
-		specs.push(testRootPath + 'lexer');
+		specs.push(testRootPath + 'data/specGrammar');
+		specs.push(testRootPath + 'data/specState');
+		specs.push(testRootPath + 'lexer/specLexer');
+		specs.push(testRootPath + 'utils/specObj');
+		specs.push(testRootPath + 'utils/specStr');
+		specs.push(testRootPath + 'data/specItemRule');
+
+        addMatchers(jasmine);
 
 		require(specs, function (spec) {
 			window.onload();
 		});
 	});
+
 })();

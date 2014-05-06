@@ -34,7 +34,9 @@ define(['../utils/obj', './state'], function(k)
         * @returns A State not processed yet */
         automata.prototype.getNextState = function() {
             if (this.index < this.states.length)
+            {
                 return this.states[this.index++];
+            }
 
             return null;
         };

@@ -5,7 +5,7 @@ define(['../utils/obj', '../data/grammar', '../data/itemRule', '../data/automata
     /* Automata Generator
     * @class
     * @classdesc This class is reponsible for given a grammar create a new LR(0) automata */
-	k.AutomataLR0Generator = (function()
+	var AutomataLR0Generator = (function()
 	{
         /*
         * Initialize a new Automaton Generator
@@ -23,15 +23,16 @@ define(['../utils/obj', '../data/grammar', '../data/itemRule', '../data/automata
         * @returns The full state with all its require items */
         automataGenerator.prototype.expandItem = function(currentState)
         {
-            // Se agrega la relga inicial y luego se llama a este method!
+            // The inital rule is first added and then this method is called
             var currentSymbol,
                 currentItem = currentState.getNextItem();
 
             while (currentItem) {
                 currentSymbol = currentItem.getCurrentSymbol();
 
-                if (currentSymbol instanceof k.data.NonTerminal)
+                if (currentSymbol instanceof k.data.NonTerminal) {
                     currentState.addItems(k.data.ItemRule.newFromRules(this.grammar.getRulesFromNonTerminal(currentSymbol)));
+                }
 
                 currentItem = currentState.getNextItem();
             }
@@ -50,19 +51,19 @@ define(['../utils/obj', '../data/grammar', '../data/itemRule', '../data/automata
                   states: [this.expandItem(initialState)]
                 });
 
-            this.expandAutomata(automata);
+            this._expandAutomata(automata);
             return automata;
         };
 
         /** @function Internal method which resive an inital automata with only it inital state and generate a full automata
         * @returns A full automata */
-        automataGenerator.prototype.expandAutomata = function(automata) {
+        automataGenerator.prototype._expandAutomata = function(automata) {
             var currentState = automata.getNextState();
 
             while (currentState) {
 
                 //Get all valid symbol from which the state can have transitions
-                var supportedTransitions = currentState.getSupportedTransitions(),
+                var supportedTransitions = currentState.getSupportedTransitionSymbols(),
                     currentItemRules,
                     addedState, //To control duplicated states
                     newItemRules = [];
@@ -92,6 +93,10 @@ define(['../utils/obj', '../data/grammar', '../data/itemRule', '../data/automata
 
         return automataGenerator;
 	})();
+
+	k.parser = k.utils.obj.extend(k.parser || {}, {
+        AutomataLR0Generator: AutomataLR0Generator
+	});
 
 	return k;
 });

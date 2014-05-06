@@ -1,4 +1,7 @@
+/*global module: true */
 module.exports = function(grunt) {
+
+    'use strict';
 
 	// Project configuration.
 	grunt.initConfig({
@@ -8,7 +11,7 @@ module.exports = function(grunt) {
 			options:
 			{
 				production:  false,
-				directory:   "bower_components"
+				directory:   'bower_components'
 			}
 		},
 		'unzip':
@@ -32,16 +35,29 @@ module.exports = function(grunt) {
 		},
 		jshint:
 		{
-			all: ['Gruntfile.js', 'src/**/*.js', 'src/*.js', 'test/**/*.js'],
+			all: ['Gruntfile.js', 'src/**/*.js', 'src/*.js', 'tests/**/*.js'],
 			options: {
-				"-W040":true //Remove "Possible Strict violation warning"
+				'-W040':true, //Remove "Possible Strict violation warning"
+				'quotmark': 'single',
+				'undef':true,
+				'strict': true,
+				'curly':  true,
+				'eqeqeq': true,
+				'freeze': true,
+				'immed': true,
+				'latedef':true,
+				'newcap': true,
+				'globals':  {
+                    'define': true,
+                    'require': true
+				}
 			}
 		}
 	});
 
 	//Load tasks
 	grunt.loadNpmTasks('grunt-zip');
-	grunt.loadNpmTasks("grunt-bower-install-simple");
+	grunt.loadNpmTasks('grunt-bower-install-simple');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 
 

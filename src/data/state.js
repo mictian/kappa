@@ -15,9 +15,9 @@ define(['../utils/obj'], function(k)
         */
         var state = function(options)
         {
+			this.transitions = options.transitions || [];
             this._items = options.items || [];
-            this.transitions = options.transitions || [];
-            this.index = 0;
+            this._index = 0;
             this._registerItems = {};
 
             for (var i = 0; i < this._items.length; i++) {
@@ -28,10 +28,7 @@ define(['../utils/obj'], function(k)
         /** @function Get the next unprocessed item rule
         * @returns Item Rule */
         state.prototype.getNextItem = function() {
-            if (this.index < this._items.length)
-                return this._items[this.index++];
-
-            return null;
+			return this._index < this._items.length ? this._items[this._index++] : null;
         };
 
         /** @function Adds an array of item rule into the state. Only the rules that are not already present in the state will be added
@@ -77,14 +74,15 @@ define(['../utils/obj'], function(k)
         /** @function Returns the stinrg ID of the current state
         * @returns String ID  */
         state.prototype.getIdentity = function() {
-            if (!this._id)
+            if (!this._id) {
                 this._id = this._generateIdentity();
+            }
             return this._id;
         };
 
         /** @function Get the list of all supported symbol which are valid to generata transition from the current state.
-        * @returns Array of object of the form: {symbol, items} where item have an array of item rules  */
-        state.prototype.getSupportedTransitions = function () {
+        * @returns Array of object of the form: {symbol, items} where items have an array of item rules  */
+        state.prototype.getSupportedTransitionSymbols = function () {
             var itemsAux = {},
                 result = [];
 
@@ -111,7 +109,7 @@ define(['../utils/obj'], function(k)
             return result;
         };
 
-        /** @function Add a new transaction into the list of transaction from the current state
+        /** @function Add a new transaction into the list of transactions of the current state
         * @param {Symbol} symbol Symbol use to make the transition, like the name of the transition
         * @param {State} state Destination state arrived when moving with the specified tranisiotn
         * @returns void  */

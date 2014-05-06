@@ -2,7 +2,7 @@ define(['../utils/obj'], function(k)
 {
 	'use strict';
 
-     /** Item Rule
+    /* Item Rule
     * @class
     * @classdesc This class represent an Item. A rule being processed. Generally a dot is used to represnet which part have already been
     processed. Ex. S ==> aB*AB */
@@ -32,22 +32,25 @@ define(['../utils/obj'], function(k)
         {
             var aux = this.rule.head.name +'-->';
             for (var i = 0; i < this.rule.tail.length; i++) {
-                if (this.dotLocation == i)
+                if (this.dotLocation === i) {
                     aux += '*';
+                }
                 aux += this.rule.tail[i].toString();
             }
-            if (this.dotLocation == i)
+            if (this.dotLocation === i) {
                     aux += '*';
+            }
             return aux;
         };
 
         /** @function Clone the current item, altering its state by the params specified in cloneOptions
         * @param {Integer} cloneOptions.dotLocationIncrement Increment that will be applied into the dot location of the new item. Default: 0
+        * @param {Object} creationOptions Optional object use to expand curren option to create the returned clone
         * @returns A clean new item */
-        itemRule.prototype.clone = function(cloneOptions)
+        itemRule.prototype.clone = function(cloneOptions, creationOptions)
         {
             var cloneOpt = k.utils.obj.extendInNew(defaultCloneOptions, cloneOptions || {});
-            var result = new ItemRule(this.options);
+            var result = new ItemRule(k.utils.obj.extendInNew(this.options,creationOptions || {}));
             result._incrementDotLocation(cloneOpt.dotLocationIncrement);
 
             return result;
@@ -56,7 +59,8 @@ define(['../utils/obj'], function(k)
         /** @function Increase the dot location by the number specified by parameter
         * @param {Integer} increment Increment that will be applied into the dot location of the new item. Default: 1
         * @returns void */
-        itemRule.prototype._incrementDotLocation= function(increment) {
+        itemRule.prototype._incrementDotLocation= function(increment)
+        {
             this.options.dotLocation = (this.options.dotLocation || 0) + (increment || 1);
             this.dotLocation = this.options.dotLocation;
         };
@@ -78,7 +82,7 @@ define(['../utils/obj'], function(k)
             {
                 itemRules.push(new ItemRule({
                     rule:rules[i],
-                    dotLocation:0
+                    dotLocation: 0
                 }));
             }
             return itemRules;

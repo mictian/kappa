@@ -15,8 +15,9 @@ define(['../utils/obj', './state'], function(k)
         */
         var automata = function (options)
         {
+			this.options = options;
             this.states = options.states || [];
-            this.index = 0; //Index used to traversal the state of the current instance
+            this._index = 0; //Index used to traversal the states of the current instance
             this._registerStates = {};
 
             for (var i = 0; i < this.states.length; i++) {
@@ -32,13 +33,9 @@ define(['../utils/obj', './state'], function(k)
 
         /** @function Get the next unprocessed state
         * @returns A State not processed yet */
-        automata.prototype.getNextState = function() {
-            if (this.index < this.states.length)
-            {
-                return this.states[this.index++];
-            }
-
-            return null;
+        automata.prototype.getNextState = function()
+        {
+            return this._index < this.states.length ? this.states[this._index++] : null;
         };
 
         /** @function Add a new state into the automata controlling if it is duplicated or not

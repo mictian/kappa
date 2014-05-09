@@ -57,7 +57,7 @@ define(['../../../src/data/itemRule'], function(k)
 
 		describe('clone', function()
 		{
-			it('should create a new rule without any change, just increasing dot location, if nothing else is specified', function()
+			it('should create a new rule without any change if nothing else is specified', function()
 			{
 				var options = {
 						dotLocation: 42,
@@ -67,10 +67,16 @@ define(['../../../src/data/itemRule'], function(k)
 
 				var clone = i.clone({});
 
-				options.dotLocation++;
 				expect(clone.options).toEqual(options);
 				expect(clone.options).not.toBe(options);
-				i.dotLocation++;
+
+				expect(clone).toEqual(i);
+
+				clone = i.clone();
+
+				expect(clone.options).toEqual(options);
+				expect(clone.options).not.toBe(options);
+
 				expect(clone).toEqual(i);
 			});
 

@@ -80,6 +80,18 @@ define(['../utils/obj'], function(k)
             return this._id;
         };
 
+        /** @function Returns a copy of the items contained in the current state
+        * @returns Array of items rules  */
+        state.prototype.getItems = function()
+        {
+			var result = [];
+			for (var i = 0; i < this._items.length; i++)
+			{
+				result.push(this._items[i].clone());
+			}
+			return result;
+        };
+
         /** @function Get the list of all supported symbol which are valid to generata transition from the current state.
         * @returns Array of object of the form: {symbol, items} where items have an array of item rules  */
         state.prototype.getSupportedTransitionSymbols = function () {

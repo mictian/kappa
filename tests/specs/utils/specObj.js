@@ -349,5 +349,27 @@ define(['../../../src/utils/obj'], function(k)
 				expect(k.utils.obj.isRegExp(true)).toBe(false);
 			});
 		});
+
+		describe('isNumber', function()
+		{
+			it('should return true if the passed in parameter is a Number', function()
+			{
+				expect(k.utils.obj.isNumber(12)).toBe(true);
+				expect(k.utils.obj.isNumber(-123)).toBe(true);
+				expect(k.utils.obj.isNumber(0.12)).toBe(true);
+				expect(k.utils.obj.isNumber(-0.12)).toBe(true);
+			});
+
+			it('should return false if the passed in parameter is not a reg exp', function()
+			{
+				expect(k.utils.obj.isNumber()).toBe(false);
+				expect(k.utils.obj.isNumber(null)).toBe(false);
+				expect(k.utils.obj.isNumber(undefined)).toBe(false);
+				expect(k.utils.obj.isNumber({})).toBe(false);
+				expect(k.utils.obj.isNumber(/a/)).toBe(false);
+				expect(k.utils.obj.isNumber(false)).toBe(false);
+				expect(k.utils.obj.isNumber(true)).toBe(false);
+			});
+		});
 	});
 });

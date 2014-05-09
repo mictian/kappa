@@ -132,6 +132,7 @@ define(['../utils/obj'],  function(k)
         var rule = function (options)
         {
             this.index = -1;
+            this.options = options;
 
             if (!options.head)
             {
@@ -150,7 +151,7 @@ define(['../utils/obj'],  function(k)
             this.tail = (options.tail && k.utils.obj.isArray(options.tail)) ? options.tail : [new Symbol({name: specialSymbol.EMPTY, isSpecial: true})];
         };
 
-        /** @function Convert a Rule to its pritty string representation
+        /* @function Convert a Rule to its pritty string representation
         * @returns Formatted string */
         rule.prototype.toString = function()
         {
@@ -159,6 +160,19 @@ define(['../utils/obj'],  function(k)
                 strResult += this.tail[i].toString();
             }
             return strResult;
+        };
+
+        /* @function Clone the current item, generating a deep copy of it
+        * @returns CLone of the current item */
+        rule.prototype.clone = function()
+        {
+			var cloneOptions = k.utils.obj.clone(this.options),
+				result = new Rule(cloneOptions);
+
+			result.head = this.head.clone();
+
+
+			return result;
         };
 
         return rule;

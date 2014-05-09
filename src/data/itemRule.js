@@ -30,6 +30,7 @@ define(['../utils/obj'], function(k)
         * @returns formatted string */
         itemRule.prototype.toString = function()
         {
+        	debugger;
             var aux = this.rule.head.name +'-->';
             for (var i = 0; i < this.rule.tail.length; i++) {
                 if (this.dotLocation === i) {
@@ -50,19 +51,31 @@ define(['../utils/obj'], function(k)
         itemRule.prototype.clone = function(cloneOptions, creationOptions)
         {
             var cloneOpt = k.utils.obj.extendInNew(defaultCloneOptions, cloneOptions || {});
-            var result = new ItemRule(k.utils.obj.extendInNew(this.options,creationOptions || {}));
+
+            var result = new ItemRule(k.utils.obj.extendInNew(this.options, creationOptions || {}));
             result._incrementDotLocation(cloneOpt.dotLocationIncrement);
 
             return result;
         };
+
+        itemRule.prototype._cloneCurrentOptions = function(extendedOptions)
+        {
+			var result = k.utils.obj.extendInNew(this.options, extendedOptions || {});
+
+			result.rule = this.rule.clone();
+
+			return result;
+        }
 
         /** @function Increase the dot location by the number specified by parameter
         * @param {Integer} increment Increment that will be applied into the dot location of the new item. Default: 1
         * @returns void */
         itemRule.prototype._incrementDotLocation= function(increment)
         {
-            this.options.dotLocation = (this.options.dotLocation || 0) + (increment || 1);
-            this.dotLocation = this.options.dotLocation;
+			var optionsValue = k.utils.obj.isNumber(this.options.dotLocation) ? this.options.dotLocation : 0,
+				incrementValue = k.utils.obj.isNumber(increment) ? increment : 1;
+
+            this.dotLocation = optionsValue + incrementValue;
         };
 
         /** @function Returns the right next symbol to the dot location

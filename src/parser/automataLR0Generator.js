@@ -11,14 +11,19 @@ define(['../utils/obj', '../data/grammar', '../data/itemRule', '../data/automata
         * Initialize a new Automaton Generator
         *
         * @constructor
-        * @param {nonTerminal} options.grammar Grammar used to generate the automata
+        * @param {Grammar} options.grammar Grammar used to generate the automata
         */
         var automataGenerator = function (options) {
             this.options = options;
             this.grammar = options.grammar;
+
+            if (!(this.grammar instanceof k.data.Grammar))
+            {
+				throw new Error('In order to create a new Automata LR(0) Generator please provide a grammar!');
+            }
         };
 
-        /** @function Expands a state adding in it the full list of require items (item rules)
+        /* @function Expands a state adding in it the full list of require items (item rules)
         * @param {State} currentState State that will be expanded
         * @returns The full state with all its require items */
         automataGenerator.prototype.expandItem = function(currentState)
@@ -40,7 +45,7 @@ define(['../utils/obj', '../data/grammar', '../data/itemRule', '../data/automata
             return currentState;
         };
 
-        /** @function Generate the LR(0) automata
+        /* @function Generate the LR(0) automata
         * @returns The corresponding automata for the specified grammar */
         automataGenerator.prototype.generateAutomata = function()
         {

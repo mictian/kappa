@@ -1,9 +1,9 @@
 /* global expect: true, describe: true, it:  true, beforeEach: true */
-define(['../../../src/data/state'], function(k)
+define(['../../../src/data/state', '../../../src/data/itemRule'], function(k)
 {
     'use strict';
 
-    describe('state', function()
+    describe('State', function()
     {
 		it('shoud override toString', function()
 		{
@@ -330,5 +330,33 @@ define(['../../../src/data/state'], function(k)
 				expect(s.transitions[0].state).toBe('state');
 			});
 		});
+
+		describe('getItems', function()
+		{
+			it('should return empty array if there is no items in the state', function()
+			{
+				var s = new k.data.State({});
+
+				expect(s.getItems()).toEqual([]);
+			});
+
+			it('should return a copy of the state\'s items', function()
+			{
+				var item = new k.data.ItemRule({rule:{}}),
+					s = new k.data.State({
+						items: [item]
+					});
+
+				var items1 = s.getItems();
+				items1.push({});
+
+				var items2 = s.getItems();
+				expect(items2.length).toBe(1);
+				expect(items2[0]).not.toBe(item);
+				expect(items2[0]).toEqual(item);
+				expect(items2[0]).toBeInstanceOf(k.data.ItemRule);
+			});
+		});
+
     });
 });

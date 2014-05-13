@@ -44,25 +44,29 @@ define(['../utils/obj'], function(k)
             return aux;
         };
 
-        /** @function Clone the current item, altering its state by the params specified in cloneOptions
-        * @param {Integer} cloneOptions.dotLocationIncrement Increment that will be applied into the dot location of the new item. Default: 0
-        * @param {Object} creationOptions Optional object use to expand curren option to create the returned clone
+        /* @function Clone the current item, altering its state by the params specified in cloneUpdateOptions
+        * @param {Integer} cloneUpdateOptions.dotLocationIncrement Increment that will be applied into the dot location of the new item. Default: 0
+        * @param {Object} creationOptions Optional object use to expand current option used to create the returned clone
         * @returns A clean new item */
-        itemRule.prototype.clone = function(cloneOptions, creationOptions)
+        itemRule.prototype.clone = function(cloneUpdateOptions, creationOptions)
         {
-            var cloneOpt = k.utils.obj.extendInNew(defaultCloneOptions, cloneOptions || {});
+            var updateOptions = k.utils.obj.extendInNew(defaultCloneOptions, cloneUpdateOptions || {}),
+				cloneOptions = this._cloneCurrentOptions(creationOptions);
 
-            var result = new ItemRule(k.utils.obj.extendInNew(this.options, creationOptions || {}));
-            result._incrementDotLocation(cloneOpt.dotLocationIncrement);
+            var result = new ItemRule(cloneOptions);
+            result._incrementDotLocation(updateOptions.dotLocationIncrement);
 
             return result;
         };
 
+		/* @function Clone the current item's options
+        * @param {Object} extendedOptions Optional object use to expand current options and create the returned clone
+        * @returns A copy of the current options */
         itemRule.prototype._cloneCurrentOptions = function(extendedOptions)
         {
 			var result = k.utils.obj.extendInNew(this.options, extendedOptions || {});
 
-			result.rule = this.rule.clone();
+			this.rule && (result.rule = this.rule.clone());
 
 			return result;
         }

@@ -209,6 +209,12 @@ define(['../core'], function(k)
 			return obj;
 		};
 
+		/* @func Iterate over the passed in first parameter and mapping each of its valur according the iteration logic
+        * @param {Object} obj object to traverse
+        * @param {Function} iterator function called per each item founded in obj
+        * @param {Object} context object from which extract keys
+        * @returns {Array} List of string keys of property names of the object passed in
+        */
 		var __map =  function(obj, iterator, context)
 		{
 			var results = [];
@@ -230,7 +236,11 @@ define(['../core'], function(k)
             isArray: __isArray,
             isString: __isString,
             isRegExp: __isRegExp,
-            isNumber: __isNumber
+            isNumber: __isNumber,
+            isObject: __isObject,
+            keys: __keys,
+            each: __each,
+            map: __map
         };
 
     })();

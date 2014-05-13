@@ -26,6 +26,7 @@ define(['../utils/obj'],  function(k)
         */
         var symbol = function (options)
         {
+			this.options = options;
             this.name = options.name;
             this.isSpecial = !!options.isSpecial;
             if (!this.name || !k.utils.obj.isString(this.name)) {
@@ -37,6 +38,12 @@ define(['../utils/obj'],  function(k)
         * @returns this.name */
         symbol.prototype.toString = function() {
             return this.name.toString();
+        };
+
+        /* @function Creates a deep copy of the current instance
+        * @returns Deep copy */
+        symbol.prototype.clone = function() {
+			return new NonTerminal(k.utils.obj.clone(this.options));
         };
 
         return symbol;
@@ -79,6 +86,12 @@ define(['../utils/obj'],  function(k)
             return result;
         };
 
+        /* @function Creates a deep copy of the current instance
+        * @returns Deep copy */
+        nonTerminal.prototype.clone = function() {
+			return new NonTerminal(k.utils.obj.clone(this.options));
+        };
+
         return nonTerminal;
     })(Symbol);
 
@@ -107,10 +120,19 @@ define(['../utils/obj'],  function(k)
             this.isTerminal = true;
         }
 
-        /** @function Shows the terminal's name between < and >
-        * @returns Fromatted stirng */
+        /* @function Shows the terminal's name between < and >
+        * @returns Fromatted string */
         terminal.prototype.toString = function() {
             return '<' + this.name + '>';
+        };
+
+		/* @function Creates a deep copy of the current instance
+        * @returns Deep copy */
+        terminal.prototype.clone = function() {
+			var cloneOptions = k.utils.obj.clone(this.options);
+			cloneOptions.body = k.utils.obj.isRegExp(this.body) ? new RegExp(this.body.source) : this.body;
+
+			return new Terminal(cloneOptions);
         };
 
         return terminal;
@@ -141,14 +163,14 @@ define(['../utils/obj'],  function(k)
 
             if (!(options.head instanceof NonTerminal))
             {
-                this.head = new NonTerminal({
+                this.head = options.head = new NonTerminal({
                    name: options.head.toString()
                 });
             } else {
                 this.head = options.head;
             }
 
-            this.tail = (options.tail && k.utils.obj.isArray(options.tail)) ? options.tail : [new Symbol({name: specialSymbol.EMPTY, isSpecial: true})];
+			this.tail = options.tail = (options.tail && k.utils.obj.isArray(options.tail)) ? options.tail : [new Symbol({name: specialSymbol.EMPTY, isSpecial: true})];
         };
 
         /* @function Convert a Rule to its pritty string representation
@@ -162,15 +184,19 @@ define(['../utils/obj'],  function(k)
             return strResult;
         };
 
-        /* @function Clone the current item, generating a deep copy of it
-        * @returns CLone of the current item */
+        /* @function Clone the current item, generating a deep copy of it.
+        * IMPORTANT: the internal property index IS NO COPIED!
+        * @returns A deep copy of the current item */
         rule.prototype.clone = function()
         {
-			var cloneOptions = k.utils.obj.clone(this.options),
-				result = new Rule(cloneOptions);
+			var cloneOptions = k.utils.obj.clone(this.options);
 
-			result.head = this.head.clone();
+			cloneOptions.head = this.head.clone();
+			cloneOptions.tail = k.utils.obj.map(this.tail, function(symbol) {
+				return symbol.clone();
+			});
 
+			var result = new Rule(cloneOptions);
 
 			return result;
         };
@@ -186,6 +212,7 @@ define(['../utils/obj'],  function(k)
         var defaultOptions = {
             name: ''
         };
+
         /*
         * Initialize a new Grammar
         *

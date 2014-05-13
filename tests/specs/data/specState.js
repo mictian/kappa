@@ -1,5 +1,5 @@
 /* global expect: true, describe: true, it:  true, beforeEach: true */
-define(['../../../src/data/state', '../../../src/data/itemRule'], function(k)
+define(['../aux/sampleGrammars', '../../../src/data/state', '../../../src/data/itemRule'], function(sampleGrammars, k)
 {
     'use strict';
 
@@ -342,7 +342,7 @@ define(['../../../src/data/state', '../../../src/data/itemRule'], function(k)
 
 			it('should return a copy of the state\'s items', function()
 			{
-				var item = new k.data.ItemRule({rule:{}}),
+				var item = new k.data.ItemRule({rule: sampleGrammars.numDivs.F}),
 					s = new k.data.State({
 						items: [item]
 					});
@@ -353,6 +353,8 @@ define(['../../../src/data/state', '../../../src/data/itemRule'], function(k)
 				var items2 = s.getItems();
 				expect(items2.length).toBe(1);
 				expect(items2[0]).not.toBe(item);
+
+				items2[0].rule.index = item.rule.index; //The index is NOT copied
 				expect(items2[0]).toEqual(item);
 				expect(items2[0]).toBeInstanceOf(k.data.ItemRule);
 			});

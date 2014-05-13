@@ -38,7 +38,14 @@ define(['../../../src/data/grammar'], function(k)
 			name: 'FRULE'
 		});
 
-		return new k.data.Grammar(S.head, [S, E1, E2, Q, F]);
+		return {
+			g: new k.data.Grammar(S.head, [S, E1, E2, Q, F]),
+			S: S,
+			E1: E1,
+			E2: E2,
+			Q: Q,
+			F: F
+		};
 	})();
 
 	/*
@@ -81,7 +88,15 @@ define(['../../../src/data/grammar'], function(k)
 			name: 'CPARENRULE'
 		});
 
-		return new k.data.Grammar(S.head, [S, EXPS1, EXPS2, EXP, OPAREN, CPAREN]);
+		return {
+			g: new k.data.Grammar(S.head, [S, EXPS1, EXPS2, EXP, OPAREN, CPAREN]),
+			S: S,
+			EXPS1: EXPS1,
+			EXPS2: EXPS2,
+			EXP: EXP,
+			OPAREN: OPAREN,
+			CPAREN: CPAREN
+		};
 	})();
 
 	return {

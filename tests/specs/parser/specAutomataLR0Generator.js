@@ -20,7 +20,7 @@ define(['../../../src/parser/automataLR0Generator', '../aux/sampleGrammars'], fu
 			it('should save the passed in options', function()
 			{
 				var options = {
-						grammar: sampleGrammars.idsList
+						grammar: sampleGrammars.idsList.g
 					},
 					ag = new k.parser.AutomataLR0Generator(options);
 
@@ -41,10 +41,10 @@ define(['../../../src/parser/automataLR0Generator', '../aux/sampleGrammars'], fu
 				}
 			}
 
-			it('shoud return the full state for the grammar idslist rule S', function()
+			it('shoud return the full state for the grammar id list rule S', function()
 			{
 				var ag = new k.parser.AutomataLR0Generator({
-						grammar: sampleGrammars.idsList
+						grammar: sampleGrammars.idsList.g
 					}),
 					initialState = new k.data.State({
 						items: k.data.ItemRule.newFromRules(ag.grammar.getRulesFromNonTerminal(ag.grammar.startSymbol))
@@ -56,7 +56,7 @@ define(['../../../src/parser/automataLR0Generator', '../aux/sampleGrammars'], fu
 				expect(itemsState.length).toBe(2);
 
 debugger;
-				var ruleS = getItemByRuleName(itemsState, 'SRULE'); //This name is defined in the rule inside the sampleGrammar file
+				var ruleS = getItemByRuleName(itemsState, 'SRULE'); //This name is defined in the rule definition inside the sampleGrammar file
 				expect(ruleS).toBeDefined();
 
 				// var ruleS = getItemByRuleName(itemsState, 'SRULE'); //This name is defined in the rule inside the sampleGrammar file

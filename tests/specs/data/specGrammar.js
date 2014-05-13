@@ -343,18 +343,26 @@ define(['../../../src/data/grammar'], function(k)
 				tail: [new k.data.Terminal({name:'CPAREN', body: /\)/})]
 			});
 
-			g = new k.data.Grammar(S.head, [S, EXPS1, EXPS2, EXP, OPAREN, CPAREN]);
+			g = new k.data.Grammar({
+				startSymbol: S.head,
+				rules: [S, EXPS1, EXPS2, EXP, OPAREN, CPAREN]
+			});
 		});
 
         it('should have an empty name if it\'s not specified', function (){
-            var gr = new k.data.Grammar(null, [],{});
+            var gr = new k.data.Grammar({
+				startSymbol: null,
+				rules: []
+            });
 
             expect(gr.options.name).toBe('');
         });
 
         it('should have an specified name', function (){
-            var gr = new k.data.Grammar(null, [],{
-                name: 'TEST'
+            var gr = new k.data.Grammar({
+				startSymbol: null,
+				rules: [],
+				name: 'TEST'
             });
 
             expect(gr.options.name).toBe('TEST');

@@ -55,19 +55,53 @@ define(['../../../src/parser/automataLR0Generator', '../aux/sampleGrammars'], fu
 
 				expect(itemsState.length).toBe(2);
 
-debugger;
-				var ruleS = getItemByRuleName(itemsState, 'SRULE'); //This name is defined in the rule definition inside the sampleGrammar file
-				expect(ruleS).toBeDefined();
+				var itemS = getItemByRuleName(itemsState, 'SRULE'); //This name is defined in the rule definition inside the sampleGrammar file
+				expect(itemS).toBeDefined();
+				expect(itemS.rule).toEqual(sampleGrammars.idsList.S.clone());
 
-				// var ruleS = getItemByRuleName(itemsState, 'SRULE'); //This name is defined in the rule inside the sampleGrammar file
-				// expect(ruleS).toBeDefined();
+				var itemOparen = getItemByRuleName(itemsState, 'OPARENRULE'); //This name is defined in the rule inside the sampleGrammar file
+				expect(itemOparen).toBeDefined();
+				expect(itemOparen.rule).toEqual(sampleGrammars.idsList.OPAREN.clone());
+			});
 
+			it('shoud return the full state for the grammar id list rule S with dot Location equal 1', function()
+			{
+				var ag = new k.parser.AutomataLR0Generator({
+						grammar: sampleGrammars.idsList.g
+					}),
+					items = k.data.ItemRule.newFromRules(ag.grammar.getRulesFromNonTerminal(ag.grammar.startSymbol));
+
+				items[0].dotLocation++;
+				var initialState = new k.data.State({
+						items: items
+					});
+
+				var state = ag.expandItem(initialState),
+					itemsState = state.getItems();
+
+				expect(itemsState.length).toBe(3);
+
+
+				var itemS = getItemByRuleName(itemsState, 'SRULE'); //This name is defined in the rule definition inside the sampleGrammar file
+				expect(itemS).toBeDefined();
+				expect(itemS.dotLocation).toBe(1);
+				expect(itemS.rule).toEqual(sampleGrammars.idsList.S.clone());
+
+				var itemExps1 = getItemByRuleName(itemsState, 'EXPS1RULE'); //This name is defined in the rule inside the sampleGrammar file
+				expect(itemExps1).toBeDefined();
+				expect(itemExps1.dotLocation).toBe(0);
+				expect(itemExps1.rule).toEqual(sampleGrammars.idsList.EXPS1.clone());
+
+				var itemExps2 = getItemByRuleName(itemsState, 'EXPS2RULE');
+				expect(itemExps2).toBeDefined();
+				expect(itemExps2.dotLocation).toBe(0);
+				expect(itemExps2.rule).toEqual(sampleGrammars.idsList.EXPS2.clone());
 			});
 		});
 
-		xdescribe('generateAutomata', function()
-		{
+		// xdescribe('generateAutomata', function()
+		// {
 
-		});
+		// });
 	});
 });

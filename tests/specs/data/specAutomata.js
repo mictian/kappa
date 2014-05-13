@@ -51,7 +51,7 @@ define(['../../../src/data/automata'], function(k)
 					a = new k.data.Automata(options);
 
 				expect(a.options).toBe(options);
-			})
+			});
 		});
 
 		describe('getNextState', function()

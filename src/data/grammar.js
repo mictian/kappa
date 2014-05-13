@@ -27,9 +27,14 @@ define(['../utils/obj'],  function(k)
         var symbol = function (options)
         {
 			this.options = options;
-            this.name = options.name;
+
+			k.utils.obj.defineProperty(this, 'name');
+			k.utils.obj.defineProperty(this, 'isSpecial');
+
             this.isSpecial = !!options.isSpecial;
-            if (!this.name || !k.utils.obj.isString(this.name)) {
+
+            if (!this.name || !k.utils.obj.isString(this.name))
+            {
                 throw new Error('Invalid initialization values for a symbol, please provide a string name a symbol');
             }
         };
@@ -43,7 +48,7 @@ define(['../utils/obj'],  function(k)
         /* @function Creates a deep copy of the current instance
         * @returns Deep copy */
         symbol.prototype.clone = function() {
-			return new NonTerminal(k.utils.obj.clone(this.options));
+			return new Symbol(k.utils.obj.clone(this.options));
         };
 
         return symbol;
@@ -115,8 +120,12 @@ define(['../utils/obj'],  function(k)
                 throw new Error('Invalid Terminal Initialization. A string or regexp body must be specified');
             }
 			options.name = options.name ? options.name : options.body.toString();
+
             _super.apply(this, arguments);
-            this.body = options.body;
+
+            k.utils.obj.defineProperty(this, 'body');
+            k.utils.obj.defineProperty(this, 'isTerminal');
+
             this.isTerminal = true;
         }
 
@@ -161,27 +170,24 @@ define(['../utils/obj'],  function(k)
                 throw new Error('Invalid initialization values, please provide a head for the rule');
             }
 
-            if (!(options.head instanceof NonTerminal))
-            {
-                this.head = options.head = new NonTerminal({
-                   name: options.head.toString()
-                });
-            } else {
-                this.head = options.head;
-            }
+			//Define alias for:
+            k.utils.obj.defineProperty(this, 'head');
+            k.utils.obj.defineProperty(this, 'tail');
 
-			this.tail = options.tail = (options.tail && k.utils.obj.isArray(options.tail)) ? options.tail : [new Symbol({name: specialSymbol.EMPTY, isSpecial: true})];
+            this.head = !(options.head instanceof NonTerminal) ?
+				new NonTerminal({
+					name: options.head.toString()
+				}) :
+				options.head;
+
+			this.tail = (options.tail && k.utils.obj.isArray(options.tail)) ? options.tail : [new Symbol({name: specialSymbol.EMPTY, isSpecial: true})];
         };
 
         /* @function Convert a Rule to its pritty string representation
         * @returns Formatted string */
         rule.prototype.toString = function()
         {
-            var strResult = this.head.toString() + '-->';
-            for (var i = 0; i < this.tail.length; i++) {
-                strResult += this.tail[i].toString();
-            }
-            return strResult;
+            return this.head.toString() + '-->' + this.tail.join(' ');
         };
 
         /* @function Clone the current item, generating a deep copy of it.
@@ -196,9 +202,7 @@ define(['../utils/obj'],  function(k)
 				return symbol.clone();
 			});
 
-			var result = new Rule(cloneOptions);
-
-			return result;
+			return new Rule(cloneOptions);
         };
 
         return rule;
@@ -217,21 +221,24 @@ define(['../utils/obj'],  function(k)
         * Initialize a new Grammar
         *
         * @constructor
-        * @param {NonTerminal} startSymbol Start symbol of the grammar
-        * @param {[Rule]} rules Array of grammatical rules
+        * @param {NonTerminal} options.startSymbol Start symbol of the grammar
+        * @param {[Rule]} options.rules Array of grammatical rules
         */
-        var grammar = function (startSymbol, rules, options)
+        var grammar = function (options)
         {
-            this.options = k.utils.obj.extend(defaultOptions, options || {});
-            this.startSymbol = startSymbol;
-            this.rules = rules;
+            this.options = k.utils.obj.extendInNew(defaultOptions, options || {});
+
+			//Define alias for:
+            k.utils.obj.defineProperty(this, 'startSymbol');
+            k.utils.obj.defineProperty(this, 'rules');
+
             this.rulesByHeader = this._getIndexByNonTerminals(this.rules);
             this.terminals = this._getTerminals(this.rules);
         };
 
-         /** @function Index all grammatical rules by its header non terminal
-         * @param {[rule]} rules Array grammatical rules of the current grammar
-         * @returns An object that has an array of rules per each non terminal name property  */
+        /* @function Index all grammatical rules by its header non terminal
+        * @param {[rule]} rules Array grammatical rules of the current grammar
+        * @returns An object that has an array of rules per each non terminal name property  */
         grammar.prototype._getIndexByNonTerminals = function(rules)
         {
             var result = {};
@@ -244,7 +251,7 @@ define(['../utils/obj'],  function(k)
             return result;
         };
 
-         /** @function Compute an Array of all grammar's terminals'
+         /* @function Compute an Array of all grammar's terminals'
          * @param {[rule]} rules Array grammatical rules of the current grammar
          * @returns An ordered array of object containg the terminals and the rules that define them */
         grammar.prototype._getTerminals = function(rules)

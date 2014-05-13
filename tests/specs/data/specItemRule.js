@@ -188,9 +188,9 @@ define(['../../../src/data/itemRule'], function(k)
 
 				expect(result.length).toBe(2);
 				expect(result[0].options).toEqual({rule:{}, dotLocation:0});
-				expect(result[0].dotLocation).toBe(0)
+				expect(result[0].dotLocation).toBe(0);
 				expect(result[1].options).toEqual({rule:{test:true}, dotLocation:0});
-				expect(result[1].dotLocation).toBe(0)
+				expect(result[1].dotLocation).toBe(0);
 			});
 		});
     });

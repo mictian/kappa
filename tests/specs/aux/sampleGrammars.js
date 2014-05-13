@@ -39,7 +39,10 @@ define(['../../../src/data/grammar'], function(k)
 		});
 
 		return {
-			g: new k.data.Grammar(S.head, [S, E1, E2, Q, F]),
+			g: new k.data.Grammar({
+				startSymbol: S.head,
+				rules: [S, E1, E2, Q, F]
+			}),
 			S: S,
 			E1: E1,
 			E2: E2,
@@ -72,7 +75,7 @@ define(['../../../src/data/grammar'], function(k)
 
 		EXP = new k.data.Rule({
 			head: 'EXP',
-			tail: [new k.data.Terminal({name:'id', body: /[a-zA-Z]+/})],
+			tail: [new k.data.Terminal({name:'ID', body: /[a-zA-Z]+/})],
 			name: 'EXPRULE'
 		}),
 
@@ -89,7 +92,10 @@ define(['../../../src/data/grammar'], function(k)
 		});
 
 		return {
-			g: new k.data.Grammar(S.head, [S, EXPS1, EXPS2, EXP, OPAREN, CPAREN]),
+			g: new k.data.Grammar({
+				startSymbol: S.head,
+				rules: [S, EXPS1, EXPS2, EXP, OPAREN, CPAREN]
+			}),
 			S: S,
 			EXPS1: EXPS1,
 			EXPS2: EXPS2,

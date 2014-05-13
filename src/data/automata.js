@@ -16,6 +16,9 @@ define(['../utils/obj', './state'], function(k)
         var automata = function (options)
         {
 			this.options = options;
+
+			k.utils.obj.defineProperty(this, 'states');
+
             this.states = options.states || [];
             this._index = 0; //Index used to traversal the states of the current instance
             this._registerStates = {};

@@ -17,15 +17,17 @@ define(['../utils/str', '../utils/obj', '../data/grammar'], function(k)
         * Initialize a new Lexer
         *
         * @constructor
-        * @param {k.grammar} grammar Grammar used to control the scan process
-        * @param {String} stream Input Stream (Generally a String)
+        * @param {Grammar} options.grammar Grammar used to control the scan process
+        * @param {String} options.stream Input Stream (Generally a String)
         * @param {Boolean} options.notIgnoreSpaces If true spaces are not ignored. False by default
         */
-        var lexer = function (grammar, stream, options)
+        var lexer = function (options)
         {
             this.options = k.utils.obj.extendInNew(defaultOptions, options || {});
-            this.grammar = grammar;
-			this.inputStream = !this.options.notIgnoreSpaces ? k.utils.str.ltrim(stream) : stream;
+
+            k.utils.obj.defineProperty(this, 'grammar');
+
+			this.inputStream = !this.options.notIgnoreSpaces ? k.utils.str.ltrim(options.stream) : options.stream;
         };
 
 		/** @function Get next input token
@@ -35,7 +37,7 @@ define(['../utils/str', '../utils/obj', '../data/grammar'], function(k)
             var result = {
 					length: -1
 				},
-				terminals =this.grammar.terminals,
+				terminals = this.grammar.terminals,
 				body;
 
             if  (!this.inputStream)

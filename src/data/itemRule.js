@@ -22,21 +22,22 @@ define(['../utils/obj'], function(k)
         var itemRule = function(options)
         {
             this.options = options;
-            this.rule = options.rule;
-            this.dotLocation = options.dotLocation || 0;
+
+			//Define alias for the next properties
+			k.utils.obj.defineProperty(this, 'rule');
+			k.utils.obj.defineProperty(this, 'dotLocation');
+
+			this.dotLocation = options.dotLocation || 0;
         };
 
         /** @function Convert the current item rule to its string representation
         * @returns formatted string */
         itemRule.prototype.toString = function()
         {
-        	debugger;
             var aux = this.rule.head.name +'-->';
-            for (var i = 0; i < this.rule.tail.length; i++) {
-                if (this.dotLocation === i) {
-                    aux += '*';
-                }
-                aux += this.rule.tail[i].toString();
+            for (var i = 0; i < this.rule.tail.length; i++)
+            {
+				aux += (this.dotLocation === i ? '*': ' ') + this.rule.tail[i].toString();
             }
             if (this.dotLocation === i) {
                     aux += '*';
@@ -66,10 +67,11 @@ define(['../utils/obj'], function(k)
         {
 			var result = k.utils.obj.extendInNew(this.options, extendedOptions || {});
 
+			/* jshint expr:true */
 			this.rule && (result.rule = this.rule.clone());
 
 			return result;
-        }
+        };
 
         /** @function Increase the dot location by the number specified by parameter
         * @param {Integer} increment Increment that will be applied into the dot location of the new item. Default: 1

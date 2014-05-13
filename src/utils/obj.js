@@ -14,6 +14,7 @@ define(['../core'], function(k)
         *
         * @param {Object} superType Object to inherit from
         * @param {Object} subType Enhanced Object
+        * @returns void
         */
         var __inherit = function (subType, superType)
         {
@@ -29,6 +30,30 @@ define(['../core'], function(k)
             __.prototype = superType.prototype;
             /* jshint newcap:false */
             subType.prototype = new __();
+        };
+
+		/*
+        * @func Util function used to define properties in objects, Common to define alias, insteas od using instance.options.property, used instance.property
+        *	It is VERY IMPORTANT to notice that all propoerties are setted and get from a property called options in the context object
+        *
+        * @param {Object} ctx Object containing the options. Father object
+        * @param {String} propName Name of the property to add/alias
+        * @param {Function} getter Optional function used ot override the default getter
+        * @param {Function} setter Optional function used ot override the default setter
+        * @returns void
+        */
+        var __defineProperty = function(ctx, propName, getter, setter)
+        {
+			Object.defineProperty(ctx, propName, {
+				// Create a new getter for the property
+				get: getter || function () {
+					return ctx.options[propName];
+				},
+				// Create a new setter for the property
+				set: setter || function (val) {
+					ctx.options[propName] = val;
+				}
+			});
         };
 
 		/*
@@ -240,7 +265,8 @@ define(['../core'], function(k)
             isObject: __isObject,
             keys: __keys,
             each: __each,
-            map: __map
+            map: __map,
+            defineProperty: __defineProperty
         };
 
     })();

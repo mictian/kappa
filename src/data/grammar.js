@@ -157,8 +157,7 @@ define(['../utils/obj'],  function(k)
         *
         * @constructor
         * @param {nonTerminal} options.head The name or denatation of the non terminal
-        * @param {[terminal|nonTerminal]} [options.tail] Array of terminals and nonTerminals that represent the tail of the rule.
-        * If is not present an empty tail will be created.
+        * @param {[terminal|nonTerminal]} [options.tail] Array of terminals and nonTerminals that represent the tail of the rule. If is not present an empty tail will be created.
         */
         var rule = function (options)
         {
@@ -191,9 +190,9 @@ define(['../utils/obj'],  function(k)
         };
 
         /* @function Clone the current item, generating a deep copy of it.
-        * IMPORTANT: the internal property index IS NO COPIED!
+        * @param {Boolean} options.copyRuleIndex Indicate if the index should be copied or not. Default: false
         * @returns A deep copy of the current item */
-        rule.prototype.clone = function()
+        rule.prototype.clone = function(options)
         {
 			var cloneOptions = k.utils.obj.clone(this.options);
 
@@ -202,7 +201,14 @@ define(['../utils/obj'],  function(k)
 				return symbol.clone();
 			});
 
-			return new Rule(cloneOptions);
+			var result = new Rule(cloneOptions);
+
+			if (options && options.copyRuleIndex)
+			{
+				result.index = this.index;
+			}
+
+			return result;
         };
 
         return rule;

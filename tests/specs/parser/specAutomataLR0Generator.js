@@ -97,11 +97,120 @@ define(['../../../src/parser/automataLR0Generator', '../aux/sampleGrammars'], fu
 				expect(itemExps2.dotLocation).toBe(0);
 				expect(itemExps2.rule).toEqual(sampleGrammars.idsList.EXPS2.clone());
 			});
+
+			it('shoud return the full state for the grammar id list rule S with dot Location equal 2', function()
+			{
+				var ag = new k.parser.AutomataLR0Generator({
+						grammar: sampleGrammars.idsList.g
+					}),
+					items = k.data.ItemRule.newFromRules(ag.grammar.getRulesFromNonTerminal(ag.grammar.startSymbol));
+
+				items[0].dotLocation++;
+				items[0].dotLocation++;
+				var initialState = new k.data.State({
+						items: items
+					});
+
+				var state = ag.expandItem(initialState),
+					itemsState = state.getItems();
+
+				expect(itemsState.length).toBe(2);
+
+
+				var itemS = getItemByRuleName(itemsState, 'SRULE'); //This name is defined in the rule definition inside the sampleGrammar file
+				expect(itemS).toBeDefined();
+				expect(itemS.dotLocation).toBe(2);
+				expect(itemS.rule).toEqual(sampleGrammars.idsList.S.clone());
+
+				var itemCparent = getItemByRuleName(itemsState, 'CPARENRULE'); //This name is defined in the rule inside the sampleGrammar file
+				expect(itemCparent).toBeDefined();
+				expect(itemCparent.dotLocation).toBe(0);
+				expect(itemCparent.rule).toEqual(sampleGrammars.idsList.CPAREN.clone());
+			});
+
+			it('shoud return the full state for the grammar id list rule S with dot Location equal 2', function()
+			{
+				var ag = new k.parser.AutomataLR0Generator({
+						grammar: sampleGrammars.idsList.g
+					}),
+					items = k.data.ItemRule.newFromRules(ag.grammar.getRulesFromNonTerminal(sampleGrammars.idsList.EXPS1.head));
+
+				var initialState = new k.data.State({
+						items: items
+					});
+
+				var state = ag.expandItem(initialState),
+					itemsState = state.getItems();
+
+				expect(itemsState.length).toBe(2);
+
+
+				var itemExp1 = getItemByRuleName(itemsState, 'EXPS1RULE'); //This name is defined in the rule definition inside the sampleGrammar file
+				expect(itemExp1).toBeDefined();
+				expect(itemExp1.dotLocation).toBe(0);
+				expect(itemExp1.rule).toEqual(sampleGrammars.idsList.EXPS1.clone());
+
+				var itemExp2 = getItemByRuleName(itemsState, 'EXPS2RULE'); //This name is defined in the rule inside the sampleGrammar file
+				expect(itemExp2).toBeDefined();
+				expect(itemExp2.dotLocation).toBe(0);
+				expect(itemExp2.rule).toEqual(sampleGrammars.idsList.EXPS2.clone());
+			});
 		});
 
-		// xdescribe('generateAutomata', function()
-		// {
+		describe('generateAutomata', function()
+		{
+			function findStateById(states, id) {
+				var result = null;
+				k.utils.obj.each(states, function(state) {
+					if (state.getIdentity() === id)
+					{
+						result = state;
+					}
+				});
+				return result;
+			}
 
-		// });
+			it('should return the correct automata form the simple grammar num divs', function ()
+			{
+				var ag = new k.parser.AutomataLR0Generator({
+						grammar: sampleGrammars.numDivs.g
+					}),
+					result = ag.generateAutomata(),
+					states = result.states;
+
+				expect(result).toBeInstanceOf(k.data.Automata);
+				expect(states.length).toBe(7);
+
+				var state = findStateById(states, '0-1-2-4');
+				expect(state).toBeDefined();
+				expect(state.getItems().length).toBe(4);
+
+				state = findStateById(states, '0-1-3');
+				expect(state).toBeDefined();
+				expect(state.getItems().length).toBe(3);
+
+				state = findStateById(states, '1-4');
+				expect(state).toBeDefined();
+				expect(state.getItems().length).toBe(2);
+
+				state = findStateById(states, '1');
+				expect(state).toBeDefined();
+				expect(state.getItems().length).toBe(1);
+
+				state = findStateById(states, '2');
+				expect(state).toBeDefined();
+				expect(state.getItems().length).toBe(1);
+
+				state = findStateById(states, '4');
+				expect(state).toBeDefined();
+				expect(state.getItems().length).toBe(1);
+
+				state = findStateById(states, '3');
+				expect(state).toBeDefined();
+				expect(state.getItems().length).toBe(1);
+			});
+
+			//TODO Get more grammar samples to increase te test strength
+		});
 	});
 });

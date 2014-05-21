@@ -15,6 +15,11 @@ define(['../utils/obj'], function(k)
         */
         var state = function(options)
         {
+        	this.options = options;
+
+        	k.utils.obj.defineProperty(this, 'transitions');
+        	k.utils.obj.defineProperty(this, '_items');
+
 			this.transitions = options.transitions || [];
             this._items = options.items || [];
             this._index = 0;
@@ -25,15 +30,15 @@ define(['../utils/obj'], function(k)
             }
         };
 
-        /** @function Get the next unprocessed item rule
+        /* @function Get the next unprocessed item rule
         * @returns Item Rule */
         state.prototype.getNextItem = function() {
 			return this._index < this._items.length ? this._items[this._index++] : null;
         };
 
-        /** @function Adds an array of item rule into the state. Only the rules that are not already present in the state will be added
+        /* @function Adds an array of item rule into the state. Only the rules that are not already present in the state will be added
         * @param {[ItemRule]} itemRules Array of item rules to add into the state
-        * @returns void */
+        * @returns {void} Nothing */
         state.prototype.addItems = function(itemRules)
         {
             for (var i = 0; i < itemRules.length; i++) {
@@ -45,8 +50,8 @@ define(['../utils/obj'], function(k)
             }
         };
 
-        /** @function Convert the current state to its string representation
-        * @returns formatted string */
+        /* @function Convert the current state to its string representation
+        * @returns {String} formatted string */
         state.prototype.toString = function()
         {
             var strResult = 'ID: ' + this.getIdentity()+'\n';
@@ -62,7 +67,7 @@ define(['../utils/obj'], function(k)
         };
 
         /** @function Generates an ID that identify this state from any other state
-        * @returns String ID  */
+        * @returns {String} Generated ID  */
         state.prototype._generateIdentity = function() {
             var indexes = [];
             for (var i = 0; i < this._items.length; i++) {
@@ -80,11 +85,11 @@ define(['../utils/obj'], function(k)
             return this._id;
         };
 
-        /** @function Returns a copy of the items contained in the current state
-        * @returns Array of items rules  */
+        /* @function Returns a copy the items contained in the current state )
+        * @returns {[ItemRule]} Array of cloned item rules  */
         state.prototype.getItems = function()
         {
-			return k.utils.obj.map(this._items, function(item) {
+			return k.utils.obj.map(this._items, function (item){
 				return item.clone();
 			});
         };
@@ -121,7 +126,7 @@ define(['../utils/obj'], function(k)
         /** @function Add a new transaction into the list of transactions of the current state
         * @param {Symbol} symbol Symbol use to make the transition, like the name of the transition
         * @param {State} state Destination state arrived when moving with the specified tranisiotn
-        * @returns void  */
+        * @returns {Void}  */
         state.prototype.addTransition = function(symbol, state) {
             this.transitions.push({
                 symbol: symbol,

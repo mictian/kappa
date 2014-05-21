@@ -47,12 +47,14 @@ define(['../utils/obj'], function(k)
 
         /* @function Clone the current item, altering its state by the params specified in cloneUpdateOptions
         * @param {Integer} cloneUpdateOptions.dotLocationIncrement Increment that will be applied into the dot location of the new item. Default: 0
+        * @param {Booelan} cloneUpdateOptions.copyRuleIndex IIndicate if the internal index's rule shouls be preserve or not. Default: false
+        * @param {Booelan} cloneUpdateOptions.dontCloneRule Indicate if the internal grammatical rule should be cloned or just use te same. Default: false
         * @param {Object} creationOptions Optional object use to expand current option used to create the returned clone
         * @returns A clean new item */
         itemRule.prototype.clone = function(cloneUpdateOptions, creationOptions)
         {
             var updateOptions = k.utils.obj.extendInNew(defaultCloneOptions, cloneUpdateOptions || {}),
-				cloneOptions = this._cloneCurrentOptions(creationOptions);
+				cloneOptions = this._cloneCurrentOptions(cloneUpdateOptions, creationOptions);
 
             var result = new ItemRule(cloneOptions);
             result._incrementDotLocation(updateOptions.dotLocationIncrement);
@@ -61,14 +63,21 @@ define(['../utils/obj'], function(k)
         };
 
 		/* @function Clone the current item's options
+		* @param {Object} cloneUpdateOptions Optional object use to control the way the options are being cloned
         * @param {Object} extendedOptions Optional object use to expand current options and create the returned clone
         * @returns A copy of the current options */
-        itemRule.prototype._cloneCurrentOptions = function(extendedOptions)
+        itemRule.prototype._cloneCurrentOptions = function(cloneUpdateOptions, extendedOptions)
         {
 			var result = k.utils.obj.extendInNew(this.options, extendedOptions || {});
 
-			/* jshint expr:true */
-			this.rule && (result.rule = this.rule.clone());
+			if ((!cloneUpdateOptions || !cloneUpdateOptions.dontCloneRule) && this.rule)
+			{
+				result.rule = this.rule.clone(cloneUpdateOptions);
+			}
+			else if (this.rule)
+			{
+				result.rule = this.rule;
+			}
 
 			return result;
         };

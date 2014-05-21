@@ -28,10 +28,17 @@ define(['../utils/obj', './state'], function(k)
             }
         };
 
-        /** @function Convert the current automata to its string representation
+        /* @function Convert the current automata to its string representation
         * @returns formatted string */
         automata.prototype.toString = function () {
-            //TODO DO THIS!!!!!
+
+			var result = '';
+            k.utils.obj.each(this.states, function (state)
+            {
+				result += state.toString() + '\n';
+            });
+
+            return result;
         };
 
         /** @function Get the next unprocessed state

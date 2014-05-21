@@ -46,7 +46,7 @@ define(['../utils/obj', '../data/grammar', '../data/itemRule', '../data/automata
         };
 
         /* @function Generate the LR(0) automata
-        * @returns The corresponding automata for the specified grammar */
+        * @returns {Automata} The corresponding automata for the specified grammar */
         automataGenerator.prototype.generateAutomata = function()
         {
             var initialState = new k.data.State({
@@ -61,7 +61,8 @@ define(['../utils/obj', '../data/grammar', '../data/itemRule', '../data/automata
         };
 
         /** @function Internal method which resive an inital automata with only it inital state and generate a full automata
-        * @returns A full automata */
+        * @param {Automata} automata Automatma to be expanded
+        * @returns {Automata} A full automata */
         automataGenerator.prototype._expandAutomata = function(automata) {
             var currentState = automata.getNextState();
 
@@ -69,28 +70,31 @@ define(['../utils/obj', '../data/grammar', '../data/itemRule', '../data/automata
 
                 //Get all valid symbol from which the state can have transitions
                 var supportedTransitions = currentState.getSupportedTransitionSymbols(),
-                    currentItemRules,
                     addedState, //To control duplicated states
                     newItemRules = [];
 
-                for (var t = 0; t < supportedTransitions.length; t++) {
-                    currentItemRules = supportedTransitions[t].items;
-                    for (var i = 0; i < currentItemRules.length; i++)
-                    {
-                        newItemRules.push(currentItemRules[i].clone({
-                            dotLocationIncrement: 1
+				//Warning remove to create function inside this loop
+				/*jshint -W083 */
+				k.utils.obj.each(supportedTransitions, function (suppertedTransition)
+				{
+					k.utils.obj.each(suppertedTransition.items, function (supportedItem)
+					{
+						newItemRules.push(supportedItem.clone({
+                            dotLocationIncrement: 1,
+                            dontCloneRule: true
                         }));
-                    }
+					});
+
                     var newState = new k.data.State({
                         items: newItemRules
                     });
 
                     this.expandItem(newState);
                     addedState = automata.addState(newState);
-                    currentState.addTransition(supportedTransitions[t].symbol, addedState);
+                    currentState.addTransition(suppertedTransition.symbol, addedState);
 
-                    newItemRules = [];
-                }
+					newItemRules = [];
+				}, this);
 
                 currentState = automata.getNextState();
             }

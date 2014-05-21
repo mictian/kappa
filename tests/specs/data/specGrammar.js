@@ -74,6 +74,25 @@ define(['../../../src/data/grammar'], function(k)
 
 			expect(s+'').toBe('result');
 		});
+
+		describe('clone', function()
+		{
+			it('should duplicate each object value in its options property', function()
+			{
+				var options = {
+						name: 'TEST',
+						anotherValue: 'YES',
+						isATest: true
+					},
+					s = new k.data.Symbol(options);
+
+				var clone = s.clone();
+
+				expect(clone.options).toEqual(options);
+				expect(clone.options).not.toBe(options);
+				expect(clone).toBeInstanceOf(k.data.Symbol);
+			});
+		});
 	});
 
 	describe('NonTerminal', function()
@@ -145,6 +164,24 @@ define(['../../../src/data/grammar'], function(k)
             });
 
             expect(nonTerminal.isSpecial).toBeFalsy();
+        });
+
+        describe('clone', function ()
+        {
+			it ('should duplicate each object value in its options property', function()
+			{
+				var options= {
+						name: 'TEST'
+					},
+					nt = new k.data.NonTerminal(options);
+
+				var clone = nt.clone();
+
+				expect(clone.options).toEqual(options);
+				expect(clone.options).not.toBe(options);
+				expect(clone).toBeInstanceOf(k.data.NonTerminal);
+				expect(clone).toBeInstanceOf(k.data.Symbol);
+			});
         });
 	});
 
@@ -231,6 +268,54 @@ define(['../../../src/data/grammar'], function(k)
 
             expect(t.toString()).toBe('<'+re.toString()+'>');
         });
+
+        describe('clone', function()
+        {
+			it('should maintain the same name', function ()
+			{
+				var options= {
+						name: 'TEST',
+						body: 'B'
+					},
+					t = new k.data.Terminal(options);
+
+				var clone = t.clone();
+
+				expect(clone.options.body).toEqual('B');
+				expect(clone.options.name).toEqual('TEST');
+			});
+
+			it('should maintain the same body', function ()
+			{
+				var options= {
+						name: 'TEST',
+						body: /a.[1,2]/
+					},
+					t = new k.data.Terminal(options);
+
+				var clone = t.clone();
+
+				expect(clone.options.body.source).toEqual('a.[1,2]');
+				expect(clone.options.body).toBeInstanceOf(RegExp);
+				expect(clone.options.name).toEqual('TEST');
+			});
+
+			it('should clone all standard options values', function ()
+			{
+				var options= {
+						name: 'TEST',
+						body: 'THIS IS THE BODY'
+					},
+					t = new k.data.Terminal(options);
+
+				var clone = t.clone();
+
+				expect(clone.options).toEqual(options);
+				expect(clone.options).not.toBe(options);
+				expect(clone).toBeInstanceOf(k.data.Terminal);
+				expect(clone).toBeInstanceOf(k.data.Symbol);
+			});
+        });
 	});
 
 	describe('Rule', function()
@@ -298,6 +383,82 @@ define(['../../../src/data/grammar'], function(k)
         it('should have toString method overriden ', function () {
             expect(r.toString()).toBe(''+r);
             expect(r.toString()).toBe('TEST-->EMPTY');
+        });
+
+        describe('clone', function ()
+        {
+			it('should clone with index -1', function()
+			{
+				var r = new k.data.Rule({
+					head: new k.data.NonTerminal({
+						name: 'HEAD'
+					})
+				});
+
+				r.index = 12;
+
+				var clone = r.clone();
+
+				expect(clone.index).toBe(-1);
+				expect(clone).toBeInstanceOf(k.data.Rule);
+			});
+
+			it('should returns a head instance', function()
+			{
+				var r = new k.data.Rule({
+					head: new k.data.NonTerminal({
+						name: 'HEAD'
+					})
+				});
+
+				var clone = r.clone();
+
+				expect(clone.index).toBe(-1);
+				expect(clone.head).toBeInstanceOf(k.data.NonTerminal);
+			});
+
+			it('should return an array of instances in its tail', function()
+			{
+				var r = new k.data.Rule({
+					head: new k.data.NonTerminal({
+						name: 'HEAD'
+					}),
+					tail: k.data.NonTerminal.fromArray(['ONE', 'TWO'])
+				});
+
+				var clone = r.clone();
+
+				expect(clone.head).toBeInstanceOf(k.data.NonTerminal);
+				expect(clone.tail).toBeInstanceOf(Array);
+				expect(clone.tail.length).toBe(2);
+				expect(clone.tail[0]).toBeInstanceOf(k.data.NonTerminal);
+				expect(clone.tail[0].name).toEqual('ONE');
+				expect(clone.tail[1]).toBeInstanceOf(k.data.NonTerminal);
+				expect(clone.tail[1].name).toEqual('TWO');
+			});
+
+			it('shoud copy each property in the options value', function()
+			{
+				var r = new k.data.Rule({
+					head: new k.data.NonTerminal({
+						name: 'HEAD'
+					}),
+					tail: k.data.NonTerminal.fromArray(['ONE', 'TWO']),
+					TEST: true,
+					REALLY: 'YES',
+					OK: {}
+				});
+
+				var clone = r.clone();
+
+				expect(clone.options.TEST).toBeDefined();
+				expect(clone.options.TEST).toBe(true);
+				expect(clone.options.REALLY).toBeDefined();
+				expect(clone.options.REALLY).toEqual('YES');
+				expect(clone.options.OK).toBeDefined();
+				expect(clone.options.OK).toEqual({});
+			});
+
         });
 	});
 

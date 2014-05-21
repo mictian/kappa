@@ -34,26 +34,33 @@ define(['../core'], function(k)
 
 		/*
         * @func Util function used to define properties in objects, Common to define alias, insteas od using instance.options.property, used instance.property
-        *	It is VERY IMPORTANT to notice that all propoerties are setted and get from a property called options in the context object
+        * It is VERY IMPORTANT to notice that all propoerties are set and get from a property called options in the context object, unless getter and setter functions are specified
         *
         * @param {Object} ctx Object containing the options. Father object
         * @param {String} propName Name of the property to add/alias
-        * @param {Function} getter Optional function used ot override the default getter
-        * @param {Function} setter Optional function used ot override the default setter
+        * @param {Function} options.set Optional function used ot override the default getter
+        * @param {Function} options.get Optional function used ot override the default setter
         * @returns void
         */
-        var __defineProperty = function(ctx, propName, getter, setter)
+        var __defineProperty = function(ctx, propName, options)
         {
-			Object.defineProperty(ctx, propName, {
-				// Create a new getter for the property
-				get: getter || function () {
-					return ctx.options[propName];
-				},
-				// Create a new setter for the property
-				set: setter || function (val) {
+			if (!ctx || !propName)
+			{
+				throw new Error('Invalid property specification. In order to create a property please specify a context and a property name.');
+			}
+
+			var propertyOptions = __extend({
+				enumerable: true,
+				configurable: false,
+				'set': function (val) {
 					ctx.options[propName] = val;
+				},
+				'get': function () {
+					return ctx.options[propName];
 				}
-			});
+			}, options || {});
+
+			Object.defineProperty(ctx, propName, propertyOptions);
         };
 
 		/*
@@ -266,6 +273,7 @@ define(['../core'], function(k)
             keys: __keys,
             each: __each,
             map: __map,
+            has: __has,
             defineProperty: __defineProperty
         };
 

@@ -29,7 +29,7 @@ define(['../utils/obj', './state'], function(k)
         };
 
         /* @function Convert the current automata to its string representation
-        * @returns formatted string */
+        * @returns {String} formatted string */
         automata.prototype.toString = function () {
 
 			var result = '';
@@ -41,16 +41,28 @@ define(['../utils/obj', './state'], function(k)
             return result;
         };
 
-        /** @function Get the next unprocessed state
-        * @returns A State not processed yet */
+        /* @function Get the next unprocessed state
+        * @returns {State} A State not processed yet */
         automata.prototype.getNextState = function()
         {
             return this._index < this.states.length ? this.states[this._index++] : null;
         };
+        
+        /* @function Functions used to check if an automamta is valid.
+        * Commonly used to check if an automata is an LR(0) valid one.
+        * @param {Automata} automata Automatma to be checked
+        * @returns {Boolean} true in case th automata is valid, false otherwise */
+        automata.prototype.isValid = function()
+        {
+            return !k.utils.obj.any(this.states, function (state)
+            {
+                return state.isInconsistent();
+            });
+        };
 
-        /** @function Add a new state into the automata controlling if it is duplicated or not
+        /* @function Add a new state into the automata controlling if it is duplicated or not
         * @param {State} state State to add
-        * @returns The added state, if the state is duplicated returns the already created state */
+        * @returns {State} The added state, if the state is duplicated returns the already created state */
         automata.prototype.addState = function(state)
         {
             if (!this._registerStates[state.getIdentity()])

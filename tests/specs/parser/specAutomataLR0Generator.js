@@ -210,7 +210,47 @@ define(['../../../src/parser/automataLR0Generator', '../aux/sampleGrammars'], fu
 				expect(state.getItems().length).toBe(1);
 			});
 
-			//TODO Get more grammar samples to increase te test strength
+			it('should return the correct automata form the simple grammar NUM DIFF', function ()
+			{
+				var ag = new k.parser.AutomataLR0Generator({
+						grammar: sampleGrammars.numDiff.g
+					}),
+					result = ag.generateAutomata(),
+					states = result.states;
+
+				expect(result).toBeInstanceOf(k.data.Automata);
+				expect(states.length).toBe(10);
+				
+				debugger
+
+				// var state = findStateById(states, '0-1-2-4');
+				// expect(state).toBeDefined();
+				// expect(state.getItems().length).toBe(4);
+
+				// state = findStateById(states, '0-1-3');
+				// expect(state).toBeDefined();
+				// expect(state.getItems().length).toBe(3);
+
+				// state = findStateById(states, '1-4');
+				// expect(state).toBeDefined();
+				// expect(state.getItems().length).toBe(2);
+
+				// state = findStateById(states, '1');
+				// expect(state).toBeDefined();
+				// expect(state.getItems().length).toBe(1);
+
+				// state = findStateById(states, '2');
+				// expect(state).toBeDefined();
+				// expect(state.getItems().length).toBe(1);
+
+				// state = findStateById(states, '4');
+				// expect(state).toBeDefined();
+				// expect(state.getItems().length).toBe(1);
+
+				// state = findStateById(states, '3');
+				// expect(state).toBeDefined();
+				// expect(state.getItems().length).toBe(1);
+			});
 		});
 	});
 });

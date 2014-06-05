@@ -158,7 +158,8 @@ define(['../core'], function(k)
 		var ArrayProto = Array.prototype;
 
 		var nativeKeys         = Object.keys,
-			nativeForEach      = ArrayProto.forEach;
+			nativeForEach      = ArrayProto.forEach,
+			nativeReduce       = ArrayProto.reduce;
 
 		/*
         * @func Util function to determine if an thing is or not a Object
@@ -247,8 +248,7 @@ define(['../core'], function(k)
         * @param {Object} context object from which extract keys
         * @returns {Array} List of string keys of property names of the object passed in
         */
-		var __map =  function(obj, iterator, context)
-		{
+		var __map =  function(obj, iterator, context) {
 			var results = [];
 			if (obj === null)
 			{
@@ -258,6 +258,33 @@ define(['../core'], function(k)
 				results.push(iterator.call(context, value, index, list));
 			});
 			return results;
+		};
+
+		var __reduce = function(obj, iterator, memo, context) {
+			var initial = arguments.length > 2;
+			if (obj == null) {
+				obj = [];
+			}
+			if (nativeReduce && obj.reduce === nativeReduce)
+			{
+				if (context)
+				{
+					iterator = _.bind(iterator, context);	
+				} 
+				return initial ? obj.reduce(iterator, memo) : obj.reduce(iterator);
+			}
+			__each(obj, function(value, index, list) {
+				if (!initial) {
+					memo = value;
+					initial = true;
+				} else {
+					memo = iterator.call(context, memo, value, index, list);
+				}
+			});
+			if (!initial) {
+				throw new TypeError(reduceError);
+			}
+			return memo;
 		};
 
         return {
@@ -274,6 +301,7 @@ define(['../core'], function(k)
             each: __each,
             map: __map,
             has: __has,
+            reduce: __reduce
             defineProperty: __defineProperty
         };
 

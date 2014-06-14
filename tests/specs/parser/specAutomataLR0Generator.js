@@ -1,5 +1,5 @@
 /* global expect: true, describe: true, it:  true, beforeEach: true */
-define(['../../../src/parser/automataLR0Generator', '../aux/sampleGrammars'], function(k, sampleGrammars)
+define(['../../../src/parser/automataLR0Generator', '../../../src/data/sampleGrammars'], function(k, sampleGrammars)
 {
 	'use strict';
 
@@ -209,6 +209,13 @@ define(['../../../src/parser/automataLR0Generator', '../aux/sampleGrammars'], fu
 				expect(state).toBeDefined();
 				expect(state.getItems().length).toBe(1);
 			});
+			
+			function validatestate(states, stateId, expectedItemsLength)
+			{
+				var state = findStateById(states, stateId);
+				expect(state).toBeDefined();
+				expect(state.getItems().length).toBe(expectedItemsLength);
+			}
 
 			it('should return the correct automata form the simple grammar NUM DIFF', function ()
 			{
@@ -221,7 +228,9 @@ define(['../../../src/parser/automataLR0Generator', '../aux/sampleGrammars'], fu
 				expect(result).toBeInstanceOf(k.data.Automata);
 				expect(states.length).toBe(10);
 				
-				debugger
+				debugger;
+				
+				// validatestate(states, '', 4);
 
 				// var state = findStateById(states, '0-1-2-4');
 				// expect(state).toBeDefined();

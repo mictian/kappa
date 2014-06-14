@@ -129,7 +129,10 @@ define(['../utils/obj'], function(k) {
          * @param {Symbol} symbol Symbol use to make the transition, like the name of the transition
          * @returns {Boolean} true if the state is inconsistent (invalid), false otherwise */
         state.prototype.isInconsistent = function() {
-            
+            //TODO TEST THIS
+            k.util.obj.each(this._items, function (item) {
+                
+            });
         }
 
         return state;

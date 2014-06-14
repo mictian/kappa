@@ -1,5 +1,5 @@
 /* global expect: true, describe: true, it:  true, beforeEach: true */
-define(['../aux/sampleGrammars', '../../../src/data/state', '../../../src/data/itemRule'], function(sampleGrammars, k)
+define(['../../../src/data/sampleGrammars', '../../../src/data/state', '../../../src/data/itemRule'], function(sampleGrammars, k)
 {
     'use strict';
 

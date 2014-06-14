@@ -1,5 +1,5 @@
 /* global expect: true, describe: true, it:  true, beforeEach: true */
-define(['../../../src/data/grammar'], function(k)
+define(['./grammar'], function(k)
 {
 	'use strict';
 
@@ -227,7 +227,7 @@ define(['../../../src/data/grammar'], function(k)
 			R:R
 		};
 	})();
-
+	
 	return {
 		numDivs: numDivs,
 		idsList: idsList,

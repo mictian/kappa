@@ -2,7 +2,7 @@ require.config({
     baseUrl: './src'
  });
 
-require(['./parser/automataLR0Generator', '../tests/specs/aux/sampleGrammars', './data/state', , './lexer/lexer'], function (k, sampleGrammars)
+require(['./parser/automataLR0Generator', './data/sampleGrammars', './data/state', , './lexer/lexer'], function (k, sampleGrammars)
 {
     'use strict';
 

@@ -260,6 +260,15 @@ define(['../core'], function(k)
 			return results;
 		};
 
+		var reduceError = 'Reduce of empty array with no initial value';
+
+		/* @func Iterate over the passed in first parameter and group them all into the result by applying the iteralot logic
+        * @param {Object} obj object to traverse
+        * @param {Function} iterator function called per each item founded in obj
+        * @param {Object} memo is the initial state of the reduction
+        * @param {Object} context object used to call the iterator
+        * @returns {Array} List of string keys of property names of the object passed in
+        */
 		var __reduce = function(obj, iterator, memo, context) {
 			var initial = arguments.length > 2;
 			if (obj == null) {
@@ -301,7 +310,7 @@ define(['../core'], function(k)
             each: __each,
             map: __map,
             has: __has,
-            reduce: __reduce
+            reduce: __reduce,
             defineProperty: __defineProperty
         };
 

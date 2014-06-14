@@ -14,7 +14,7 @@
 		shim:
 		{
 			'jasmine': {
-				exports: 'window.jasmine' //jasmineRequire
+				exports: 'window.jasmine'
 			},
 			'jasmine-html': {
 				deps: ['jasmine'],
@@ -64,9 +64,7 @@
 
         addMatchers(jasmine);
 
-		require(specs, function (spec) {
-			window.onload();
-		});
+		require(specs, window.onload);
 	});
 
 })();

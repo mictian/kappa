@@ -149,17 +149,30 @@ define(['../core'], function(k)
 		{
 			return Object.prototype.toString.call(n) === '[object Number]';
 		};
+		
+		/*
+        * @func Util function to determine if an object is or not a Function
+        * @param {Object} f object to check its type
+        * @returns {Boolean} True if the object passed in is a Functioj, false otherwise
+        */
+		var __isFunction = function(f)
+		{
+			return Object.prototype.toString.call(f) === '[object Function]';
+		};
 
 		/*The next function are copied from underscorejs.org. These function are here because I want to be in control of all the code I manage.
 		Besides I like that I my code pass my JSHint rule, which are much more stringer that the onces applied by underscore.js */
 
 		/*General Variables*/
 		var breaker = {};
-		var ArrayProto = Array.prototype;
+		var ArrayProto	= Array.prototype,
+			FuncProto	= Function.prototype;
 
-		var nativeKeys         = Object.keys,
-			nativeForEach      = ArrayProto.forEach,
-			nativeReduce       = ArrayProto.reduce;
+		var nativeKeys         	= Object.keys,
+			nativeForEach      	= ArrayProto.forEach,
+			nativeReduce       	= ArrayProto.reduce,
+			nativeBind         	= FuncProto.bind,
+			slice				= ArrayProto.slice;
 
 		/*
         * @func Util function to determine if an thing is or not a Object
@@ -271,14 +284,14 @@ define(['../core'], function(k)
         */
 		var __reduce = function(obj, iterator, memo, context) {
 			var initial = arguments.length > 2;
-			if (obj == null) {
+			if (obj === null) {
 				obj = [];
 			}
 			if (nativeReduce && obj.reduce === nativeReduce)
 			{
 				if (context)
 				{
-					iterator = _.bind(iterator, context);	
+					iterator = __bind(iterator, context);	
 				} 
 				return initial ? obj.reduce(iterator, memo) : obj.reduce(iterator);
 			}
@@ -294,6 +307,34 @@ define(['../core'], function(k)
 				throw new TypeError(reduceError);
 			}
 			return memo;
+		};
+		
+		var Ctor = function(){};
+		
+		var __bind = function(func, context) {
+			var args, bound;
+			if (nativeBind && func.bind === nativeBind) {
+				return nativeBind.apply(func, slice.call(arguments, 1));
+			}
+			if (!__isFunction(func)) {
+				throw new TypeError();
+			}
+			args = slice.call(arguments, 2);
+			bound = function() {
+				if (!(this instanceof bound)) {
+					return func.apply(context, args.concat(slice.call(arguments)));
+				}
+				Ctor.prototype = func.prototype;
+				var self = new Ctor();
+				Ctor.prototype = null;
+				var result = func.apply(self, args.concat(slice.call(arguments)));
+				if (Object(result) === result)
+				{
+					return result;
+				}
+				return self;
+			};
+			return bound;
 		};
 
         return {

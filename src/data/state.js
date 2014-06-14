@@ -4,7 +4,8 @@ define(['../utils/obj'], function(k) {
     /* State
      * @class
      * @classdesc This class reprensent an automata state */
-    var State = (function() {
+    var State = (function()
+    {
         /*
          * Constructor Automata State
          *
@@ -71,14 +72,27 @@ define(['../utils/obj'], function(k) {
                 return a - b;
             }).join('-');
         };
-
-        /** @function Returns the stinrg ID of the current state
-         * @returns String ID  */
+        
+        /* @function Returns the string ID of the current state
+         * @returns {String} ID  */
         state.prototype.getIdentity = function() {
             if (!this._id) {
                 this._id = this._generateIdentity();
             }
             return this._id;
+        };
+        
+        /* @function Returns the condenced (one line) string that reprenset the current 'state' of the current state
+         * @returns {String} State  */
+        state.prototype.getCondencedString = function() {
+            //TODO TEST THIS
+            if (!this._condencedView)
+            {
+                this._condencedView = k.utils.obj.reduce(this._items, function (acc, item) {
+                    return acc + item.rule.index + '(' + item.dotLocation + ')';
+                }, '');
+            }
+            return this._condencedView;
         };
 
         /* @function Returns a copy the items contained in the current state )
@@ -133,7 +147,7 @@ define(['../utils/obj'], function(k) {
             k.util.obj.each(this._items, function (item) {
                 
             });
-        }
+        };
 
         return state;
     })();

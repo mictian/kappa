@@ -21,7 +21,7 @@
         {
             indexedStates[state.getIdentity()] = new Springy.Node(state.getIdentity(), {
                 lrState: state,
-                label: state.getIdentity() //toString()
+                label: state.getCondencedString() //getIdentity() //toString()
             });
             graph.addNode(indexedStates[state.getIdentity()]);
             

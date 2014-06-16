@@ -172,6 +172,7 @@ define(['../core'], function(k)
 			nativeForEach      	= ArrayProto.forEach,
 			nativeReduce       	= ArrayProto.reduce,
 			nativeBind         	= FuncProto.bind,
+			nativeFilter    	= ArrayProto.filter,
 			slice				= ArrayProto.slice;
 
 		/*
@@ -283,6 +284,7 @@ define(['../core'], function(k)
         * @returns {Array} List of string keys of property names of the object passed in
         */
 		var __reduce = function(obj, iterator, memo, context) {
+			//TODO TEST THIS
 			var initial = arguments.length > 2;
 			if (obj === null) {
 				obj = [];
@@ -311,7 +313,14 @@ define(['../core'], function(k)
 		
 		var Ctor = function(){};
 		
+		/* @func Bind a function to an object, meaning that whenever the function is called, the value of this will be the object. 
+		* Optionally, pass arguments to the function to pre-fill them, also known as partial application
+		* @param {Function} func Function to wrap up
+		* @param {Object} context Object used as a context in the execution of func
+		* @returns {Function} A new wrap function
+		*/
 		var __bind = function(func, context) {
+			//TODO TEST THIS
 			var args, bound;
 			if (nativeBind && func.bind === nativeBind) {
 				return nativeBind.apply(func, slice.call(arguments, 1));
@@ -336,6 +345,30 @@ define(['../core'], function(k)
 			};
 			return bound;
 		};
+		
+		/* @func Iterate over the passed in first parameter and filter them based on the result of the predicate parameter
+        * @param {Object} obj object to traverse
+        * @param {Function} predicate function called per each item founded in obj to determine if the item is or no in the final result
+        * @param {Object} context object used to call the iterator
+        * @returns {Array} List of item in object that pass thruly the pass in predicate
+        */
+		var __filter = function(obj, predicate, context) {
+			var results = [];
+			if (obj === null) {
+				return results;
+			}
+			if (nativeFilter && obj.filter === nativeFilter) {
+				return obj.filter(predicate, context);
+			}
+			
+			__each(obj, function(value, index, list) {
+				if (predicate.call(context, value, index, list))
+				{
+					results.push(value);
+				}
+			});
+			return results;
+		};
 
         return {
             inherit: __inherit,
@@ -352,6 +385,8 @@ define(['../core'], function(k)
             map: __map,
             has: __has,
             reduce: __reduce,
+            bind: __bind,
+            filter: __filter,
             defineProperty: __defineProperty
         };
 

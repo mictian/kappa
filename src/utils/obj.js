@@ -173,6 +173,7 @@ define(['../core'], function(k)
 			nativeReduce       	= ArrayProto.reduce,
 			nativeBind         	= FuncProto.bind,
 			nativeFilter    	= ArrayProto.filter,
+			nativeSome			= ArrayProto.some,
 			slice				= ArrayProto.slice;
 
 		/*
@@ -353,6 +354,7 @@ define(['../core'], function(k)
         * @returns {Array} List of item in object that pass thruly the pass in predicate
         */
 		var __filter = function(obj, predicate, context) {
+			//TODO TEST THIS
 			var results = [];
 			if (obj === null) {
 				return results;
@@ -368,6 +370,38 @@ define(['../core'], function(k)
 				}
 			});
 			return results;
+		};
+
+		/* @func Keep the identity function around for default iterators.
+		* @param {Object} value Value that will returned
+		* @returns {Object} The same value that passed in
+		*/
+		var __identity = function(value) {
+			return value;
+		};
+		
+		/* @func Determine if at least one element in the object matches a truth test
+        * @param {Object} obj object to traverse
+        * @param {Function} predicate function called per each item founded in obj to determine if the item fullfil the requirements
+        * @param {Object} context object used to call the iterator
+        * @returns {Boolean} True if at least one item pass the predicate, false otherwise
+        */
+		var __any = function(obj, predicate, context) {
+			predicate || (predicate = __identity);
+			var result = false;
+			if (obj === null) { 
+				return result;
+			}
+			if (nativeSome && obj.some === nativeSome) {
+				return obj.some(predicate, context);
+			}
+			
+			__each(obj, function(value, index, list) {
+				if (result || (result = predicate.call(context, value, index, list))) {
+					return breaker;
+				}
+			});
+			return !!result;
 		};
 
         return {
@@ -387,6 +421,7 @@ define(['../core'], function(k)
             reduce: __reduce,
             bind: __bind,
             filter: __filter,
+            any: __any,
             defineProperty: __defineProperty
         };
 

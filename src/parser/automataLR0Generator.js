@@ -45,9 +45,21 @@ define(['../utils/obj', '../data/grammar', '../data/itemRule', '../data/automata
             return currentState;
         };
 
-        /* @function Generate the LR(0) automata
+        /* @function Generate the LALR(1) automata
         * @returns {Automata} The corresponding automata for the specified grammar */
         automataGenerator.prototype.generateAutomata = function()
+        {
+            var automata = this._generateAutomata();
+            if (automata.isValid())
+            {
+                return automata;
+            } 
+            //WTF :S Think here :P
+        };
+        
+        /* @function Generate the LR(0) automata
+        * @returns {Automata} The corresponding automata for the specified grammar */
+        automataGenerator.prototype._generateAutomata = function()
         {
             var initialState = new k.data.State({
                     items: k.data.ItemRule.newFromRules(this.grammar.getRulesFromNonTerminal(this.grammar.startSymbol))

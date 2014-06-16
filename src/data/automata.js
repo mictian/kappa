@@ -48,12 +48,12 @@ define(['../utils/obj', './state'], function(k)
             return this._index < this.states.length ? this.states[this._index++] : null;
         };
         
-        /* @function Functions used to check if an automamta is valid.
+        /* @function Function used to check if an automamta is valid.
         * Commonly used to check if an automata is an LR(0) valid one.
-        * @param {Automata} automata Automatma to be checked
         * @returns {Boolean} true in case th automata is valid, false otherwise */
         automata.prototype.isValid = function()
         {
+            //TODO TEST THIS
             return !k.utils.obj.any(this.states, function (state)
             {
                 return state.isInconsistent();

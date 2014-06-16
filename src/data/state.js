@@ -141,12 +141,16 @@ define(['../utils/obj'], function(k) {
         
         /* @function Determine if the current state is inconsistent or not.
          * @param {Symbol} symbol Symbol use to make the transition, like the name of the transition
-         * @returns {Boolean} true if the state is inconsistent (invalid), false otherwise */
+         * @returns {Boolean} true if the state is inconsistent (invalid), false otherwise (valid) */
         state.prototype.isInconsistent = function() {
             //TODO TEST THIS
-            k.util.obj.each(this._items, function (item) {
-                
+            
+            //Shif-Reduce or Reduce-Reduce Conflicts
+            var reduceItems = k.util.obj.filter(this._items, function (item) {
+                return item.dotLocation === (item.rule.tail.length+1);
             });
+            //If the state has more thatn one item and amonth them there are reduce item, the state is inconsistent
+            return this._items.length > 1 && reduceItems.length > 0;
         };
 
         return state;

@@ -144,10 +144,11 @@ define(['../utils/obj'], function(k) {
          * @returns {Boolean} true if the state is inconsistent (invalid), false otherwise (valid) */
         state.prototype.isInconsistent = function() {
             //TODO TEST THIS
+            //TODO Take into account when the state have items WITH LOOK-AHEAD!!
             
             //Shif-Reduce or Reduce-Reduce Conflicts
-            var reduceItems = k.util.obj.filter(this._items, function (item) {
-                return item.dotLocation === (item.rule.tail.length+1);
+            var reduceItems = k.utils.obj.filter(this._items, function (item) {
+                return item.dotLocation === item.rule.tail.length;
             });
             //If the state has more thatn one item and amonth them there are reduce item, the state is inconsistent
             return this._items.length > 1 && reduceItems.length > 0;

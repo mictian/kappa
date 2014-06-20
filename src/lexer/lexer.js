@@ -30,8 +30,8 @@ define(['../utils/str', '../utils/obj', '../data/grammar'], function(k)
 			this.inputStream = !this.options.notIgnoreSpaces ? k.utils.str.ltrim(options.stream) : options.stream;
         };
 
-		/** @function Get next input token
-         * @returns An object representing the current finded token. The object can not have a rule associated if there is any match */
+		/* @function Get next input token
+        * @returns {Object} An object representing the current finded token. The object can not have a rule associated if there is any match */
         lexer.prototype.getNext = function()
         {
             var result = {

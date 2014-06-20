@@ -1,6 +1,16 @@
 define(['../utils/obj', '../data/grammar', '../data/itemRule', '../data/automata'], function(k)
 {
 	'use strict';
+	
+	/*Enum for valid action in an action table
+    * @readonly
+    * @enum {String}
+    */
+    var tableAction = {
+        SHIFT: 'SHIFT',
+        REDUCE: 'REDUCE',
+        ERROR: 'ERROR'
+    };
 
     /* Automata Generator
     * @class
@@ -49,12 +59,18 @@ define(['../utils/obj', '../data/grammar', '../data/itemRule', '../data/automata
         * @returns {Automata} The corresponding automata for the specified grammar */
         automataGenerator.prototype.generateAutomata = function()
         {
+            //TODO TEST THIS
             var automata = this._generateAutomata();
+            
             if (automata.isValid())
             {
                 return automata;
-            } 
+            }
+            
+            automata.hasLookAhead = true;
             //WTF :S Think here :P
+            
+            return automata;
         };
         
         /* @function Generate the LR(0) automata
@@ -68,6 +84,7 @@ define(['../utils/obj', '../data/grammar', '../data/itemRule', '../data/automata
                   states: [this.expandItem(initialState)]
                 });
 
+            automata.initialStateAccessor(initialState);
             this._expandAutomata(automata);
             return automata;
         };
@@ -111,12 +128,78 @@ define(['../utils/obj', '../data/grammar', '../data/itemRule', '../data/automata
                 currentState = automata.getNextState();
             }
         };
+        
+        /* @function Given an automata returnes its GOTO Table. The table is represented by an object where each state is a property (row) and each possible symbol is a property of the previous object (column)
+        * Sample: table[<state>][<symbol>] = [undefined = error|<state id - string>]
+        * @param {Automata} automata Automatma used as a base of the calculation
+        * @returns {Object} A GOTO Table */
+        automataGenerator.prototype.generateGOTOTable = function(automata) {
+            //TODO TEST THIS
+            //TODO think how to represent the acceptance state!!
+            var table = {};
+            
+            k.utils.obj.each(automata.states, function (state) {
+                table[state.getIdentity()] = {};
+                
+                k.utils.obj.each(state.transitions, function (transition) {
+                    table[state.getIdentity()][transition.symbol.toString()] = transition.state.getIdentity();
+                });
+            });
+            
+            return table;
+        };
+        
+        /* @function Given an automata returnes its ACTION Table. 
+        * @param {Automata} automata Automatma used as a base of the calculation
+        * @returns {Function} Function that given the a state id and a lookAhead returns the action to take */
+        automataGenerator.prototype.generateACTIONTable = function (automata) {
+            //TODO TEST THIS
+            var table = {};
+            
+            if (!automata.hasLookAhead)
+            {
+                k.utils.obj.each(automata.states, function(state){
+                    var stateItems = state.getItems();
+                    
+                    //If it is a reduce state
+                    if (stateItems.length === 1 && stateItems[0].dotLocation === (stateItems[0].rule.tail.length+1))
+                    {
+                        table[state.getIdentity()] = {
+                            action: tableAction.REDUCE,
+                            rule: stateItems[0].rule
+                        };
+                    } else {
+                        table[state.getIdentity()] = {
+                            action: tableAction.SHIFT
+                        };
+                    }
+                });
+            }
+            else
+            {
+                //TODO DO THIS
+            }
+            
+            return (function (hasLookAhead, actionTable) {
+                return function (currentStateId, look_ahead)
+                {
+                    if (!hasLookAhead)
+                    {
+                        return actionTable[currentStateId];
+                    }
+                    
+                    //TODO DO THIS
+                    
+                };
+            })(automata.hasLookAhead, table);
+        };
 
         return automataGenerator;
 	})();
 
 	k.parser = k.utils.obj.extend(k.parser || {}, {
-        AutomataLR0Generator: AutomataLR0Generator
+        AutomataLR0Generator: AutomataLR0Generator,
+        tableAction: tableAction
 	});
 
 	return k;

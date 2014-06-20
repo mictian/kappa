@@ -403,6 +403,72 @@ define(['../core'], function(k)
 			});
 			return !!result;
 		};
+		
+		/* @func Convenience version of a common use case of map: fetching a property.
+        * @param {Object} obj Object to be traverse
+        * @param {String} key Name of the property to extract from eacj item in obje
+        * @returns {Array} List of each property value from each item in obj
+        */
+		var __pluck = function(obj, key) {
+			//TODO TEST THIS
+			return __map(obj, __property(key));
+		};
+		
+		/* @func Auxiliar and Internal function used to return an object's propert by settings using a closure the property name
+        * @param {String} key Name of the property name to 'lock'
+        * @returns {Function} A function that accepts an object and returns the value of its property set before
+        */
+		var __property = function(key) {
+			return function(obj) {
+				return obj[key];
+			};
+		};
+		
+		/* @func An internal function to generate lookup iterators
+        * @param {Object} value Lookup
+        * @returns {Object} Object lookup
+        */
+		var lookupIterator = function(value) {
+			if (value === null) {
+				return __identity;
+			}
+			if (__isFunction(value)) {
+				return value;
+			}
+			return __property(value);
+		};
+		
+		/* @func Sort the object’s values by a criterion produced by an iterator.
+        * @param {Object} obj object to traverse
+        * @param {Function} iterator function called per each item founded in obj
+        * @param {Object} context object from which extract keys
+        * @returns {Object} The same obk passed in but sort as specified by the iterator function
+        */
+		var __sortBy = function(obj, iterator, context) {
+			//TODO TEST THIS
+			iterator = lookupIterator(iterator);
+			
+			return __pluck(__map(obj, function(value, index, list)
+			{
+				return {
+				value: value,
+				index: index,
+				criteria: iterator.call(context, value, index, list)
+				};
+			}).sort(function(left, right) {
+				var a = left.criteria;
+				var b = right.criteria;
+				if (a !== b) {
+					if (a > b || a === void 0) { 
+						return 1;
+					}
+					if (a < b || b === void 0) { 
+						return -1;
+					}
+				}
+				return left.index - right.index;
+			}), 'value');
+		};
 
         return {
             inherit: __inherit,
@@ -422,7 +488,9 @@ define(['../core'], function(k)
             bind: __bind,
             filter: __filter,
             any: __any,
-            defineProperty: __defineProperty
+            defineProperty: __defineProperty,
+            pluck: __pluck,
+            sortBy: __sortBy
         };
 
     })();

@@ -18,6 +18,8 @@ define(['../utils/obj', './state'], function(k)
 			this.options = options;
 
 			k.utils.obj.defineProperty(this, 'states');
+			k.utils.obj.defineProperty(this, 'initialState');
+			k.utils.obj.defineProperty(this, 'hasLookAhead'); //In case the generate Automata is not LR(0) valid, it is extended to be LALR(1) which means add look-ahead
 
             this.states = options.states || [];
             this._index = 0; //Index used to traversal the states of the current instance
@@ -58,6 +60,18 @@ define(['../utils/obj', './state'], function(k)
             {
                 return state.isInconsistent();
             });
+        };
+        
+        /* @function Set or get the initial state.
+        * @param {State} state If specified set the initial state of the automata
+        * @returns {State} In case that none state is specifed returnes the initial state previously set */
+        automata.prototype.initialStateAccessor = function(state)
+        {
+            //TODO TEST THIS
+            if (!state) {
+                return this.initialState;
+            }
+            this.initialState = state;
         };
 
         /* @function Add a new state into the automata controlling if it is duplicated or not

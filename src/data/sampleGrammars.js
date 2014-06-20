@@ -8,6 +8,14 @@ define(['./grammar'], function(k)
 	*/
 	var numDivs = (function()
 	{
+		/*
+		LR(1)
+		0. S --> E
+		1. E --> E Q F
+		2. E --> F
+		3. Q --> '%'
+		4. F --> 'number
+		*/
 		var S = new k.data.Rule({
 			head: 'S',
 			tail: k.data.NonTerminal.fromArray(['E']),
@@ -56,6 +64,15 @@ define(['./grammar'], function(k)
 	*/
 	var idsList = (function()
 	{
+		/*
+		LR(1)
+		0. S --> OPAREN EXPS CPAREN
+		1. EXPS --> EXPS EXP
+		2. EXPS --> <EMPTY>
+		3. EXP --> 'id'
+		4. OPAREN --> '('
+		5. CPAREN --> ')'
+		*/
 		var S = new k.data.Rule({
 			head: 'S',
 			tail: k.data.NonTerminal.fromArray(['OPAREN','EXPS','CPAREN']),
@@ -110,6 +127,16 @@ define(['./grammar'], function(k)
 	*/
 	var numDivsEmpty = (function()
 	{
+		/*
+		LR(1)
+		0. S --> E
+		1. E --> E Q F
+		2. E --> F
+		3. Q --> '%'
+		4. Q --> <EMPTY>
+		5. F --> 'number'
+		
+		*/
 		var S = new k.data.Rule({
 			head: 'S',
 			tail: k.data.NonTerminal.fromArray(['E']),
@@ -164,6 +191,17 @@ define(['./grammar'], function(k)
 	*/
 	var numDiff = (function()
 	{
+		/*
+		LR(1)
+		0. S --> E
+		1. E --> E R T
+		2. E --> T
+		3. T --> 'number'
+		4. T --> OPAREN E CPAREN
+		5. OPAREN --> '('
+		6. CPAREN --> ')'
+		7. R --> '-'
+		*/
 		var S = new k.data.Rule({
 			head: 'S',
 			tail: k.data.NonTerminal.fromArray(['E']),
@@ -228,10 +266,67 @@ define(['./grammar'], function(k)
 		};
 	})();
 	
+	/*
+	005. Very simple grammar for a*b (b, ab, aab, aaaaaaab)
+	*/
+	var aPlusb = (function()
+	{
+		/*
+		LR(1)
+		0. S --> A
+		1. A --> A_LET A
+		2. A --> B_LET
+		3. A_LET --> 'a'
+		4. B_LET --> 'b'
+		*/
+		var S = new k.data.Rule({
+			head: 'S',
+			tail: k.data.NonTerminal.fromArray(['A']),
+			name: 'SRULE'
+		}),
+
+		A1 = new k.data.Rule({
+			head: 'A',
+			tail: k.data.NonTerminal.fromArray(['A_LET', 'A']),
+			name: 'A1RULE'
+		}),
+
+		A2 = new k.data.Rule({
+			head: 'A',
+			tail: k.data.NonTerminal.fromArray(['B_LET']),
+			name: 'A2RULE'
+		}),
+		
+		A_LET = new k.data.Rule({
+			head: 'A_LET',
+			tail: [new k.data.Terminal({name:'A_LET', body: 'a'})],
+			name: 'A_LETNRULE'
+		}),
+
+		B_LET = new k.data.Rule({
+			head: 'B_LET',
+			tail: [new k.data.Terminal({name:'B_LET', body: 'b'})],
+			name: 'B_LETRULE'
+		});
+
+		return {
+			g: new k.data.Grammar({
+				startSymbol: S.head,
+				rules: [S, A1, A2, A_LET, B_LET]
+			}),
+			S: S,
+			A1: A1,
+			A2: A2,
+			A_LET: A_LET,
+			B_LET: B_LET
+		};
+	})();
+	
 	return {
 		numDivs: numDivs,
 		idsList: idsList,
 		numDivsEmpty: numDivsEmpty,
-		numDiff: numDiff
+		numDiff: numDiff,
+		aPlusb: aPlusb
 	};
 });

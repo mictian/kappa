@@ -12,13 +12,13 @@ define(['../utils/obj'],  function(k)
         EOF : 'EOF'
     };
 
-     /** Symbol
+    /** Symbol
     * @class
     * @classdesc This class represent any simbol in the entire system */
     var Symbol = (function ()
     {
         /*
-        * Creates an instance of a Symbol (This class represent non Temrinals, Terminals and Special symbols)
+        * Creates an instance of a Symbol (This class represent non Terminals, Terminals and Special symbols)
         *
         * @constructor
         * @param {String} options.name The name or denatation of the non terminal
@@ -152,12 +152,13 @@ define(['../utils/obj'],  function(k)
     * @classdesc Use this class to create new instance of non Termianls */
     var Rule = (function()
     {
-         /*
+        /*
         * Initialize a new Grammatical Rule
         *
         * @constructor
-        * @param {nonTerminal} options.head The name or denatation of the non terminal
-        * @param {[terminal|nonTerminal]} [options.tail] Array of terminals and nonTerminals that represent the tail of the rule. If is not present an empty tail will be created.
+        * @param {NonTerminal} options.head The name or denatation of the non terminal
+        * @param {[Terminal|NonTerminal]} [options.tail] Array of terminals and nonTerminals that represent the tail of the rule. If is not present an empty tail will be created.
+        * @param {Function} options.reduceFunc A function to be executed when reducint this rule
         */
         var rule = function (options)
         {
@@ -172,6 +173,7 @@ define(['../utils/obj'],  function(k)
 			//Define alias for:
             k.utils.obj.defineProperty(this, 'head');
             k.utils.obj.defineProperty(this, 'tail');
+            k.utils.obj.defineProperty(this, 'reduceFunc');
 
             this.head = !(options.head instanceof NonTerminal) ?
 				new NonTerminal({
@@ -186,7 +188,7 @@ define(['../utils/obj'],  function(k)
         * @returns Formatted string */
         rule.prototype.toString = function()
         {
-            return this.head.toString() + '-->' + this.tail.join(' ');
+            return this.head.toString() + ' --> ' + this.tail.join(' ');
         };
 
         /* @function Clone the current item, generating a deep copy of it.
@@ -237,62 +239,76 @@ define(['../utils/obj'],  function(k)
 			//Define alias for:
             k.utils.obj.defineProperty(this, 'startSymbol');
             k.utils.obj.defineProperty(this, 'rules');
+            k.utils.obj.defineProperty(this, 'terminals');
+            k.utils.obj.defineProperty(this, 'rulesByHeader');
 
+            this._setRulesIndex();
             this.rulesByHeader = this._getIndexByNonTerminals(this.rules);
             this.terminals = this._getTerminals(this.rules);
+        };
+        
+        /* @function Set the index of each rule in the current grammar
+        * @returns {Void} */
+        grammar.prototype._setRulesIndex = function ()
+        {
+            //TODO TEST THIS
+            k.utils.obj.each(this.rules, function (rule, i) {
+                rule.index = i;
+            });
         };
 
         /* @function Index all grammatical rules by its header non terminal
         * @param {[rule]} rules Array grammatical rules of the current grammar
-        * @returns An object that has an array of rules per each non terminal name property  */
-        grammar.prototype._getIndexByNonTerminals = function(rules)
+        * @returns {Object} An object that has an array of rules per each non terminal name property  */
+        grammar.prototype._getIndexByNonTerminals = function (rules)
         {
             var result = {};
             for (var i = 0; i < rules.length; i++)
             {
-				rules[i].index = i;
 				/* jshint expr:true */
                 result[rules[i].head.name] ? result[rules[i].head.name].push(rules[i]) : result[rules[i].head.name] = new Array(rules[i]);
             }
             return result;
         };
 
-         /* @function Compute an Array of all grammar's terminals'
-         * @param {[rule]} rules Array grammatical rules of the current grammar
-         * @returns An ordered array of object containg the terminals and the rules that define them */
+        /* @function Compute an Array of all grammar's terminals'
+        * @param {[rule]} rules Array grammatical rules of the current grammar
+        * @returns {[Object]} An ordered array of object containg the terminals and the rules that define them */
         grammar.prototype._getTerminals = function(rules)
         {
             var result = [];
-            for (var i = 0; i < rules.length; i++)
+            k.utils.obj.each(rules, function (rule)
             {
-                if (rules[i].tail.length === 1 && rules[i].tail[0].isTerminal)
+                if (rule.tail.length === 1 && rule.tail[0].isTerminal)
                 {
                     result[result.length] = {
-                        body: rules[i].tail[0].body,
-                        rule: rules[i]
+                        body: rule.tail[0].body,
+                        rule: rule
                     };
-                }
-            }
+                }    
+            }, this);
+            
             return result;
         };
 
-         /** @function Returns the list of rules that start with the specified symbols as the head
-         * @param {Symbol} symbol Symbol used as the head of the requested rules
-         * @returns Array of rules */
+        /* @function Returns the list of rules that start with the specified symbols as the head
+        * @param {Symbol} symbol Symbol used as the head of the requested rules
+        * @returns {[Rules]} Array of rules */
         grammar.prototype.getRulesFromNonTerminal = function(symbol)
         {
             return this.rulesByHeader[symbol.name];
         };
 
-        /** @function Convert a Grammar to its pritty string representation
+        /* @function Convert a Grammar to its pritty string representation
         * @returns Formatted string */
         grammar.prototype.toString = function() {
             var strResult = this.name ? 'Name: ' + this.name : '';
             strResult += 'Start Symbol: ' + this.startSymbol.name +'\n';
 
-            for (var i = 0; i < this.rules.length; i++) {
-                strResult += i +': '+ this.rules[i] + '\n';
-            }
+            strResult += k.utils.obj.reduce(k.utils.obj.sortBy(this.rules, function(rule) {return rule.index;}), function (strAcc, rule) {
+                return strAcc + '\n' + rule.index + '. ' + rule.toString();
+            }, '');
+            
             return strResult;
         };
 

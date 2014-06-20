@@ -9,8 +9,9 @@
     
     require(['./data/sampleGrammars', './parser/automataLR0Generator'], function (sampleGrammars, k)
     {
-        var automataGenerator = new k.parser.AutomataLR0Generator({
-                grammar: sampleGrammars.numDivs.g
+        var grammar = sampleGrammars.aPlusb.g,
+            automataGenerator = new k.parser.AutomataLR0Generator({
+                grammar: grammar
             }),
             automata = automataGenerator.generateAutomata(),
             states = automata.states,
@@ -40,6 +41,23 @@
         jQuery('#springydemo').springy({
             graph: graph
         });
+        
+        var entityMap = {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': '&quot;',
+            "'": '&#39;',
+            "/": '&#x2F;'
+        };
+        
+        function escapeHtml(string) {
+            return String(string).replace(/[&<>"'\/]/g, function (s) {
+            return entityMap[s];
+            });
+        }
+        
+        jQuery('#grammarShower').html(escapeHtml(grammar.toString()).replace(/\n/g,'<br/>'));
     
     });
 

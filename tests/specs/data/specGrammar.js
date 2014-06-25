@@ -380,9 +380,8 @@ define(['../../../src/data/grammar'], function(k)
             expect(rule.tail[0].name).toBe(k.data.specialSymbol.EMPTY);
         });
 
-        it('should have toString method overriden ', function () {
-            expect(r.toString()).toBe(''+r);
-            expect(r.toString()).toBe('TEST-->EMPTY');
+        it('should have toString method overriden', function () {
+			expect(Object.getPrototypeOf(r).hasOwnProperty('toString')).toBe(true);
         });
 
         describe('clone', function ()
@@ -512,21 +511,21 @@ define(['../../../src/data/grammar'], function(k)
 
         it('should have an empty name if it\'s not specified', function (){
             var gr = new k.data.Grammar({
-				startSymbol: null,
+				startSymbol: new k.data.Symbol({name: k.data.specialSymbol.EOF, isSpecial:true}), //Because a grammar requires a start symbol
 				rules: []
             });
 
-            expect(gr.options.name).toBe('');
+            expect(gr.name).toBe('');
         });
 
         it('should have an specified name', function (){
             var gr = new k.data.Grammar({
-				startSymbol: null,
+				startSymbol: new k.data.Symbol({name: k.data.specialSymbol.EOF, isSpecial:true}), //Because a grammar requires a start symbol
 				rules: [],
 				name: 'TEST'
             });
 
-            expect(gr.options.name).toBe('TEST');
+            expect(gr.name).toBe('TEST');
         });
 
         it ('should have grouped all rules by it head', function(){
@@ -552,12 +551,12 @@ define(['../../../src/data/grammar'], function(k)
         });
 
         it ('should add a index to each rule', function(){
-			expect(S.index).toBe(0);
-			expect(EXPS1.index).toBe(1);
-			expect(EXPS2.index).toBe(2);
-			expect(EXP.index).toBe(3);
-			expect(OPAREN.index).toBe(4);
-			expect(CPAREN.index).toBe(5);
+			expect(S.index).toBe(1);
+			expect(EXPS1.index).toBe(2);
+			expect(EXPS2.index).toBe(3);
+			expect(EXP.index).toBe(4);
+			expect(OPAREN.index).toBe(5);
+			expect(CPAREN.index).toBe(6);
         });
 
         it ('should have grouped all terminal symbols', function(){

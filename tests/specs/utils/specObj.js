@@ -539,6 +539,7 @@ define(['../../../src/utils/obj'], function(k)
 				expect(k.utils.obj.isObject(undefined)).toBe(false);
 				expect(k.utils.obj.isObject(false)).toBe(false);
 				expect(k.utils.obj.isObject(true)).toBe(false);
+				expect(k.utils.obj.isObject(function(){})).toBe(false);
 			});
 		});
 

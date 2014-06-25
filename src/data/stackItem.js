@@ -11,14 +11,15 @@ define(['../utils/obj'],  function(k)
         * Creates an instance of a Parser 
         *
         * @constructor
-        * @param {Object} options.stateId The current state Id
+        * @param {Object} options.state The current state
         * @param {Object} options.currentValue The result of getting this stack Item
         * @param {Symbol} options.symbol The Current Symbol of the stack item
         * @param {Automata} options.AST The underprocessing AST. The Sub-tree AST for the current node
         */
-	    var stackItem = function(options){
+	    var stackItem = function(options) {
+	    	this.options = options;
 
-            k.utils.obj.defineProperty(this, 'stateId');
+            k.utils.obj.defineProperty(this, 'state');
             k.utils.obj.defineProperty(this, 'currentValue');
             k.utils.obj.defineProperty(this, 'symbol');
             k.utils.obj.defineProperty(this, 'AST');
@@ -31,7 +32,9 @@ define(['../utils/obj'],  function(k)
 	    return stackItem;
 	})();
 	
-	k.parser = k.utils.obj.extend(k.data || {}, {
+	k.data = k.utils.obj.extend(k.data || {}, {
         StackItem: StackItem
 	});
+	
+	return k;
 });

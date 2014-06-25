@@ -26,8 +26,20 @@ define(['../utils/str', '../utils/obj', '../data/grammar'], function(k)
             this.options = k.utils.obj.extendInNew(defaultOptions, options || {});
 
             k.utils.obj.defineProperty(this, 'grammar');
+            k.utils.obj.defineProperty(this, 'stream'); //Specified input stream
+            k.utils.obj.defineProperty(this, 'inputStream'); // Post-Processed input stream
+            k.utils.obj.defineProperty(this, 'notIgnoreSpaces');
 
-			this.inputStream = !this.options.notIgnoreSpaces ? k.utils.str.ltrim(options.stream) : options.stream;
+			this.inputStream = (!this.notIgnoreSpaces && this.stream) ? k.utils.str.ltrim(this.stream) : this.stream;
+        };
+        
+        /* @function Get next input token
+        * @param {String} stream Input string to be processed
+        * @returns {Void} */
+        lexer.prototype.setStream = function (stream)
+        {
+        	//TODO TEST THIS
+        	this.inputStream = (!this.notIgnoreSpaces && this.stream) ? k.utils.str.ltrim(this.stream) : this.stream;
         };
 
 		/* @function Get next input token

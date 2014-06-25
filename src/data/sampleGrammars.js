@@ -272,53 +272,29 @@ define(['./grammar'], function(k)
 	var aPlusb = (function()
 	{
 		/*
-		LR(1)
-		0. S --> A
-		1. A --> A_LET A
-		2. A --> B_LET
-		3. A_LET --> 'a'
-		4. B_LET --> 'b'
+		LR(0)
+		1. A --> 'a' A
+		2. A --> 'b'
 		*/
-		var S = new k.data.Rule({
-			head: 'S',
-			tail: k.data.NonTerminal.fromArray(['A']),
-			name: 'SRULE'
-		}),
-
-		A1 = new k.data.Rule({
+		var A1 = new k.data.Rule({
 			head: 'A',
-			tail: k.data.NonTerminal.fromArray(['A_LET', 'A']),
+			tail: [new k.data.Terminal({name:'A_LET', body: 'a'}), new k.data.NonTerminal({name: 'A'})],
 			name: 'A1RULE'
 		}),
 
 		A2 = new k.data.Rule({
 			head: 'A',
-			tail: k.data.NonTerminal.fromArray(['B_LET']),
-			name: 'A2RULE'
-		}),
-		
-		A_LET = new k.data.Rule({
-			head: 'A_LET',
-			tail: [new k.data.Terminal({name:'A_LET', body: 'a'})],
-			name: 'A_LETNRULE'
-		}),
-
-		B_LET = new k.data.Rule({
-			head: 'B_LET',
 			tail: [new k.data.Terminal({name:'B_LET', body: 'b'})],
-			name: 'B_LETRULE'
+			name: 'A2RULE'
 		});
 
 		return {
 			g: new k.data.Grammar({
-				startSymbol: S.head,
-				rules: [S, A1, A2, A_LET, B_LET]
+				startSymbol: A1.head,
+				rules: [A1, A2]
 			}),
-			S: S,
 			A1: A1,
-			A2: A2,
-			A_LET: A_LET,
-			B_LET: B_LET
+			A2: A2
 		};
 	})();
 	

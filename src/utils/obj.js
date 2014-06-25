@@ -183,7 +183,7 @@ define(['../core'], function(k)
         */
 		var __isObject = function(obj)
 		{
-			return obj === Object(obj);
+			return obj === Object(obj) && !__isFunction(obj);
 		};
 
 		/* @func Alias of hasOwnProperty just for brevety
@@ -414,7 +414,8 @@ define(['../core'], function(k)
 			return __map(obj, __property(key));
 		};
 		
-		/* @func Auxiliar and Internal function used to return an object's propert by settings using a closure the property name
+		/* @func Auxiliar and Internal function used to return an object's propert by settings using a closure the property name.
+		* Returns a function that will itself return the key property of any passed-in object
         * @param {String} key Name of the property name to 'lock'
         * @returns {Function} A function that accepts an object and returns the value of its property set before
         */
@@ -442,7 +443,7 @@ define(['../core'], function(k)
         * @param {Object} obj object to traverse
         * @param {Function} iterator function called per each item founded in obj
         * @param {Object} context object from which extract keys
-        * @returns {Object} The same obk passed in but sort as specified by the iterator function
+        * @returns {Object} The same obj passed in but sorted as specified by the iterator function
         */
 		var __sortBy = function(obj, iterator, context) {
 			//TODO TEST THIS
@@ -469,6 +470,52 @@ define(['../core'], function(k)
 				return left.index - right.index;
 			}), 'value');
 		};
+		
+		/* @func Return the first value which passes a truth test
+        * @param {Object} obj object to traverse
+        * @param {Function} predicate function called per each item founded in obj
+        * @param {Object} context object from which extract keys
+        * @returns {Object} The first item in obj that returns true
+        */
+		var __find = function(obj, predicate, context) {
+			//TODO TEST THIS
+			var result;
+			__any(obj, function(value, index, list) {
+				if (predicate.call(context, value, index, list)) {
+					result = value;
+					return true;
+				}
+			});
+			return result;
+		};
+		
+		/* @func An internal function used for aggregate “group by” operations.
+        * @param {Array} obj object to traverse
+        * @param {Function} iterator function called per each item founded in obj
+        * @param {Object} context object from which extract keys
+        * @returns {Object} Object where each property is the key of each group, and where the values of these key are the array of values grouped
+        */
+		var group = function(behavior) {
+			return function(obj, iterator, context) {
+				var result = {};
+				iterator = lookupIterator(iterator);
+				__each(obj, function(value, index) {
+					var key = iterator.call(context, value, index, obj);
+					behavior(result, key, value);
+				});
+				return result;
+			};
+		};
+		
+		/* @func Groups the object’s values by a criterion. Pass either a string attribute to group by, or a function that returns the criterion
+        * @param {Array} obj object to traverse
+        * @param {Function} iterator function called per each item founded in obj
+        * @param {Object} context object from which extract keys
+        * @returns {Object} Object where each property is the key of each group, and where the values of these key are the array of values grouped
+        */
+		var __groupBy = group(function(result, key, value) {
+			__has(result, key) ? result[key].push(value) : result[key] = [value];
+		});
 
         return {
             inherit: __inherit,
@@ -480,6 +527,7 @@ define(['../core'], function(k)
             isRegExp: __isRegExp,
             isNumber: __isNumber,
             isObject: __isObject,
+            isFunction: __isFunction,
             keys: __keys,
             each: __each,
             map: __map,
@@ -490,7 +538,10 @@ define(['../core'], function(k)
             any: __any,
             defineProperty: __defineProperty,
             pluck: __pluck,
-            sortBy: __sortBy
+            sortBy: __sortBy,
+            property: __property,
+            find: __find,
+            groupBy: __groupBy
         };
 
     })();

@@ -32,12 +32,12 @@ define(['../../../src/data/sampleGrammars', '../../../src/data/state', '../../..
 
 			it('shoud return null if it has processed all items', function()
 			{
-				var s= new k.data.State({
-					items: [{
+				var s = new k.data.State({
+					items: [new k.data.ItemRule({
 						rule: {
 							index: 0
 						}
-					}]
+					})]
 				});
 
 				s.getNextItem();
@@ -48,33 +48,35 @@ define(['../../../src/data/sampleGrammars', '../../../src/data/state', '../../..
 
 			it('shoud return an item if it has it', function()
 			{
-				var expectedResult = {
+				var expectedResultOptions = {
 						rule: {
 							index: 0
 						}
 					},
-					s= new k.data.State({
-						items: [expectedResult]
+					items = [new k.data.ItemRule(expectedResultOptions)],
+					s = new k.data.State({
+						items: items
 					});
 
 				var result = s.getNextItem();
 
-				expect(result).toBe(expectedResult);
+				expect(result).toBe(items[0]);
 			});
 
 			it('shoud never return the same item twise', function()
 			{
-				var expectedResult = {
+				var expectedResultOptions = {
 						rule: {
 							index: 0
 						}
 					},
-					s= new k.data.State({
-						items: [expectedResult]
+					items = [new k.data.ItemRule(expectedResultOptions)],
+					s = new k.data.State({
+						items: items
 					});
 
 				var result = s.getNextItem();
-				expect(result).toBe(expectedResult);
+				expect(result).toBe(items[0]);
 
 				result = s.getNextItem();
 				expect(result).toBeFalsy();
@@ -90,11 +92,11 @@ define(['../../../src/data/sampleGrammars', '../../../src/data/state', '../../..
 			it('should add an item into the state if it is new', function()
 			{
 				var s = new k.data.State({}),
-					item = {
+					item = new k.data.ItemRule({
 						rule: {
 							index: 0
 						}
-					};
+					});
 
 				s.addItems([item]);
 				var result = s.getNextItem();
@@ -104,20 +106,19 @@ define(['../../../src/data/sampleGrammars', '../../../src/data/state', '../../..
 
 			it('should not add an item into the state if it is duplicated', function()
 			{
-				var s = new k.data.State({
-						items: [
-							{
-								rule: {
-									index: 0
-								}
-							}
-						]
+				var items = [new k.data.ItemRule({
+						rule: {
+							index:0
+						}
+					})],
+					s = new k.data.State({
+						items: items
 					}),
-					item = {
+					item = new k.data.ItemRule({
 							rule: {
 								index: 0
 							}
-						};
+						});
 
 				s.addItems([item]);
 				var result = s.getNextItem();
@@ -130,11 +131,11 @@ define(['../../../src/data/sampleGrammars', '../../../src/data/state', '../../..
 			it('should get available the added item to the getNextItem method', function()
 			{
 				var s = new k.data.State({}),
-					item = {
+					item = new k.data.ItemRule({
 							rule: {
 								index: 0
 							}
-						};
+						});
 
 				s.addItems([item]);
 				var result = s.getNextItem();
@@ -150,34 +151,35 @@ define(['../../../src/data/sampleGrammars', '../../../src/data/state', '../../..
 				expect(s.getIdentity()).toBe('');
 			});
 
-			it('should returnes always the same regardless if its item where updated (Really?)', function()
+			it('should NOT returns always the same regardless if its item where updated', function()
 			{
 				var s = new k.data.State({
-					items: [
-						{
+					items: [new k.data.ItemRule({
 							rule: {
 								index: 0
 							}
-						},
-						{
+						}),
+						new k.data.ItemRule({
 							rule: {
 								index: 1
 							}
-						}
+						})
 					]
 				});
 
 				var result = s.getIdentity();
+				expect(result).toEqual('0(0)1(0)');
 
-				s.addItems([{
+				s.addItems([new k.data.ItemRule({
 					rule: {
 						index: 2
 					}
-				}]);
+				})]);
 
 				var id2 = s.getIdentity();
 
-				expect(result).toBe(id2);
+				expect(result).not.toBe(id2);
+				expect(id2).toEqual('0(0)1(0)2(0)');
 			});
 		});
 
@@ -192,19 +194,21 @@ define(['../../../src/data/sampleGrammars', '../../../src/data/state', '../../..
 
 			it('should return an array with the rule specified by the item', function()
 			{
-				var item = {
-							getCurrentSymbol: function() {
-								return {
-									name: 'S'
-								};
-							},
-							rule: {
-								index: 0
-							}
-						},
+				var item = new k.data.ItemRule(
+					{
+						rule: {
+							index: 0
+						}
+					}),
 					s = new k.data.State({
 						items: [item]
 					});
+					
+				item.getCurrentSymbol = function() {
+					return {
+						name: 'S'
+					};
+				};
 
 				var ts = s.getSupportedTransitionSymbols();
 
@@ -219,29 +223,31 @@ define(['../../../src/data/sampleGrammars', '../../../src/data/state', '../../..
 
 			it('should one element of the array per symbol', function()
 			{
-				var item1 = {
-						getCurrentSymbol: function() {
-							return {
-								name: 'S'
-							};
-						},
+				var item1 = new k.data.ItemRule({
 						rule: {
 							index: 0
 						}
-					},
-					item2 = {
-						getCurrentSymbol: function() {
-							return {
-								name: 'H'
-							};
-						},
+					}),
+					item2 = new k.data.ItemRule({
 						rule: {
 							index: 1
 						}
-					},
+					}),
 					s = new k.data.State({
 						items: [item1, item2]
 					});
+					
+				
+				item1.getCurrentSymbol = function() {
+					return {
+						name: 'S'
+					};
+				};
+				item2.getCurrentSymbol = function() {
+					return {
+						name: 'H'
+					};
+				};
 
 				var ts = s.getSupportedTransitionSymbols();
 
@@ -261,39 +267,40 @@ define(['../../../src/data/sampleGrammars', '../../../src/data/state', '../../..
 
 			it('should group the items per symbol', function()
 			{
-				var item1 = {
-						getCurrentSymbol: function() {
-							return {
-								name: 'S'
-							};
-						},
+				var item1 = new k.data.ItemRule({
 						rule: {
 							index: 0
 						}
-					},
-					item2 = {
-						getCurrentSymbol: function() {
-							return {
-								name: 'H'
-							};
-						},
+					}),
+					item2 = new k.data.ItemRule({
 						rule: {
 							index: 1
 						}
-					},
-					item3 = {
-						getCurrentSymbol: function() {
-							return {
-								name: 'H'
-							};
-						},
+					}),
+					item3 = new k.data.ItemRule({
 						rule: {
 							index: 1
 						}
-					},
+					}),
 					s = new k.data.State({
 						items: [item1, item2, item3]
 					});
+					
+				item1.getCurrentSymbol = function() {
+					return {
+						name: 'S'
+					};
+				};
+				item2.getCurrentSymbol = function() {
+					return {
+						name: 'H'
+					};
+				};
+				item3.getCurrentSymbol = function() {
+					return {
+						name: 'H'
+					};
+				};
 
 				var ts = s.getSupportedTransitionSymbols();
 
@@ -347,14 +354,12 @@ define(['../../../src/data/sampleGrammars', '../../../src/data/state', '../../..
 						items: [item]
 					});
 
-				var items1 = s.getItems();
-				items1.push({});
-
 				var items2 = s.getItems();
 				expect(items2.length).toBe(1);
 				expect(items2[0]).not.toBe(item);
 
 				items2[0].rule.index = item.rule.index; //The index is NOT copied
+				items2[0].getIdentity(); //Calculate id
 				expect(items2[0]).toEqual(item);
 				expect(items2[0]).toBeInstanceOf(k.data.ItemRule);
 			});

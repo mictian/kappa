@@ -4,7 +4,7 @@ define(['../utils/obj'], function(k)
 
 	/* Item Rule
 	* @class
-	* @classdesc This class represent an Item. A rule being processed. Generally a dot is used to represnet which part have already been
+	* @classdesc This class represent an Item. A rule being processed. Generally a dot is used to represent which part have already been
 	processed. Ex. S ==> aB*AB */
 	var ItemRule = (function()
 	{
@@ -26,6 +26,7 @@ define(['../utils/obj'], function(k)
 			//Define alias for the next properties
 			k.utils.obj.defineProperty(this, 'rule');
 			k.utils.obj.defineProperty(this, 'dotLocation');
+			k.utils.obj.defineProperty(this, '_id');
 
 			this.dotLocation = options.dotLocation || 0;
 		};
@@ -58,6 +59,7 @@ define(['../utils/obj'], function(k)
 
 			var result = new ItemRule(cloneOptions);
 			result._incrementDotLocation(updateOptions.dotLocationIncrement);
+			result._id = null;
 
 			return result;
 		};
@@ -82,9 +84,9 @@ define(['../utils/obj'], function(k)
 			return result;
 		};
 
-		/** @function Increase the dot location by the number specified by parameter
+		/* @function Increase the dot location by the number specified by parameter
 		* @param {Integer} increment Increment that will be applied into the dot location of the new item. Default: 1
-		* @returns void */
+		* @returns {Void} */
 		itemRule.prototype._incrementDotLocation= function(increment)
 		{
 			var optionsValue = k.utils.obj.isNumber(this.options.dotLocation) ? this.options.dotLocation : 0,
@@ -92,11 +94,32 @@ define(['../utils/obj'], function(k)
 
 			this.dotLocation = optionsValue + incrementValue;
 		};
+		
+		/* @function Gets a string id that uniquely identity the current item rule
+		* @returns {String} Id */
+		itemRule.prototype.getIdentity = function ()
+		{
+			//TODO TEST THIS
+			if (!this._id)
+			{
+				this._id = this._generateIdentity();
+			}
+			return this._id;
+		};
+		
+		/* @function Internal method to generate a unique Id
+		* @returns {String} Id */
+		itemRule.prototype._generateIdentity = function ()
+		{
+			return this.rule.index + '(' + this.dotLocation + ')';
+		};
 
 		/** @function Returns the right next symbol to the dot location
 		* @returns Next symbol or null if there is not next symbol */
 		itemRule.prototype.getCurrentSymbol = function ()
 		{
+			// When the dot location is the same as tail length is a reduce item.
+			// In this case the next item is null
 			return this.dotLocation < (this.rule.tail.length + 1) ? this.rule.tail[this.dotLocation] : null;
 		};
 

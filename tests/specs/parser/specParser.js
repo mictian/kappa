@@ -1,5 +1,5 @@
 /* global expect: true, describe: true, it:  true, beforeEach: true */
-define(['../../../src/parser/parser', '../../../src/data/sampleGrammars'], function(k, sampleGrammars)
+define(['../../../src/data/sampleGrammars', '../../../src/parser/parser'], function(sampleGrammars, k)
 {
 	'use strict';
 
@@ -7,9 +7,19 @@ define(['../../../src/parser/parser', '../../../src/data/sampleGrammars'], funct
 	{
 		describe('Constructor', function()
 		{
-			it('should do FOO', function(){
-			
-				debugger;	
+			it('should do FOO', function()
+			{
+				var p = k.parser.parserCreator.create({
+						grammar: sampleGrammars.aPlusb.g,
+						strInput: '-HOLA-'
+					});
+		        
+		        // p.lexer.setStream(strInput);
+		        var result = p.parser.parse(p.lexer);
+		        
+		        expect(result).toBe(false);
+		        // debugger;
+		        
 			});
 		});
 	});

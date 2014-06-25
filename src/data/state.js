@@ -1,4 +1,4 @@
-define(['../utils/obj'], function(k) {
+define(['../utils/obj', './grammar'], function(k) {
     'use strict';
 
     /* State
@@ -17,15 +17,22 @@ define(['../utils/obj'], function(k) {
 
             k.utils.obj.defineProperty(this, 'transitions');
             k.utils.obj.defineProperty(this, '_items');
+            k.utils.obj.defineProperty(this, '_index');
+            k.utils.obj.defineProperty(this, '_registerItems');
+            k.utils.obj.defineProperty(this, '_id');
+            k.utils.obj.defineProperty(this, '_condencedView');
+            k.utils.obj.defineProperty(this, 'isAcceptanceState'); // This is set by the automata generator
 
+            this.isAcceptanceState = false;
             this.transitions = options.transitions || [];
             this._items = options.items || [];
             this._index = 0;
             this._registerItems = {};
 
-            for (var i = 0; i < this._items.length; i++) {
-                this._registerItems[this._items[i].rule.index] = true;
-            }
+            k.utils.obj.each(this._items, function (itemRule)
+            {
+                this._registerItems[itemRule.getIdentity()] = true;
+            }, this);
         };
 
         /* @function Get the next unprocessed item rule
@@ -38,39 +45,56 @@ define(['../utils/obj'], function(k) {
          * @param {[ItemRule]} itemRules Array of item rules to add into the state
          * @returns {void} Nothing */
         state.prototype.addItems = function(itemRules) {
-            for (var i = 0; i < itemRules.length; i++) {
-                if (!this._registerItems[itemRules[i].rule.index]) {
-                    this._registerItems[itemRules[i].rule.index] = true;
-                    this._items.push(itemRules[i]);
+            this._id = null;
+            k.utils.obj.each(itemRules, function (itemRule)
+            {
+                if (!this._registerItems[itemRule.getIdentity()])
+                {
+                    this._registerItems[itemRule.getIdentity()] = true;
+                    this._items.push(itemRule);
                 }
-            }
+            }, this);
         };
 
         /* @function Convert the current state to its string representation
          * @returns {String} formatted string */
         state.prototype.toString = function() {
             var strResult = 'ID: ' + this.getIdentity() + '\n';
-            for (var i = 0; i < this._items.length; i++) {
-                strResult += this._items[i].toString() + '\n';
-            }
+            k.utils.obj.each(this._items, function (item)
+            {
+                strResult += item.toString() + '\n';
+            });
+            
             strResult += '\nTRANSITIONS:\n';
-
-            for (i = 0; i < this.transitions.length; i++) {
-                strResult += '*--' + this.transitions[i].symbol + '-->' + this.transitions[i].state.getIdentity() + '\n';
-            }
+            k.utils.obj.each(this.transitions, function (transition)
+            {
+                strResult += '*--' + transition.symbol + '-->' + transition.state.getIdentity() + '\n';
+            });
             return strResult;
         };
-
-        /** @function Generates an ID that identify this state from any other state
-         * @returns {String} Generated ID  */
-        state.prototype._generateIdentity = function() {
-            var indexes = [];
-            for (var i = 0; i < this._items.length; i++) {
-                indexes.push(this._items[i].rule.index);
+        
+        /* @function Returns the condenced (one line) string that reprenset the current 'state' of the current state
+         * @returns {String} State Representation in one line  */
+        state.prototype.getCondencedString = function() {
+            //TODO TEST THIS
+            if(!this._condencedView)
+            {
+                this._condencedView = this._generateCondencedString();
             }
-            return indexes.sort(function(a, b) {
-                return a - b;
-            }).join('-');
+            return this._condencedView;
+        };
+        
+        /* @function Internal method to generate a condenced (one line) string that reprenset the current 'state' of the current state
+         * @returns {String} State Representation in one line  */
+        state.prototype._generateCondencedString = function() {
+            return  k.utils.obj.map(
+                k.utils.obj.sortBy(this._items, function(item) 
+                {
+                    return item.rule.index;
+                }),
+                function (item) {
+                    return item.rule.index;
+                }).join('-');
         };
         
         /* @function Returns the string ID of the current state
@@ -82,17 +106,24 @@ define(['../utils/obj'], function(k) {
             return this._id;
         };
         
-        /* @function Returns the condenced (one line) string that reprenset the current 'state' of the current state
-         * @returns {String} State  */
-        state.prototype.getCondencedString = function() {
+        /* @function Generates an ID that identify this state from any other state
+         * @returns {String} Generated ID  */
+        state.prototype._generateIdentity = function() {
             //TODO TEST THIS
-            if (!this._condencedView)
+            
+            if (this._items.length === 1 && this._items[0].rule.name === k.data.Grammar.constants.AugmentedRuleName && this._items[0].dotLocation === 2)
             {
-                this._condencedView = k.utils.obj.reduce(this._items, function (acc, item) {
+                return 'AcceptanceState';
+            }
+        
+            return k.utils.obj.reduce(
+                k.utils.obj.sortBy(this._items, function(item) 
+                {
+                    return item.rule.index;
+                }),
+                function (acc, item) {
                     return acc + item.rule.index + '(' + item.dotLocation + ')';
                 }, '');
-            }
-            return this._condencedView;
         };
 
         /* @function Returns a copy the items contained in the current state )
@@ -107,23 +138,27 @@ define(['../utils/obj'], function(k) {
          * @returns Array of object of the form: {symbol, items} where items have an array of item rules  */
         state.prototype.getSupportedTransitionSymbols = function() {
             var itemsAux = {},
-            result = [];
+                result = [],
+                symbol;
 
-            for (var i = 0; i < this._items.length; i++) {
-                var symbol = this._items[i].getCurrentSymbol();
-                if (symbol) {
+            k.utils.obj.each(this._items, function (item)
+            {
+                symbol = item.getCurrentSymbol();
+                if (symbol)
+                {
                     if (itemsAux[symbol.name]) {
-                        itemsAux[symbol.name].push(this._items[i]);
+                        itemsAux[symbol.name].push(item);
                     }
-                    else {
-                        itemsAux[symbol.name] = [this._items[i]];
+                    else
+                    {
+                        itemsAux[symbol.name] = [item];
                         result.push({
                             symbol: symbol,
                             items: itemsAux[symbol.name]
                         });
                     }
                 }
-            }
+            });
 
             return result;
         };

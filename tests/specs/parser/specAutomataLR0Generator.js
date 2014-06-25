@@ -32,14 +32,40 @@ define(['../../../src/parser/automataLR0Generator', '../../../src/data/sampleGra
 		{
 			function getItemByRuleName(items, ruleName)
 			{
-				for (var i = 0; i < items.length; i++)
-				{
-					if (items[i].rule.options.name === ruleName)
-					{
-						return items[i];
-					}
-				}
+				return k.utils.obj.find(items, function(item) {
+				    return (item.rule.name === ruleName);
+				});
 			}
+			
+			it('should duplicate a rule if the dot location differs', function ()
+			{
+				var ag = new k.parser.AutomataLR0Generator({
+						grammar: sampleGrammars.aPlusb.g
+					}),
+					initialState,
+					items = k.data.ItemRule.newFromRules([sampleGrammars.aPlusb.A1]),
+					state,
+					itemsState;
+					
+				// Convert A --> *'a'A into A --> 'a'*A
+				items[0].dotLocation++;
+				
+				initialState = new k.data.State({
+					items: items
+				});
+					
+				state = ag.expandItem(initialState);
+				itemsState = state.getItems();
+					
+				expect(itemsState.length).toBe(3);
+				
+				var groupedItems = k.utils.obj.groupBy(itemsState, function (itemRule)
+				{
+					return itemRule.rule.name;
+				});
+				expect(groupedItems['A1RULE'].length).toBe(2);
+				expect(groupedItems['A2RULE'].length).toBe(1);
+			});
 
 			it('shoud return the full state for the grammar id list rule S', function()
 			{
@@ -53,7 +79,7 @@ define(['../../../src/parser/automataLR0Generator', '../../../src/data/sampleGra
 				var state = ag.expandItem(initialState),
 					itemsState = state.getItems();
 
-				expect(itemsState.length).toBe(2);
+				expect(itemsState.length).toBe(3);
 
 				var itemS = getItemByRuleName(itemsState, 'SRULE'); //This name is defined in the rule definition inside the sampleGrammar file
 				expect(itemS).toBeDefined();
@@ -62,6 +88,9 @@ define(['../../../src/parser/automataLR0Generator', '../../../src/data/sampleGra
 				var itemOparen = getItemByRuleName(itemsState, 'OPARENRULE'); //This name is defined in the rule inside the sampleGrammar file
 				expect(itemOparen).toBeDefined();
 				expect(itemOparen.rule).toEqual(sampleGrammars.idsList.OPAREN.clone());
+				
+				var itemAugment = getItemByRuleName(itemsState, 'AUGMENTRULE'); //This name is defined in all the grammars
+				expect(itemAugment).toBeDefined();
 			});
 
 			it('shoud return the full state for the grammar id list rule S with dot Location equal 1', function()
@@ -69,7 +98,7 @@ define(['../../../src/parser/automataLR0Generator', '../../../src/data/sampleGra
 				var ag = new k.parser.AutomataLR0Generator({
 						grammar: sampleGrammars.idsList.g
 					}),
-					items = k.data.ItemRule.newFromRules(ag.grammar.getRulesFromNonTerminal(ag.grammar.startSymbol));
+					items = k.data.ItemRule.newFromRules(ag.grammar.getRulesFromNonTerminal(ag.grammar.specifiedStartSymbol));
 
 				items[0].dotLocation++;
 				var initialState = new k.data.State({
@@ -103,7 +132,7 @@ define(['../../../src/parser/automataLR0Generator', '../../../src/data/sampleGra
 				var ag = new k.parser.AutomataLR0Generator({
 						grammar: sampleGrammars.idsList.g
 					}),
-					items = k.data.ItemRule.newFromRules(ag.grammar.getRulesFromNonTerminal(ag.grammar.startSymbol));
+					items = k.data.ItemRule.newFromRules(ag.grammar.getRulesFromNonTerminal(ag.grammar.specifiedStartSymbol));
 
 				items[0].dotLocation++;
 				items[0].dotLocation++;
@@ -159,15 +188,19 @@ define(['../../../src/parser/automataLR0Generator', '../../../src/data/sampleGra
 
 		describe('generateAutomata', function()
 		{
-			function findStateById(states, id) {
-				var result = null;
-				k.utils.obj.each(states, function(state) {
-					if (state.getIdentity() === id)
-					{
-						result = state;
-					}
+			function findStateById(states, id)
+			{
+				return k.utils.obj.find(states, function(state) {
+					return state.getIdentity() === id;
 				});
-				return result;
+			}
+			
+			function validateState(states, stateId, expectedItemsLength)
+			{
+				var state = findStateById(states, stateId);
+				expect(state).toBeDefined();
+				expect(state).not.toBe(null);
+				expect(state.getItems().length).toBe(expectedItemsLength);
 			}
 
 			it('should return the correct automata form the simple grammar num divs', function ()
@@ -179,44 +212,19 @@ define(['../../../src/parser/automataLR0Generator', '../../../src/data/sampleGra
 					states = result.states;
 
 				expect(result).toBeInstanceOf(k.data.Automata);
-				expect(states.length).toBe(7);
-
-				var state = findStateById(states, '0-1-2-4');
-				expect(state).toBeDefined();
-				expect(state.getItems().length).toBe(4);
-
-				state = findStateById(states, '0-1-3');
-				expect(state).toBeDefined();
-				expect(state.getItems().length).toBe(3);
-
-				state = findStateById(states, '1-4');
-				expect(state).toBeDefined();
-				expect(state.getItems().length).toBe(2);
-
-				state = findStateById(states, '1');
-				expect(state).toBeDefined();
-				expect(state.getItems().length).toBe(1);
-
-				state = findStateById(states, '2');
-				expect(state).toBeDefined();
-				expect(state.getItems().length).toBe(1);
-
-				state = findStateById(states, '4');
-				expect(state).toBeDefined();
-				expect(state.getItems().length).toBe(1);
-
-				state = findStateById(states, '3');
-				expect(state).toBeDefined();
-				expect(state.getItems().length).toBe(1);
+				expect(states.length).toBe(9);
+				
+				validateState(states, '0(0)1(0)2(0)3(0)5(0)', 5);
+				validateState(states, '1(1)2(1)4(0)', 3);
+				validateState(states, '2(2)5(0)', 2);
+				validateState(states, '2(3)', 1);
+				validateState(states, '3(1)', 1);
+				validateState(states, '4(1)', 1);
+				validateState(states, '5(1)', 1);
+				validateState(states, '0(1)', 1);
+				validateState(states, 'AcceptanceState', 1);
 			});
 			
-			function validatestate(states, stateId, expectedItemsLength)
-			{
-				var state = findStateById(states, stateId);
-				expect(state).toBeDefined();
-				expect(state.getItems().length).toBe(expectedItemsLength);
-			}
-
 			it('should return the correct automata form the simple grammar NUM DIFF', function ()
 			{
 				var ag = new k.parser.AutomataLR0Generator({
@@ -226,39 +234,20 @@ define(['../../../src/parser/automataLR0Generator', '../../../src/data/sampleGra
 					states = result.states;
 
 				expect(result).toBeInstanceOf(k.data.Automata);
-				expect(states.length).toBe(10);
+				expect(states.length).toBe(12);
 				
-				debugger;
-				
-				// validatestate(states, '', 4);
-
-				// var state = findStateById(states, '0-1-2-4');
-				// expect(state).toBeDefined();
-				// expect(state.getItems().length).toBe(4);
-
-				// state = findStateById(states, '0-1-3');
-				// expect(state).toBeDefined();
-				// expect(state.getItems().length).toBe(3);
-
-				// state = findStateById(states, '1-4');
-				// expect(state).toBeDefined();
-				// expect(state.getItems().length).toBe(2);
-
-				// state = findStateById(states, '1');
-				// expect(state).toBeDefined();
-				// expect(state.getItems().length).toBe(1);
-
-				// state = findStateById(states, '2');
-				// expect(state).toBeDefined();
-				// expect(state.getItems().length).toBe(1);
-
-				// state = findStateById(states, '4');
-				// expect(state).toBeDefined();
-				// expect(state.getItems().length).toBe(1);
-
-				// state = findStateById(states, '3');
-				// expect(state).toBeDefined();
-				// expect(state.getItems().length).toBe(1);
+				validateState(states, '0(0)1(0)2(0)3(0)4(0)5(0)7(0)', 7);
+				validateState(states, '2(0)3(0)4(0)5(1)5(0)7(1)7(0)', 7);
+				validateState(states, '2(2)4(0)5(0)7(0)', 4);
+				validateState(states, '2(1)5(2)6(0)8(0)', 4);
+				validateState(states, '1(1)2(1)6(0)', 3);
+				validateState(states, '5(3)8(1)', 2);
+				validateState(states, '2(3)', 1);
+				validateState(states, '3(1)', 1);
+				validateState(states, '4(1)', 1);
+				validateState(states, '6(1)', 1);
+				validateState(states, '0(1)', 1);
+				validateState(states, 'AcceptanceState', 1);
 			});
 		});
 	});

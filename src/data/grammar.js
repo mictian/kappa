@@ -174,6 +174,7 @@ define(['../utils/obj'],  function(k)
             k.utils.obj.defineProperty(this, 'head');
             k.utils.obj.defineProperty(this, 'tail');
             k.utils.obj.defineProperty(this, 'reduceFunc');
+            k.utils.obj.defineProperty(this, 'name');
 
             this.head = !(options.head instanceof NonTerminal) ?
 				new NonTerminal({
@@ -238,23 +239,57 @@ define(['../utils/obj'],  function(k)
 
 			//Define alias for:
             k.utils.obj.defineProperty(this, 'startSymbol');
+            k.utils.obj.defineProperty(this, 'specifiedStartSymbol'); //After augmented the grammar this property save the specified start symbol (it should be read only)
             k.utils.obj.defineProperty(this, 'rules');
             k.utils.obj.defineProperty(this, 'terminals');
             k.utils.obj.defineProperty(this, 'rulesByHeader');
+            k.utils.obj.defineProperty(this, 'name');
+            
+            if (!(this.startSymbol instanceof Symbol))
+            {
+                throw new Error('Invalid grammar creation, please specify a start Symbol!');
+            }
 
-            this._setRulesIndex();
+            this._generateRequireRequisites();
             this.rulesByHeader = this._getIndexByNonTerminals(this.rules);
             this.terminals = this._getTerminals(this.rules);
         };
         
-        /* @function Set the index of each rule in the current grammar
+        grammar.constants = {
+            AugmentedRuleName: 'AUGMENTRULE'
+        };
+        
+        /* @function Generate require state for a grammar.
+        * Set rule index
+        * Augment the grammar to detect when a string is accepts by adding S' --> S#
         * @returns {Void} */
-        grammar.prototype._setRulesIndex = function ()
+        grammar.prototype._generateRequireRequisites = function ()
         {
             //TODO TEST THIS
+            
+            //TODO Remove epsilon in the middle of rules, like A ==> B <EMPTY> 'a' C converted into A ==> B 'a' C
+            
+            //TODO Remove rules that contains non terminals that does NOT produce anything. NonTerminales that are not in non head rule.
+            //this will generate that our automata generator, make invalid loops!!! IMPORTANT!
+            
+            //TODO REMOVE UNREACHABLE RULES, (After applying previious logic)
+            //DO NOT REMOVE AUGMENTRULE 
+            //BECAREFUL if all the rules get removed!!
+            this.specifiedStartSymbol = this.startSymbol;
+            var augmentedRule = new Rule({
+                head: 'S\'',
+                tail: [this.startSymbol, new k.data.Symbol({name: specialSymbol.EOF, isSpecial: true})],
+                name: grammar.constants.AugmentedRuleName //'AUGMENTRULE'
+            });
+            
+            this.rules.unshift(augmentedRule);
+            this.startSymbol = augmentedRule.head;
+            
             k.utils.obj.each(this.rules, function (rule, i) {
                 rule.index = i;
             });
+            
+            
         };
 
         /* @function Index all grammatical rules by its header non terminal
@@ -279,13 +314,16 @@ define(['../utils/obj'],  function(k)
             var result = [];
             k.utils.obj.each(rules, function (rule)
             {
-                if (rule.tail.length === 1 && rule.tail[0].isTerminal)
+                k.utils.obj.each(rule.tail, function (symbol) 
                 {
-                    result[result.length] = {
-                        body: rule.tail[0].body,
-                        rule: rule
-                    };
-                }    
+                    if (symbol.isTerminal)
+                    {
+                        result[result.length] = {
+                            body: symbol.body,
+                            rule: rule
+                        };    
+                    }
+                });
             }, this);
             
             return result;

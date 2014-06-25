@@ -61,11 +61,21 @@ define(['../../../src/data/itemRule'], function(k)
 			{
 				var options = {
 						dotLocation: 42,
-						name: 'testing'
+						name: 'testing',
+						rule: {
+						    index: 0,
+						    clone: function ()
+						    {
+						        return this;
+						    }
+						}
 					},
 					i = new k.data.ItemRule(options);
+				
+				i.getIdentity(); // Calculate internal id
 
 				var clone = i.clone({});
+				clone.getIdentity();
 
 				expect(clone.options).toEqual(options);
 				expect(clone.options).not.toBe(options);
@@ -73,6 +83,7 @@ define(['../../../src/data/itemRule'], function(k)
 				expect(clone).toEqual(i);
 
 				clone = i.clone();
+				clone.getIdentity();
 
 				expect(clone.options).toEqual(options);
 				expect(clone.options).not.toBe(options);

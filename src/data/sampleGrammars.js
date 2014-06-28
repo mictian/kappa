@@ -92,19 +92,19 @@ define(['./grammar'], function(k)
 
 		EXP = new k.data.Rule({
 			head: 'EXP',
-			tail: [new k.data.Terminal({name:'ID', body: /[a-zA-Z]+/})],
+			tail: [new k.data.Terminal({name:'id_terminal', body: /[a-zA-Z]+/})],
 			name: 'EXPRULE'
 		}),
 
 		OPAREN = new k.data.Rule({
 			head: 'OPAREN',
-			tail: [new k.data.Terminal({name:'OPAREN', body: /\(/})],
+			tail: [new k.data.Terminal({name:'oparen_terminal', body: /\(/})],
 			name: 'OPARENRULE'
 		}),
 
 		CPAREN = new k.data.Rule({
 			head: 'CPAREN',
-			tail: [new k.data.Terminal({name:'CPAREN', body: /\)/})],
+			tail: [new k.data.Terminal({name:'cparen_terminal', body: /\)/})],
 			name: 'CPARENRULE'
 		});
 

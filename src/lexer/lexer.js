@@ -19,7 +19,8 @@ define(['../utils/str', '../utils/obj', '../data/grammar'], function(k)
         * @constructor
         * @param {Grammar} options.grammar Grammar used to control the scan process
         * @param {String} options.stream Input Stream (Generally a String)
-        * @param {Boolean} options.notIgnoreSpaces If true spaces are not ignored. False by default
+        * @param {Boolean} options.notIgnoreSpaces If true spaces are not ignored. False by default. 
+        	IMPORTANT: If the grammar has empty rules (A --> <EMPTY>) ignoring spaces will make that the lexer returns EOF instead of EMPTY at the end of the string ('').
         */
         var lexer = function (options)
         {
@@ -30,7 +31,7 @@ define(['../utils/str', '../utils/obj', '../data/grammar'], function(k)
             k.utils.obj.defineProperty(this, 'inputStream'); // Post-Processed input stream
             k.utils.obj.defineProperty(this, 'notIgnoreSpaces');
 
-			this.inputStream = (!this.notIgnoreSpaces && this.stream) ? k.utils.str.ltrim(this.stream) : this.stream;
+			this.setStream(this.stream);
         };
         
         /* @function Get next input token
@@ -40,24 +41,61 @@ define(['../utils/str', '../utils/obj', '../data/grammar'], function(k)
         {
         	//TODO TEST THIS
         	this.inputStream = (!this.notIgnoreSpaces && this.stream) ? k.utils.str.ltrim(this.stream) : this.stream;
+        	if (!this.notIgnoreSpaces && this.inputStream === '')
+        	{
+        		this.inputStream = null;
+        	}
+        };
+        
+        /* @function Get a generic result in case of error, when the lexer cannnot match any terminal in the input
+        * @returns {Object} An object representing the the mis of any match (error)  */
+        lexer.prototype.__getErrorResult = function()
+        {
+        	return {
+					length: -1,
+					string: this.inputStream,
+					ERROR: 'NOT MATCHING FOUND'
+				};
         };
 
 		/* @function Get next input token
         * @returns {Object} An object representing the current finded token. The object can not have a rule associated if there is any match */
         lexer.prototype.getNext = function()
         {
+        	//TODO TEST THIS
+        	//TODO return EMPTY whne the string is empty, and then return EOF!, or OEF cuando es null or undefined
             var result = {
 					length: -1
 				},
 				terminals = this.grammar.terminals,
+				grammarHasEmptyRules = k.utils.obj.find(this.grammar.rules, function (rule)
+					{
+						return rule.tail.length === 1 && rule.tail[0].isSpecial && rule.tail[0].name === k.data.specialSymbol.EMPTY;
+					}),
 				body;
 
-            if  (!this.inputStream)
+            if  (this.inputStream === null)
             {
 				result = {
 					length: -1,
-					terminal: new k.data.Symbol({name: k.data.specialSymbol.EOF, isSpecial:true})
+					terminal: new k.data.Symbol({name: k.data.specialSymbol.EOF})
 				};
+            }
+            else if (this.inputStream === '')
+            {
+            	if (grammarHasEmptyRules)
+            	{
+            		result = {
+						length: 0,
+						string: '',
+						terminal: new k.data.Symbol({name: k.data.specialSymbol.EMPTY})
+					};
+					this.inputStream = null;	
+            	}
+            	else
+            	{
+            		result = this.__getErrorResult();
+            	}
             }
             else
             {
@@ -73,18 +111,17 @@ define(['../utils/str', '../utils/obj', '../data/grammar'], function(k)
 							result = {
 								length: match.length,
 								string: match,
-								rule: terminals[i].rule,
 								terminal: terminals[i].rule.tail[0]
 							};
 						}
 					}
+					
 					//if it is a string check if there are the same
-					else if (toString.call(body) === '[object String]' && k.utils.str.startsWith(this.inputStream, body) && result.length < body.length)
+					else if (k.utils.obj.isString(body) && k.utils.str.startsWith(this.inputStream, body) && result.length < body.length)
 					{
 						result = {
 							length: body.length,
 							string: body,
-							rule: terminals[i].rule,
 							terminal: terminals[i].rule.tail[0]
 						};
 					}
@@ -93,10 +130,7 @@ define(['../utils/str', '../utils/obj', '../data/grammar'], function(k)
 				if (result.length === -1)
 				{
 					//if there is no valid match, we return the current input stream
-					result = {
-						length: this.inputStream.length,
-						string: this.inputStream
-					};
+					result = this.__getErrorResult();
 				}
 				else
 				{
@@ -105,6 +139,11 @@ define(['../utils/str', '../utils/obj', '../data/grammar'], function(k)
 					if (!this.options.notIgnoreSpaces)
 					{
 						this.inputStream = k.utils.str.ltrim(this.inputStream);
+						// if ignoring spaces and the input string only left empty, set the input as finished
+						if (this.inputStream === '')
+						{
+							this.inputStream = null;
+						}
 					}
 
 				}

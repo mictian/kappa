@@ -7,6 +7,7 @@ define(['../../../src/data/sampleGrammars', '../../../src/parser/parser'], funct
 	{
 		describe('Constructor', function()
 		{
+			//TODO FINISH THIS
 			it('should do FOO', function()
 			{
 				var p = k.parser.parserCreator.create({

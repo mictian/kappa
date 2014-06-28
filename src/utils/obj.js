@@ -153,12 +153,38 @@ define(['../core'], function(k)
 		/*
         * @func Util function to determine if an object is or not a Function
         * @param {Object} f object to check its type
-        * @returns {Boolean} True if the object passed in is a Functioj, false otherwise
+        * @returns {Boolean} True if the object passed in is a Function, false otherwise
         */
 		var __isFunction = function(f)
 		{
 			return Object.prototype.toString.call(f) === '[object Function]';
 		};
+		
+		/*
+        * @func Util function to determine if an object is or not Boolean
+        * @param {Object} b object to check its type
+        * @returns {Boolean} True if the object passed in is Boolean, false otherwise
+        */
+		var __isBoolean = function(b) {
+			return b === true || b === false || toString.call(b) == '[object Boolean]';
+		};
+		
+		/*
+        * @func Util function to determine if an object is the JS Arguments array, which is of a particular type
+        * @param {Object} a object to check its type
+        * @returns {Boolean} True if the object passed in is an Arguments Array, false otherwise
+        */
+		var __isArguments = function(a)
+		{
+			//TODO TEST THIS
+			return Object.prototype.toString.call(a) === '[object Arguments]';
+		};
+		
+		if (!__isArguments(arguments)) {
+			__isArguments = function(a) {
+				return !!(a && __has(a, 'callee'));
+			};
+		}
 
 		/*The next function are copied from underscorejs.org. These function are here because I want to be in control of all the code I manage.
 		Besides I like that I my code pass my JSHint rule, which are much more stringer that the onces applied by underscore.js */
@@ -166,6 +192,8 @@ define(['../core'], function(k)
 		/*General Variables*/
 		var breaker = {};
 		var ArrayProto	= Array.prototype,
+			concat		= ArrayProto.concat,
+			push		= ArrayProto.push,
 			FuncProto	= Function.prototype;
 
 		var nativeKeys         	= Object.keys,
@@ -174,6 +202,8 @@ define(['../core'], function(k)
 			nativeBind         	= FuncProto.bind,
 			nativeFilter    	= ArrayProto.filter,
 			nativeSome			= ArrayProto.some,
+			nativeEvery			= ArrayProto.every,
+			nativeIndexOf		= ArrayProto.indexOf,
 			slice				= ArrayProto.slice;
 
 		/*
@@ -181,8 +211,7 @@ define(['../core'], function(k)
         * @param {Thing} n object to check its type
         * @returns {Boolean} True if the thing passed in is a Object, false otherwise
         */
-		var __isObject = function(obj)
-		{
+		var __isObject = function(obj) {
 			return obj === Object(obj) && !__isFunction(obj);
 		};
 
@@ -387,6 +416,7 @@ define(['../core'], function(k)
         * @returns {Boolean} True if at least one item pass the predicate, false otherwise
         */
 		var __any = function(obj, predicate, context) {
+			//TODO TEST THIS
 			predicate || (predicate = __identity);
 			var result = false;
 			if (obj === null) { 
@@ -420,6 +450,7 @@ define(['../core'], function(k)
         * @returns {Function} A function that accepts an object and returns the value of its property set before
         */
 		var __property = function(key) {
+			//TOD TEST THIS
 			return function(obj) {
 				return obj[key];
 			};
@@ -507,6 +538,107 @@ define(['../core'], function(k)
 			};
 		};
 		
+		/* @func Determine whether all of the elements match a truth test.
+        * @param {Array} obj object to traverse
+        * @param {Function} predicate function called per each item founded in obj to determine if fulfill the requirements
+        * @param {Object} context object from which extract keys
+        * @returns {Boolean} Returns true if all of the values in the list pass the predicate truth test.
+        */
+		var __every = function(obj, predicate, context) {
+			//TODO TEST THIS
+			predicate || (predicate = __identity);
+			var result = true;
+			if (obj === null) {
+				return result;
+			}
+			if (nativeEvery && obj.every === nativeEvery) {
+				return obj.every(predicate, context);
+			}
+			__each(obj, function(value, index, list) {
+				if (!(result = result && predicate.call(context, value, index, list))) 
+				{
+					return breaker;
+				}
+			});
+			return !!result;
+		};
+		
+		/* @func Internal implementation of a recursive flatten function.
+        * @param {Array} input object to traverse
+        * @param {Boolean} shallow Indicate if the flattening should NOT be made recusrively (true: DO NOT make it recursively)
+        * @param {Array} output Output parameter wheere the final list is saved
+        * @returns {Array} Array where each item if flattened
+        */
+		var flatten = function(input, shallow, output) {
+			if (shallow && __every(input, __isArray)) {
+				return concat.apply(output, input);
+			}
+			__each(input, function(value) {
+				if (__isArray(value) || __isArguments(value)) {
+					shallow ? push.apply(output, value) : flatten(value, shallow, output);
+				} else {
+					output.push(value);
+				}
+			});
+			return output;
+		};
+		
+		/* @func Flatten out an array, either recursively (by default), or just one level.
+        * @param {Array} array object to traverse
+        * @param {Boolean} shallow Indicate if the flattening should NOT be made recusrively (true: DO NOT make it recursively)
+        * @returns {Array} Array where each item if flattened
+        */
+		var __flatten = function(array, shallow) {
+			//TODO TEST THIS
+			return flatten(array, shallow, []);
+		};
+		
+		/* @func Determine if the array or object contains a given value (using ===).
+        * @param {Array} obj object to traverse
+        * @param {Object} target Object looked for
+        * @returns {Boolean} True if the obj contains the value pass in
+        */
+		var __contains = function(obj, target) {
+			//TODO TEST THIS
+			if (obj === null) {
+				return false;
+			}
+			if (nativeIndexOf && obj.indexOf === nativeIndexOf) {
+				return obj.indexOf(target) != -1;
+			}
+			return __any(obj, function(value) {
+				return value === target;
+			});
+		};
+		
+		/* @func Produce a duplicate-free version of the array. If the array has already been sorted, you have the option of using a faster algorithm.
+        * @param {Array} array object to traverse
+        * @param {Boolean} isSorted indicate if the array is osrted or not
+        * @param {Function} iterator If you want to compute unique items based on a transformation, pass an iterator function
+        * @param {Object} context object from which extract keys
+        * @returns {Array} Original array without duplicates
+        */
+		var __uniq = function(array, isSorted, iterator, context) {
+			//TODO TEST THIS
+			if (__isFunction(isSorted)) {
+				context = iterator;
+				iterator = isSorted;
+				isSorted = false;
+			}
+			var initial = iterator ? __map(array, iterator, context) : array,
+				results = [],
+				seen = [];
+			
+			__each(initial, function(value, index) {
+				if (isSorted ? (!index || seen[seen.length - 1] !== value) : !__contains(seen, value))
+				{
+					seen.push(value);
+					results.push(array[index]);
+				}
+			});
+			return results;
+		};
+		
 		/* @func Groups the object’s values by a criterion. Pass either a string attribute to group by, or a function that returns the criterion
         * @param {Array} obj object to traverse
         * @param {Function} iterator function called per each item founded in obj
@@ -528,6 +660,8 @@ define(['../core'], function(k)
             isNumber: __isNumber,
             isObject: __isObject,
             isFunction: __isFunction,
+            isArguments: __isArguments,
+            isBoolean: __isBoolean,
             keys: __keys,
             each: __each,
             map: __map,
@@ -541,7 +675,11 @@ define(['../core'], function(k)
             sortBy: __sortBy,
             property: __property,
             find: __find,
-            groupBy: __groupBy
+            every: __every,
+            flatten: __flatten,
+            groupBy: __groupBy,
+            contains: __contains,
+            uniq: __uniq
         };
 
     })();

@@ -1,66 +1,21 @@
 /* global expect: true, describe: true, it:  true, beforeEach: true */
-define(['../../../src/lexer/lexer'], function(k)
+define(['../../../src/lexer/lexer', '../../../src/data/sampleGrammars'], function(k, sampleGrammar)
 {
 	'use strict';
 
 	describe('Lexer', function ()
 	{
-        var S,
-			EXPS1,
-			EXPS2,
-			EXP,
-			OPAREN,
-			CPAREN,
-			g;
-
-		beforeEach(function()
-		{
-            S = new k.data.Rule({
-				head: 'S',
-				tail: k.data.NonTerminal.fromArray(['OPAREN','EXPS','CPAREN'])
-			});
-
-			EXPS1 = new k.data.Rule({
-				head: 'EXPS',
-				tail: k.data.NonTerminal.fromArray(['EXPS','EXP'])
-			});
-
-            EXPS2 = new k.data.Rule({
-				head: 'EXPS'
-			});
-
-			EXP = new k.data.Rule({
-				head: 'EXP',
-				tail: [new k.data.Terminal({name:'id', body: /[a-zA-Z]+/})]
-			});
-
-			OPAREN = new k.data.Rule({
-				head: 'OPAREN',
-				tail: [new k.data.Terminal({name:'OPAREN', body: /\(/})]
-			});
-
-			CPAREN = new k.data.Rule({
-				head: 'CPAREN',
-				tail: [new k.data.Terminal({name:'CPAREN', body: /\)/})]
-			});
-
-			g = new k.data.Grammar({
-				startSymbol: S.head,
-				rules: [S, EXPS1, EXPS2, EXP, OPAREN, CPAREN]
-			});
-		});
-
-        it ('should ignore spaces by default', function(){
+        it ('should ignore spaces by default', function() {
              var lexer = new k.lexer.Lexer({
-				grammar: g,
+				grammar: sampleGrammar.idsList.g,
 				stream: ''
              });
              expect(lexer.options.notIgnoreSpaces).toBe(false);
         });
 
-        it ('should manage spaces as specified', function(){
+        it ('should manage spaces as specified', function() {
             var lexer = new k.lexer.Lexer({
-				grammar: g,
+				grammar: sampleGrammar.idsList,
 				stream: '',
                 notIgnoreSpaces: true
             });
@@ -71,7 +26,7 @@ define(['../../../src/lexer/lexer'], function(k)
         {
             it ('shoud left trim the input after reading a valid input if ignore spaced is specified', function(){
                 var lexer = new k.lexer.Lexer({
-					grammar: g,
+					grammar: sampleGrammar.idsList.g,
 					stream: '(  THIS IS A TEST) '
                 });
 
@@ -82,9 +37,9 @@ define(['../../../src/lexer/lexer'], function(k)
                 expect(lexer.inputStream).toBe('IS A TEST) ');
             });
 
-            it ('shoud return EOF if there is no more input to process', function() {
+            it ('shoud return EOF if there is no more input to process (ignore spaces equals true)', function() {
                 var lexer = new k.lexer.Lexer({
-					grammar: g,
+					grammar: sampleGrammar.idsList.g,
 					stream: ''
                 });
 
@@ -94,6 +49,123 @@ define(['../../../src/lexer/lexer'], function(k)
                 expect(result.terminal).toBeInstanceOf(k.data.Symbol);
                 expect(result.terminal.isSpecial).toBe(true);
                 expect(result.terminal.name).toBe(k.data.specialSymbol.EOF);
+            });
+            
+            it ('should return EMPTY if the only remaining string is "" and not ignoring spaced is false and there are rule with empty', function ()
+            {
+            	var sort = new k.data.Rule({
+	                    head: 'sort'
+					}),
+					grammar = new k.data.Grammar({
+						startSymbol: sort.head,
+						rules: [sort]
+					}),
+					lexer = new k.lexer.Lexer({
+						grammar: grammar,
+						notIgnoreSpaces: true,
+						stream: ''
+	                });
+                
+                var result = lexer.getNext();
+                
+                expect(result.length).toBe(0);
+                expect(result.string).toBe('');
+                expect(result.terminal.name).toBe('EMPTY');
+                
+            });
+            
+            it ('should return ERROR if the only remaining string is "" and not ignoring spaced and there are NOT rule with empty', function ()
+            {
+            	var sort = new k.data.Rule({
+	                    head: 'sort',
+	                    tail: [new k.data.Terminal({name:'hi', body: 'hi'})]
+					}),
+					grammar = new k.data.Grammar({
+						startSymbol: sort.head,
+						rules: [sort]
+					}),
+					lexer = new k.lexer.Lexer({
+						grammar: grammar,
+						notIgnoreSpaces: true,
+						stream: ''
+	                });
+                
+                var result = lexer.getNext();
+                
+                expect(result.length).toBe(-1);
+                expect(result.string).toBe('');
+                expect(result.terminal).toBeUndefined();
+                expect(result.ERROR).toBeDefined();
+            });
+            
+            it ('should return EOF if the only remaining string is "" and DO ignore spaced and there are rules with empty', function ()
+            {
+            	var sort = new k.data.Rule({
+	                    head: 'sort'
+					}),
+					grammar = new k.data.Grammar({
+						startSymbol: sort.head,
+						rules: [sort]
+					}),
+					lexer = new k.lexer.Lexer({
+						grammar: grammar,
+						stream: ''
+	                });
+                
+                var result = lexer.getNext();
+                
+                expect(result.length).toBe(-1);
+                expect(result.string).toBeUndefined();
+                expect(result.terminal.name).toBe('EOF');
+                expect(result.ERROR).toBeUndefined();
+            });
+            
+            it ('should return ERROR if the current input do NOT match any terminal NOT ignoring paces', function ()
+            {
+            	var sort = new k.data.Rule({
+	                    head: 'sort',
+	                    tail: [new k.data.Terminal({name:'hi', body: 'hi'})]
+					}),
+					grammar = new k.data.Grammar({
+						startSymbol: sort.head,
+						rules: [sort]
+					}),
+					lexer = new k.lexer.Lexer({
+						grammar: grammar,
+						notIgnoreSpaces: true,
+						stream: 'not match'
+	                });
+                
+                var result = lexer.getNext();
+                
+                expect(result.length).toBe(-1);
+                expect(result.string).toBe('not match');
+                expect(result.terminal).toBeUndefined();
+                expect(result.ERROR).toBeDefined();
+            });
+            
+            it ('should return ERROR if the current input do NOT match any terminal ignoring paces', function ()
+            {
+            	var sort = new k.data.Rule({
+	                    head: 'sort',
+	                    tail: [new k.data.Terminal({name:'hi', body: 'hi'})]
+					}),
+					grammar = new k.data.Grammar({
+						startSymbol: sort.head,
+						rules: [sort]
+					}),
+					lexer = new k.lexer.Lexer({
+						grammar: grammar,
+						notIgnoreSpaces: false,
+						stream: 'not match'
+	                });
+                
+                var result = lexer.getNext();
+                
+                expect(result.length).toBe(-1);
+                expect(result.string).toBe('not match');
+                expect(result.terminal).toBeUndefined();
+                expect(result.ERROR).toBeDefined();
             });
 
             it ('shoud return the larget possible match when regexp', function() {
@@ -125,9 +197,9 @@ define(['../../../src/lexer/lexer'], function(k)
             });
 
             it ('shoud return the larget possible match when string', function() {
-				var sort = new k.data.Rule({
+				var short = new k.data.Rule({
                     head: 'sort',
-                    tail: [new k.data.Terminal({name:'hel', body: 'he;'})]
+                    tail: [new k.data.Terminal({name:'SHORT', body: 'he;'})]
 				});
 
 				var large = new k.data.Rule({
@@ -135,13 +207,13 @@ define(['../../../src/lexer/lexer'], function(k)
 					tail: [new k.data.Terminal({name:'LARGE', body: 'hello'})]
 				});
 
-				var gramar = new k.data.Grammar({
-					startSymbol: sort.head,
-					rules: [sort, large]
+				var grammar = new k.data.Grammar({
+					startSymbol: short.head,
+					rules: [short, large]
 				});
 
 				var lexer = new k.lexer.Lexer({
-					grammar: gramar,
+					grammar: grammar,
 					stream: 'hello world'
 				});
 
@@ -154,34 +226,35 @@ define(['../../../src/lexer/lexer'], function(k)
             it('should return OPAREN, ID, ID, ID, ID, CPAREN for a simple gramar with ( THIS IS A TEST )', function()
             {
                 var l = new k.lexer.Lexer({
-					grammar: g,
+					grammar: sampleGrammar.idsList.g,
 					stream: '( THIS IS A TEST )'
                 });
 
                 var n = l.getNext();
                 expect(n.string).toBe('(');
-                expect(n.terminal.name).toBe('OPAREN');
+                expect(n.terminal.name).toBe('oparen_terminal');
 
                 n = l.getNext();
                 expect(n.string).toBe('THIS');
-                expect(n.terminal.name).toBe('id');
+                expect(n.terminal.name).toBe('id_terminal');
 
                 n = l.getNext();
                 expect(n.string).toBe('IS');
-                expect(n.terminal.name).toBe('id');
+                expect(n.terminal.name).toBe('id_terminal');
 
                 n = l.getNext();
                 expect(n.string).toBe('A');
-                expect(n.terminal.name).toBe('id');
+                expect(n.terminal.name).toBe('id_terminal');
 
                 n = l.getNext();
                 expect(n.string).toBe('TEST');
-                expect(n.terminal.name).toBe('id');
+                expect(n.terminal.name).toBe('id_terminal');
 
                 n = l.getNext();
                 expect(n.string).toBe(')');
-                expect(n.terminal.name).toBe('CPAREN');
+                expect(n.terminal.name).toBe('cparen_terminal');
             });
+            
         });
 
 	});

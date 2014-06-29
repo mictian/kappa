@@ -55,8 +55,8 @@
 
 		// specs.push(testRootPath + 'data/specGrammar');
 		// specs.push(testRootPath + 'data/specState');
-		specs.push(testRootPath + 'lexer/specLexer');
-		// specs.push(testRootPath + 'utils/specObj');
+		// specs.push(testRootPath + 'lexer/specLexer');
+		specs.push(testRootPath + 'utils/specObj');
 		// specs.push(testRootPath + 'utils/specStr');
 		// specs.push(testRootPath + 'data/specItemRule');
 		// specs.push(testRootPath + 'data/specAutomata');

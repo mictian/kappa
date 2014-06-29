@@ -185,6 +185,16 @@ define(['../core'], function(k)
 				return !!(a && __has(a, 'callee'));
 			};
 		}
+		
+		/*
+        * @func Util function to determine if an thing is or not a Object
+        * @param {Thing} n object to check its type
+        * @returns {Boolean} True if the thing passed in is a Object, false otherwise
+        */
+		var __isObject = function(obj) {
+			return obj === Object(obj) && !__isFunction(obj);
+		};
+		
 
 		/*The next function are copied from underscorejs.org. These function are here because I want to be in control of all the code I manage.
 		Besides I like that I my code pass my JSHint rule, which are much more stringer that the onces applied by underscore.js */
@@ -205,15 +215,6 @@ define(['../core'], function(k)
 			nativeEvery			= ArrayProto.every,
 			nativeIndexOf		= ArrayProto.indexOf,
 			slice				= ArrayProto.slice;
-
-		/*
-        * @func Util function to determine if an thing is or not a Object
-        * @param {Thing} n object to check its type
-        * @returns {Boolean} True if the thing passed in is a Object, false otherwise
-        */
-		var __isObject = function(obj) {
-			return obj === Object(obj) && !__isFunction(obj);
-		};
 
 		/* @func Alias of hasOwnProperty just for brevety
         * @param {Object} obj object to check ownership of property
@@ -314,7 +315,6 @@ define(['../core'], function(k)
         * @returns {Array} List of string keys of property names of the object passed in
         */
 		var __reduce = function(obj, iterator, memo, context) {
-			//TODO TEST THIS
 			var initial = arguments.length > 2;
 			if (obj === null) {
 				obj = [];
@@ -383,7 +383,6 @@ define(['../core'], function(k)
         * @returns {Array} List of item in object that pass thruly the pass in predicate
         */
 		var __filter = function(obj, predicate, context) {
-			//TODO TEST THIS
 			var results = [];
 			if (obj === null) {
 				return results;
@@ -440,7 +439,6 @@ define(['../core'], function(k)
         * @returns {Array} List of each property value from each item in obj
         */
 		var __pluck = function(obj, key) {
-			//TODO TEST THIS
 			return __map(obj, __property(key));
 		};
 		
@@ -450,7 +448,6 @@ define(['../core'], function(k)
         * @returns {Function} A function that accepts an object and returns the value of its property set before
         */
 		var __property = function(key) {
-			//TOD TEST THIS
 			return function(obj) {
 				return obj[key];
 			};
@@ -477,15 +474,14 @@ define(['../core'], function(k)
         * @returns {Object} The same obj passed in but sorted as specified by the iterator function
         */
 		var __sortBy = function(obj, iterator, context) {
-			//TODO TEST THIS
 			iterator = lookupIterator(iterator);
 			
 			return __pluck(__map(obj, function(value, index, list)
 			{
 				return {
-				value: value,
-				index: index,
-				criteria: iterator.call(context, value, index, list)
+					value: value,
+					index: index,
+					criteria: iterator.call(context, value, index, list)
 				};
 			}).sort(function(left, right) {
 				var a = left.criteria;
@@ -509,7 +505,6 @@ define(['../core'], function(k)
         * @returns {Object} The first item in obj that returns true
         */
 		var __find = function(obj, predicate, context) {
-			//TODO TEST THIS
 			var result;
 			__any(obj, function(value, index, list) {
 				if (predicate.call(context, value, index, list)) {
@@ -545,7 +540,6 @@ define(['../core'], function(k)
         * @returns {Boolean} Returns true if all of the values in the list pass the predicate truth test.
         */
 		var __every = function(obj, predicate, context) {
-			//TODO TEST THIS
 			predicate || (predicate = __identity);
 			var result = true;
 			if (obj === null) {
@@ -589,7 +583,6 @@ define(['../core'], function(k)
         * @returns {Array} Array where each item if flattened
         */
 		var __flatten = function(array, shallow) {
-			//TODO TEST THIS
 			return flatten(array, shallow, []);
 		};
 		
@@ -599,7 +592,6 @@ define(['../core'], function(k)
         * @returns {Boolean} True if the obj contains the value pass in
         */
 		var __contains = function(obj, target) {
-			//TODO TEST THIS
 			if (obj === null) {
 				return false;
 			}
@@ -619,7 +611,6 @@ define(['../core'], function(k)
         * @returns {Array} Original array without duplicates
         */
 		var __uniq = function(array, isSorted, iterator, context) {
-			//TODO TEST THIS
 			if (__isFunction(isSorted)) {
 				context = iterator;
 				iterator = isSorted;

@@ -2,8 +2,7 @@ define(['../utils/obj'],  function(k)
 {
 	'use strict';
 
-	/**
-	* Enum for any special Symbol
+	/* Enum for any special Symbol
 	* @readonly
 	* @enum {String}
 	*/
@@ -12,7 +11,7 @@ define(['../utils/obj'],  function(k)
         EOF : 'EOF'
     };
 
-    /** Symbol
+    /* Symbol
     * @class
     * @classdesc This class represent any simbol in the entire system */
     var Symbol = (function ()
@@ -31,7 +30,7 @@ define(['../utils/obj'],  function(k)
 
 			k.utils.obj.defineProperty(this, 'name');
 			k.utils.obj.defineProperty(this, 'isSpecial');
-			k.utils.obj.defineProperty(this, 'rule'); // The rule at which this symbol belongs
+			k.utils.obj.defineProperty(this, 'rule');
 
             this.isSpecial = k.utils.obj.isBoolean(options.isSpecial) ? options.isSpecial : true;
 
@@ -41,7 +40,7 @@ define(['../utils/obj'],  function(k)
             }
         };
 
-        /** @function Shows the symbol's name
+        /* @function Shows the symbol's name
         * @returns {String} this.name */
         symbol.prototype.toString = function() {
             return this.name.toString();
@@ -56,13 +55,14 @@ define(['../utils/obj'],  function(k)
         return symbol;
     })();
 
-    /** Non Terminal
+    /* Non Terminal
     * @class
     * @classdesc Use this class to create new instance of non Termianls */
     var NonTerminal = (function(_super)
     {
         /* jshint latedef:false */
         k.utils.obj.inherit(nonTerminal, _super);
+
         /*
         * Creates an instance of a new Non Termianl
         *
@@ -75,27 +75,25 @@ define(['../utils/obj'],  function(k)
             this.isSpecial = false;
         }
 
-        /** @function Creates an array os non terminals from a string that represen them
+        /* @function Creates an array os non terminals from a string that represen them
          * @param {[Array]} arr Array of string used to create new non terminals
-         * @returns An array of new nonterminals  */
+         * @returns {[NonTerminal]} An array of new nonterminals  */
         nonTerminal.fromArray = function (arr)
         {
             if (!k.utils.obj.isArray(arr) && !k.utils.obj.isString(arr)) {
                 throw new Error('Invalid parameter. To create non terminal from array the input parameter should be an array!');
             }
             var result = [];
-            for (var i = 0; i < arr.length; i++)
+            k.utils.obj.each(arr, function(nonTerminalName)
             {
-                result[i] = new NonTerminal({
-                    name: arr[i]
-                });
-            }
+                result[result.length] = new NonTerminal({name: nonTerminalName});
+            });
 
             return result;
         };
 
         /* @function Creates a deep copy of the current instance
-        * @returns Deep copy */
+        * @returns {NonTerminal} Deep copy */
         nonTerminal.prototype.clone = function() {
 			return new NonTerminal(k.utils.obj.clone(this.options));
         };
@@ -110,6 +108,7 @@ define(['../utils/obj'],  function(k)
     {
         /* jshint latedef:false */
         k.utils.obj.inherit(terminal, _super);
+
         /*
         * Creates an instance of a new Termianl
         *
@@ -128,19 +127,19 @@ define(['../utils/obj'],  function(k)
 
             k.utils.obj.defineProperty(this, 'body');
             k.utils.obj.defineProperty(this, 'isTerminal');
-            
+
             this.isSpecial = false;
             this.isTerminal = true;
         }
 
         /* @function Shows the terminal's name between < and >
-        * @returns Fromatted string */
+        * @returns {String} Fromatted string */
         terminal.prototype.toString = function() {
             return '<' + this.name + '>';
         };
 
 		/* @function Creates a deep copy of the current instance
-        * @returns Deep copy */
+        * @returns {Terminal} Deep copy */
         terminal.prototype.clone = function() {
 			var cloneOptions = k.utils.obj.clone(this.options);
 			cloneOptions.body = k.utils.obj.isRegExp(this.body) ? new RegExp(this.body.source) : this.body;
@@ -151,7 +150,7 @@ define(['../utils/obj'],  function(k)
         return terminal;
     })(Symbol);
 
-     /**  Grammatical Rules
+    /* Grammatical Rules
     * @class
     * @classdesc Use this class to create new instance of non Termianls */
     var Rule = (function()
@@ -161,8 +160,9 @@ define(['../utils/obj'],  function(k)
         *
         * @constructor
         * @param {NonTerminal} options.head The name or denatation of the non terminal
-        * @param {[Terminal|NonTerminal]} [options.tail] Array of terminals and nonTerminals that represent the tail of the rule. If is not present an empty tail will be created.
+        * @param {[Terminal|NonTerminal]} options.tail Array of terminals and nonTerminals that represent the tail of the rule. If is not present an empty tail will be created.
         * @param {Function} options.reduceFunc A function to be executed when reducint this rule
+        * @param {String} options.name Identification of the rule instance
         */
         var rule = function (options)
         {
@@ -178,8 +178,9 @@ define(['../utils/obj'],  function(k)
             k.utils.obj.defineProperty(this, 'tail');
             k.utils.obj.defineProperty(this, 'reduceFunc');
             k.utils.obj.defineProperty(this, 'name');
+
             k.utils.obj.defineProperty(this, 'index');
-            
+
             this.index = -1;
 
             this.head = !(options.head instanceof NonTerminal) ?
@@ -189,7 +190,7 @@ define(['../utils/obj'],  function(k)
 				options.head;
 
 			this.tail = (options.tail && k.utils.obj.isArray(options.tail)) ? options.tail : [new Symbol({name: specialSymbol.EMPTY, isSpecial: true})];
-			
+
 			k.utils.obj.each(this.tail, function (symbol)
 			{
 			    symbol.rule = this;
@@ -197,7 +198,7 @@ define(['../utils/obj'],  function(k)
         };
 
         /* @function Convert a Rule to its pritty string representation
-        * @returns Formatted string */
+        * @returns {String} Formatted string */
         rule.prototype.toString = function()
         {
             return this.head.toString() + ' --> ' + this.tail.join(' ');
@@ -205,14 +206,22 @@ define(['../utils/obj'],  function(k)
 
         /* @function Clone the current item, generating a deep copy of it.
         * @param {Boolean} options.copyRuleIndex Indicate if the index should be copied or not. Default: false
-        * @returns A deep copy of the current item */
+        * @returns {Rule} A deep copy of the current item */
         rule.prototype.clone = function(options)
         {
-			var cloneOptions = k.utils.obj.clone(this.options);
+            var auxHead = this.head,
+                auxTail = this.tail,
+			    cloneOptions;
 
-			cloneOptions.head = this.head.clone();
-			cloneOptions.tail = k.utils.obj.map(this.tail, function(symbol) {
-				return symbol.clone();
+			// We conserve the head and the tail because the symbol know at what rule it belongs, cause cyclic references
+			this.options.head = null;
+			this.options.tail = null;
+
+		    cloneOptions = k.utils.obj.clone(this.options);
+
+			cloneOptions.head = auxHead.clone();
+			cloneOptions.tail = k.utils.obj.map(auxTail, function(symbol) {
+			    return symbol.clone();
 			});
 
 			var result = new Rule(cloneOptions);
@@ -228,7 +237,7 @@ define(['../utils/obj'],  function(k)
         return rule;
     })();
 
-     /**  Grammar
+    /*  Grammar
     * @class
     * @classdesc This class is used to represent grammars */
     var Grammar = (function ()
@@ -253,11 +262,11 @@ define(['../utils/obj'],  function(k)
             k.utils.obj.defineProperty(this, 'startSymbol');
             k.utils.obj.defineProperty(this, 'name');
             k.utils.obj.defineProperty(this, 'rules');
-            
+
             k.utils.obj.defineProperty(this, 'specifiedStartSymbol'); //After augmented the grammar this property save the specified start symbol (it should be read only)
             k.utils.obj.defineProperty(this, 'terminals');
             k.utils.obj.defineProperty(this, 'rulesByHeader');
-            
+
             if (!(this.startSymbol instanceof Symbol))
             {
                 throw new Error('Invalid grammar creation, please specify a start Symbol!');
@@ -265,11 +274,11 @@ define(['../utils/obj'],  function(k)
 
             this._generateRequireRequisites();
         };
-        
+
         grammar.constants = {
             AugmentedRuleName: 'AUGMENTRULE'
         };
-        
+
         /* @function Generate require state for a grammar.
         * Set rule index
         * Augment the grammar to detect when a string is accepts by adding S' --> S#
@@ -278,20 +287,20 @@ define(['../utils/obj'],  function(k)
         grammar.prototype._generateRequireRequisites = function ()
         {
             //TODO TEST THIS
-            
+
             //TODO Remove epsilon in the middle of rules, like A ==> B <EMPTY> 'a' C converted into A ==> B 'a' C
-            
+
             //TODO Determines nullable non-terminals
-            
-            
+
+
             //TODO Remove rules that contains non terminals that does NOT produce anything. NonTerminales that are not in non head rule.
             //this could generate that our automata generator, make invalid loops!!! IMPORTANT!
-            
+
             //TODO REMOVE UNREACHABLE RULES, (After applying previous logic)
-            //DO NOT REMOVE AUGMENTRULE 
+            //DO NOT REMOVE AUGMENTRULE
             //BECAREFUL if all the rules get removed!!
-            
-            
+
+
             // augment the grammar
             this.specifiedStartSymbol = this.startSymbol;
             var augmentedRule = new Rule({
@@ -299,23 +308,23 @@ define(['../utils/obj'],  function(k)
                 tail: [this.startSymbol, new k.data.Symbol({name: specialSymbol.EOF})],
                 name: grammar.constants.AugmentedRuleName
             });
-            
+
             this.rules.unshift(augmentedRule);
             this.startSymbol = augmentedRule.head;
-            
+
             //set rules index
             k.utils.obj.each(this.rules, function (rule, i) {
                 rule.index = i;
             });
-            
-            
+
+
             // index rule its rule's head name
             this.rulesByHeader = k.utils.obj.groupBy(this.rules, function (rule)
             {
                 return rule.head.name;
             });
-            
-            
+
+
             // get all terminals & determine if it has empty rules
             //flat all rules to get a list of symbol (its tails)
             var tailSymbols = k.utils.obj.flatten(
@@ -324,7 +333,7 @@ define(['../utils/obj'],  function(k)
                         return rule.tail;
                     }),
                     false);
-                
+
             // remove duplicated symbol (by its name) and filter all non terminals
             this.terminals = k.utils.obj.filter(
                 k.utils.obj.uniq(tailSymbols, false, function (symbol)
@@ -346,7 +355,7 @@ define(['../utils/obj'],  function(k)
         };
 
         /* @function Convert a Grammar to its pritty string representation
-        * @returns Formatted string */
+        * @returns {String} Formatted string */
         grammar.prototype.toString = function() {
             var strResult = this.name ? 'Name: ' + this.name : '';
             strResult += 'Start Symbol: ' + this.startSymbol.name +'\n';
@@ -354,7 +363,7 @@ define(['../utils/obj'],  function(k)
             strResult += k.utils.obj.reduce(k.utils.obj.sortBy(this.rules, function(rule) {return rule.index;}), function (strAcc, rule) {
                 return strAcc + '\n' + rule.index + '. ' + rule.toString();
             }, '');
-            
+
             return strResult;
         };
 

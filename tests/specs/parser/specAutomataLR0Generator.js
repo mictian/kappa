@@ -63,8 +63,8 @@ define(['../../../src/parser/automataLR0Generator', '../../../src/data/sampleGra
 				{
 					return itemRule.rule.name;
 				});
-				expect(groupedItems['A1RULE'].length).toBe(2);
-				expect(groupedItems['A2RULE'].length).toBe(1);
+				expect(groupedItems.A1RULE.length).toBe(2);
+				expect(groupedItems.A2RULE.length).toBe(1);
 			});
 
 			it('shoud return the full state for the grammar id list rule S', function()

@@ -40,13 +40,13 @@ define(['../../../src/data/grammar'], function(k)
             }).not.toThrow();
 		});
 
-		it('should not create a special one by default', function()
+		it('should create a special one by default', function()
 		{
             var s =  new k.data.Symbol({
                 name: 'Test Symbol'
 			});
 
-			expect(s.isSpecial).toBe(false);
+			expect(s.isSpecial).toBe(true);
 		});
 
 		it('should create a special symbol if specified', function()
@@ -490,17 +490,17 @@ define(['../../../src/data/grammar'], function(k)
 
 			EXP = new k.data.Rule({
 				head: 'EXP',
-				tail: [new k.data.Terminal({name:'id', body: /[a-zA-Z]+/})]
+				tail: [new k.data.Terminal({name:'id_terminal', body: /[a-zA-Z]+/})]
 			});
 
 			OPAREN = new k.data.Rule({
 				head: 'OPAREN',
-				tail: [new k.data.Terminal({name:'OPAREN', body: /\(/})]
+				tail: [new k.data.Terminal({name:'oparent_terminal', body: /\(/})]
 			});
 
 			CPAREN = new k.data.Rule({
 				head: 'CPAREN',
-				tail: [new k.data.Terminal({name:'CPAREN', body: /\)/})]
+				tail: [new k.data.Terminal({name:'cparent_terminal', body: /\)/})]
 			});
 
 			g = new k.data.Grammar({
@@ -508,99 +508,143 @@ define(['../../../src/data/grammar'], function(k)
 				rules: [S, EXPS1, EXPS2, EXP, OPAREN, CPAREN]
 			});
 		});
-
-        it('should have an empty name if it\'s not specified', function (){
-            var gr = new k.data.Grammar({
-				startSymbol: new k.data.Symbol({name: k.data.specialSymbol.EOF, isSpecial:true}), //Because a grammar requires a start symbol
-				rules: []
-            });
-
-            expect(gr.name).toBe('');
-        });
-
-        it('should have an specified name', function (){
-            var gr = new k.data.Grammar({
-				startSymbol: new k.data.Symbol({name: k.data.specialSymbol.EOF, isSpecial:true}), //Because a grammar requires a start symbol
-				rules: [],
-				name: 'TEST'
-            });
-
-            expect(gr.name).toBe('TEST');
-        });
-
-        it ('should have grouped all rules by it head', function(){
-
-            /*jshint -W069 */
-			expect(g.rulesByHeader).toBeDefined();
-
-			expect(g.rulesByHeader['S'].length).toBe(1);
-			expect(g.rulesByHeader['S'][0]).toBe(S);
-
-			expect(g.rulesByHeader['EXPS'].length).toBe(2);
-			expect(g.rulesByHeader['EXPS'][0]).toBe(EXPS1);
-			expect(g.rulesByHeader['EXPS'][1]).toBe(EXPS2);
-
-			expect(g.rulesByHeader['EXP'].length).toBe(1);
-			expect(g.rulesByHeader['EXP'][0]).toBe(EXP);
-
-			expect(g.rulesByHeader['OPAREN'].length).toBe(1);
-			expect(g.rulesByHeader['OPAREN'][0]).toBe(OPAREN);
-
-			expect(g.rulesByHeader['CPAREN'].length).toBe(1);
-			expect(g.rulesByHeader['CPAREN'][0]).toBe(CPAREN);
-        });
-
-        it ('should add a index to each rule', function(){
-			expect(S.index).toBe(1);
-			expect(EXPS1.index).toBe(2);
-			expect(EXPS2.index).toBe(3);
-			expect(EXP.index).toBe(4);
-			expect(OPAREN.index).toBe(5);
-			expect(CPAREN.index).toBe(6);
-        });
-
-        it ('should have grouped all terminal symbols', function(){
-
-            expect(g.terminals).toBeDefined();
-            expect(g.terminals.length).toBe(3); //The number of non terminal in the current grammar
-            expect(g.terminals[0]).toEqual({
-                body: EXP.tail[0].body,
-                rule: EXP
-            });
-
-            expect(g.terminals[1]).toEqual({
-                body: OPAREN.tail[0].body,
-                rule: OPAREN
-            });
-
-            expect(g.terminals[2]).toEqual({
-                body: CPAREN.tail[0].body,
-                rule: CPAREN
-            });
-        });
-
-        it ('.getRulesFromNonTerminal should return a rule by passing its valid head', function(){
-            expect(g.getRulesFromNonTerminal(S.head)).toEqual([S]);
-            expect(g.getRulesFromNonTerminal(EXP.head)).toEqual([EXP]);
-            expect(g.getRulesFromNonTerminal(CPAREN.head)).toEqual([CPAREN]);
-            expect(g.getRulesFromNonTerminal(OPAREN.head)).toEqual([OPAREN]);
-
-            expect(g.getRulesFromNonTerminal(EXPS1.head)[0]).toEqual(EXPS1);
-            expect(g.getRulesFromNonTerminal(EXPS1.head)[1]).toEqual(EXPS2);
-
-            expect(g.getRulesFromNonTerminal(EXPS2.head)[0]).toEqual(EXPS1);
-            expect(g.getRulesFromNonTerminal(EXPS2.head)[1]).toEqual(EXPS2);
-        });
-
-        it ('.getRulesFromNonTerminal should return undefined by passing a non valid head', function(){
-             expect(function(){ return g.getRulesFromNonTerminal(undefined);}).toThrow();
-             expect(g.getRulesFromNonTerminal({})).toBeUndefined();
-             expect(g.getRulesFromNonTerminal(true)).toBeUndefined();
-             expect(g.getRulesFromNonTerminal('')).toBeUndefined();
-        });
-
-        it ('should have .toString overridden', function(){
+		
+		it ('should have .toString overridden', function(){
             expect(k.data.Grammar.prototype.toString).toBeDefined();
         });
+
+		describe('constructor', function ()
+		{
+		    it('should have an empty name if it\'s not specified', function (){
+                var gr = new k.data.Grammar({
+    				startSymbol: new k.data.Symbol({name: k.data.specialSymbol.EOF, isSpecial:true}), //Because a grammar requires a start symbol
+    				rules: []
+                });
+
+                expect(gr.name).toBe('');
+            });
+
+            it('should have an specified name', function (){
+                var gr = new k.data.Grammar({
+    				startSymbol: new k.data.Symbol({name: k.data.specialSymbol.EOF, isSpecial:true}), //Because a grammar requires a start symbol
+    				rules: [],
+    				name: 'TEST'
+                });
+
+                expect(gr.name).toBe('TEST');
+            });
+
+            it ('should have grouped all rules by it head', function(){
+
+                // Ignore error caused by invoke object properties by using array notation
+                /*jshint -W069 */
+    			expect(g.rulesByHeader).toBeDefined();
+
+    			expect(g.rulesByHeader['S'].length).toBe(1);
+    			expect(g.rulesByHeader['S'][0]).toBe(S);
+
+    			expect(g.rulesByHeader['EXPS'].length).toBe(2);
+    			expect(g.rulesByHeader['EXPS'][0]).toBe(EXPS1);
+    			expect(g.rulesByHeader['EXPS'][1]).toBe(EXPS2);
+
+    			expect(g.rulesByHeader['EXP'].length).toBe(1);
+    			expect(g.rulesByHeader['EXP'][0]).toBe(EXP);
+
+    			expect(g.rulesByHeader['OPAREN'].length).toBe(1);
+    			expect(g.rulesByHeader['OPAREN'][0]).toBe(OPAREN);
+
+    			expect(g.rulesByHeader['CPAREN'].length).toBe(1);
+    			expect(g.rulesByHeader['CPAREN'][0]).toBe(CPAREN);
+            });
+
+            it ('should add a index to each rule', function(){
+    			expect(S.index).toBe(1);
+    			expect(EXPS1.index).toBe(2);
+    			expect(EXPS2.index).toBe(3);
+    			expect(EXP.index).toBe(4);
+    			expect(OPAREN.index).toBe(5);
+    			expect(CPAREN.index).toBe(6);
+            });
+
+            it ('should have grouped all terminal symbols', function(){
+
+                expect(g.terminals).toBeDefined();
+                expect(g.terminals.length).toBe(3); //The number of non terminal in the current grammar
+
+                var terminal = k.utils.obj.find(g.terminals, function (terminal)
+                {
+                   return terminal.name === 'id_terminal';
+                });
+                expect(terminal).toBe(EXP.tail[0]);
+
+                terminal = k.utils.obj.find(g.terminals, function (terminal)
+                {
+                   return terminal.name === 'oparent_terminal';
+                });
+                expect(terminal).toBe(OPAREN.tail[0]);
+
+                terminal = k.utils.obj.find(g.terminals, function (terminal)
+                {
+                   return terminal.name === 'cparent_terminal';
+                });
+                expect(terminal).toBe(CPAREN.tail[0]);
+
+            });
+            
+            it ('should expand the original grammar adding an extra initial rule', function ()
+            {
+                    
+            });
+            
+            it ('should put the extra rule at first place', function ()
+            {
+                
+            });
+            
+            it ('should remove un productive rule', function ()
+            {
+                
+            });
+            
+            it ('shoud preserve the specified start symbol as specifiedStartSymbol', function ()
+            {
+                
+            });
+            
+            it ('should remove epsilon in the middle of a rule when epsilon is not the only element in the rule', function ()
+            {
+                
+            });
+            
+            it ('should preserve epsilon in rules where it is the only element in the tail', function ()
+            {
+                
+            });
+		});
+
+        describe('getRulesFromNonTerminal', function()
+        {
+            it ('should return a rule by passing its valid head', function(){
+                expect(g.getRulesFromNonTerminal(S.head)).toEqual([S]);
+                expect(g.getRulesFromNonTerminal(EXP.head)).toEqual([EXP]);
+                expect(g.getRulesFromNonTerminal(CPAREN.head)).toEqual([CPAREN]);
+                expect(g.getRulesFromNonTerminal(OPAREN.head)).toEqual([OPAREN]);
+    
+                expect(g.getRulesFromNonTerminal(EXPS1.head)[0]).toEqual(EXPS1);
+                expect(g.getRulesFromNonTerminal(EXPS1.head)[1]).toEqual(EXPS2);
+    
+                expect(g.getRulesFromNonTerminal(EXPS2.head)[0]).toEqual(EXPS1);
+                expect(g.getRulesFromNonTerminal(EXPS2.head)[1]).toEqual(EXPS2);
+            });
+    
+            it ('should return undefined by passing a non valid head', function(){
+                 expect(function(){ return g.getRulesFromNonTerminal(undefined);}).toThrow();
+                 expect(g.getRulesFromNonTerminal({})).toBeUndefined();
+                 expect(g.getRulesFromNonTerminal(true)).toBeUndefined();
+                 expect(g.getRulesFromNonTerminal('')).toBeUndefined();
+            });    
+        });
+        
+        
 	});
 });

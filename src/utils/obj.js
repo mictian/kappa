@@ -166,7 +166,7 @@ define(['../core'], function(k)
         * @returns {Boolean} True if the object passed in is Boolean, false otherwise
         */
 		var __isBoolean = function(b) {
-			return b === true || b === false || toString.call(b) == '[object Boolean]';
+			return b === true || b === false || Object.prototype.toString.call(b) === '[object Boolean]';
 		};
 		
 		/*
@@ -176,7 +176,6 @@ define(['../core'], function(k)
         */
 		var __isArguments = function(a)
 		{
-			//TODO TEST THIS
 			return Object.prototype.toString.call(a) === '[object Arguments]';
 		};
 		
@@ -350,7 +349,6 @@ define(['../core'], function(k)
 		* @returns {Function} A new wrap function
 		*/
 		var __bind = function(func, context) {
-			//TODO TEST THIS
 			var args, bound;
 			if (nativeBind && func.bind === nativeBind) {
 				return nativeBind.apply(func, slice.call(arguments, 1));
@@ -415,8 +413,7 @@ define(['../core'], function(k)
         * @returns {Boolean} True if at least one item pass the predicate, false otherwise
         */
 		var __any = function(obj, predicate, context) {
-			//TODO TEST THIS
-			predicate || (predicate = __identity);
+			predicate = predicate || __identity;
 			var result = false;
 			if (obj === null) { 
 				return result;
@@ -540,7 +537,7 @@ define(['../core'], function(k)
         * @returns {Boolean} Returns true if all of the values in the list pass the predicate truth test.
         */
 		var __every = function(obj, predicate, context) {
-			predicate || (predicate = __identity);
+			predicate = predicate || __identity;
 			var result = true;
 			if (obj === null) {
 				return result;
@@ -569,7 +566,11 @@ define(['../core'], function(k)
 			}
 			__each(input, function(value) {
 				if (__isArray(value) || __isArguments(value)) {
-					shallow ? push.apply(output, value) : flatten(value, shallow, output);
+					if (shallow) {
+						push.apply(output, value);
+					} else { 
+						flatten(value, shallow, output);
+					}
 				} else {
 					output.push(value);
 				}
@@ -596,7 +597,7 @@ define(['../core'], function(k)
 				return false;
 			}
 			if (nativeIndexOf && obj.indexOf === nativeIndexOf) {
-				return obj.indexOf(target) != -1;
+				return obj.indexOf(target) !== -1;
 			}
 			return __any(obj, function(value) {
 				return value === target;
@@ -637,7 +638,12 @@ define(['../core'], function(k)
         * @returns {Object} Object where each property is the key of each group, and where the values of these key are the array of values grouped
         */
 		var __groupBy = group(function(result, key, value) {
-			__has(result, key) ? result[key].push(value) : result[key] = [value];
+			if (__has(result, key))
+			{
+				result[key].push(value);
+			} else { 
+				result[key] = [value];
+			}
 		});
 
         return {

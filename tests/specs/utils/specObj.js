@@ -560,7 +560,7 @@ define(['../../../src/utils/obj'], function(k)
 				expect(k.utils.obj.isBoolean(function(){})).toBe(false);
 				expect(k.utils.obj.isBoolean(12)).toBe(false);
 				expect(k.utils.obj.isBoolean(0.7)).toBe(false);
-				expect(k.utils.obj.isBoolean("a")).toBe(false);
+				expect(k.utils.obj.isBoolean('a')).toBe(false);
 			});
 		});
 		
@@ -583,7 +583,7 @@ define(['../../../src/utils/obj'], function(k)
 				expect(k.utils.obj.isArguments(0.7)).toBe(false);
 				expect(k.utils.obj.isArguments(false)).toBe(false);
 				expect(k.utils.obj.isArguments(true)).toBe(false);
-				expect(k.utils.obj.isArguments("a")).toBe(false);
+				expect(k.utils.obj.isArguments('a')).toBe(false);
 			});
 		});
 
@@ -943,7 +943,7 @@ define(['../../../src/utils/obj'], function(k)
 				var stooges = [{name: 'moe', age: 40}, {name: 'larry', age: 50}, {name: 'curly', age: 60}];
 				var result = k.utils.obj.pluck(stooges, 'name');
 				
-				expect(result).toEqual(["moe", "larry", "curly"]);
+				expect(result).toEqual(['moe', 'larry', 'curly']);
 			});
 			
 			it('should return [] if passed null', function()
@@ -1063,7 +1063,7 @@ define(['../../../src/utils/obj'], function(k)
 		{
 			it('should find the first object that fulfill the specified requirements', function ()
 			{
-				expect(k.utils.obj.find([1,2,3,4,5], function(i){return i === 2})).toBe(2);
+				expect(k.utils.obj.find([1,2,3,4,5], function(i){return i === 2; })).toBe(2);
 			});
 			
 			it('should iterate the list just until the first element if found', function ()
@@ -1287,13 +1287,8 @@ define(['../../../src/utils/obj'], function(k)
 			it('should group by the property passed if instead of a function a string is passed', function ()
 			{
 				var result = k.utils.obj.groupBy(['one', 'two', 'three'], 'length');
-				expect(result).toEqual({3: ["one", "two"], 5: ["three"]});
+				expect(result).toEqual({3: ['one', 'two'], 5: ['three']});
 			});
 		});
-		
-		// it('should ', function ()
-			// {
-				
-			// });
 	});
 });

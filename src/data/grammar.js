@@ -1,4 +1,4 @@
-define(['../utils/obj'],  function(k)
+define(['../utils/obj'],  function (k)
 {
 	'use strict';
 
@@ -72,6 +72,10 @@ define(['../utils/obj'],  function(k)
         function nonTerminal (options)
         {
             _super.apply(this, arguments);
+            
+            k.utils.obj.defineProperty(this, 'isNullable'); // Control if the current non-terminal is nullable or not, This valus is calculate by the grammar's constructor
+            
+            this.isNullable = false;
             this.isSpecial = false;
         }
 
@@ -180,8 +184,14 @@ define(['../utils/obj'],  function(k)
             k.utils.obj.defineProperty(this, 'name');
 
             k.utils.obj.defineProperty(this, 'index');
+            k.utils.obj.defineProperty(this, 'isProductive'); //Determine if the rule be active part of the grammar. This is calculate by the grammar itself
+            k.utils.obj.defineProperty(this, 'isReachable'); //Determine if the rule is reachabke form the start symbol of the grammar. This is calculate by the grammar itself
+            k.utils.obj.defineProperty(this, 'terminalsCount'); //Contains the number of terminals in the tail of the current rule
 
             this.index = -1;
+            this.isProductive = false;
+            this.isReachable = false;
+            this.terminalsCount = 0;
 
             this.head = !(options.head instanceof NonTerminal) ?
 				new NonTerminal({
@@ -193,6 +203,10 @@ define(['../utils/obj'],  function(k)
 
 			k.utils.obj.each(this.tail, function (symbol)
 			{
+			    if (symbol instanceof Terminal)
+			    {
+			        this.terminalsCount++;
+			    }
 			    symbol.rule = this;
 			}, this);
         };
@@ -252,6 +266,8 @@ define(['../utils/obj'],  function(k)
         * @constructor
         * @param {NonTerminal} options.startSymbol Start symbol of the grammar
         * @param {[Rule]} options.rules Array of grammatical rules
+        * @param {Boolean} options.preserveNonProductiveRules Determine if non-productive rules should be preserve or not. Default: false
+        * @param {Boolean} options.preserveUnReachableRules Determine if unreachable rules should be preserve or not. Default: false
         * @param {String} options.name Optional name of the grammar
         */
         var grammar = function (options)
@@ -262,21 +278,47 @@ define(['../utils/obj'],  function(k)
             k.utils.obj.defineProperty(this, 'startSymbol');
             k.utils.obj.defineProperty(this, 'name');
             k.utils.obj.defineProperty(this, 'rules');
+            k.utils.obj.defineProperty(this, 'preserveNonProductiveRules');
+            k.utils.obj.defineProperty(this, 'preserveUnReachableRules');
 
             k.utils.obj.defineProperty(this, 'specifiedStartSymbol'); //After augmented the grammar this property save the specified start symbol (it should be read only)
             k.utils.obj.defineProperty(this, 'terminals');
             k.utils.obj.defineProperty(this, 'rulesByHeader');
+            k.utils.obj.defineProperty(this, 'nullableNonTerminals');
 
             if (!(this.startSymbol instanceof Symbol))
             {
                 throw new Error('Invalid grammar creation, please specify a start Symbol!');
             }
 
+            this.nullableNonTerminals = [];
             this._generateRequireRequisites();
         };
 
         grammar.constants = {
             AugmentedRuleName: 'AUGMENTRULE'
+        };
+        
+        /* @function Determines if a rule is productive or not based on the CURRENT state of all the rest of the rules in the grammar
+        * @param {Rule} rule Rule that will be analized
+        * @returns {Boolean} True if the rule is productive,, false otherwise */
+        grammar.prototype._isRuleProductive = function (rule)
+        {
+            //find NONProductive tail symbols
+            return !k.utils.obj.find(rule.tail, function (symbol)
+            {
+                // the tail symnol is a non terminal, that; has rules and its rule are all invalid, OR not have any rule
+                if (symbol instanceof NonTerminal &&
+                    (
+                        (this.rulesByHeader[symbol.name] && k.utils.obj.every(this.rulesByHeader[symbol.name], function (rule) { return !rule.isProductive; } ) ) ||
+                        (!this.rulesByHeader[symbol.name])
+                    )
+                    )
+                {
+                    return true;
+                }
+                return false;
+            }, this);
         };
 
         /* @function Generate require state for a grammar.
@@ -286,20 +328,9 @@ define(['../utils/obj'],  function(k)
         * @returns {Void} */
         grammar.prototype._generateRequireRequisites = function ()
         {
-            //TODO TEST THIS
-
-            //TODO Remove epsilon in the middle of rules, like A ==> B <EMPTY> 'a' C converted into A ==> B 'a' C
-
-            //TODO Determines nullable non-terminals
-
-
-            //TODO Remove rules that contains non terminals that does NOT produce anything. NonTerminales that are not in non head rule.
-            //this could generate that our automata generator, make invalid loops!!! IMPORTANT!
-
-            //TODO REMOVE UNREACHABLE RULES, (After applying previous logic)
-            //DO NOT REMOVE AUGMENTRULE
-            //BECAREFUL if all the rules get removed!!
-
+            /*jshint -W083 */
+            var areChanges = false;
+            var ruleIndex = 0;
 
             // augment the grammar
             this.specifiedStartSymbol = this.startSymbol;
@@ -318,13 +349,158 @@ define(['../utils/obj'],  function(k)
             });
 
 
-            // index rule its rule's head name
+            // index rule by its rule's head name
             this.rulesByHeader = k.utils.obj.groupBy(this.rules, function (rule)
             {
                 return rule.head.name;
             });
+            
+            
+            // determine which rules are productive and remove unproductive ones
+            do {
+                areChanges = false;
+                k.utils.obj.each(this.rules, function (rule)
+                {
+                    if (!rule.isProductive)
+                    {
+                        rule.isProductive = this._isRuleProductive(rule);
+                        areChanges = areChanges || rule.isProductive;
+                    }
+                }, this);
+            } while (areChanges);
+            
+            if (!this.preserveNonProductiveRules)
+            {
+                while (ruleIndex < this.rules.length)
+                {
+                    if (!this.rules[ruleIndex].isProductive) {
+                        this.rules.splice(ruleIndex, 1);
+                    } else {
+                        ruleIndex++;
+                    }
+                }
+                
+                if (this.rules.length === 0)
+                {
+                    //In this case the augmentation rule does not have a tail! S' --> <EMPTY>
+                    augmentedRule = new Rule({
+                        head: 'S\'',
+                        name: grammar.constants.AugmentedRuleName
+                    });
+        
+                    this.rules.unshift(augmentedRule);
+                }
+            }
+            
+            
+            //Remove unreachabel rules
+            augmentedRule.isReachable = true;
+            do
+            {
+                areChanges = false;
+                k.utils.obj.each(this.rules, function (rule)
+                {
+                    if (rule.isReachable)
+                    {
+                        k.utils.obj.each(rule.tail, function (symbol)
+                        {
+                            if (symbol instanceof NonTerminal)
+                            {
+                                k.utils.obj.each(this.rulesByHeader[symbol.name], function (rule)
+                                {
+                                    if (!rule.isReachable)
+                                    {
+                                        areChanges = true;
+                                        rule.isReachable = true;
+                                    }
+                                });
+                            }
+                        }, this);
+                    }
+                }, this);
+            } while (areChanges);
+            if (!this.preserveUnReachableRules)
+            {
+                ruleIndex = 0;
+                while (ruleIndex < this.rules.length)
+                {
+                    if (!this.rules[ruleIndex].isReachable) {
+                        this.rules.splice(ruleIndex, 1);
+                    } else {
+                        ruleIndex++;
+                    }
+                }
+            }
+            
+            
+            // remove middle tail epsilons
+            var tailIndex = 0;
+            k.utils.obj.each(this.rules, function (rule)
+            {
+                tailIndex = 0;
+                
+                while (tailIndex < rule.tail.length)
+                {
+                    // if the current tail su,bol is an empty one
+                    if (rule.tail[tailIndex].isSpecial && rule.tail[tailIndex].name === k.data.specialSymbol.EMPTY)
+                    {
+                        //if it is not last one or the previous one is not empty
+                        if ( (tailIndex + 1) < rule.tail.length || (tailIndex === (rule.tail.length -1) && tailIndex > 0 && !rule.tail[tailIndex-1].isSpecial) )
+                        {
+                            rule.tail.splice(tailIndex, 1);
+                            --tailIndex;
+                        }
+                    }
+                    tailIndex++;
+                }
+            });
 
 
+            //Determines nullable non-terminals
+            var allNonTerminalAreNullablesInRule = false;
+            do {
+                areChanges = false;
+                // debugger;
+                k.utils.obj.each(this.rules, function (rule)
+                {
+                    if (rule.tail.length === 1 && rule.tail[0].name === k.data.specialSymbol.EMPTY && !rule.head.isNullable)
+                    {
+                        rule.head.isNullable = true;
+                        areChanges = true;
+                        this.nullableNonTerminals.push(rule.head.name);
+                    }
+                    else if (rule.terminalsCount === 0)
+                    {
+                        allNonTerminalAreNullablesInRule = k.utils.obj.every(rule.tail, function (nonTerminal)
+                        {
+                            return this.nullableNonTerminals.indexOf(nonTerminal.name) >= 0;
+                        }, this);
+                        if (allNonTerminalAreNullablesInRule && !rule.head.isNullable)
+                        {
+                            rule.head.isNullable = true;
+                            areChanges = true;
+                            this.nullableNonTerminals.push(rule.head.name);
+                        }
+                    }
+                }, this);
+            } while (areChanges);
+            
+            var allRulesSymbols = k.utils.obj.flatten(
+                    k.utils.obj.map(this.rules, function (rule)
+                    {
+                        return rule.tail.concat(rule.head);
+                    }),
+                    false);
+                    
+            // Mark all non terminals that were determined in the previous step, as nullables. This is require because besides share the same name, each non-temrinal in diferentes rules are different isntances
+            var allNullablesNonTerminals = k.utils.obj.filter(allRulesSymbols, function (symbol) {
+               return symbol instanceof NonTerminal && this.nullableNonTerminals.indexOf(symbol.name) >= 0;
+            }, this);
+            k.utils.obj.each(allNullablesNonTerminals, function(nonTerminal) {
+                nonTerminal.isNullable = true;
+            });
+            
+            
             // get all terminals & determine if it has empty rules
             //flat all rules to get a list of symbol (its tails)
             var tailSymbols = k.utils.obj.flatten(

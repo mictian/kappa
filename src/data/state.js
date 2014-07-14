@@ -174,10 +174,9 @@ define(['../utils/obj', './grammar'], function(k) {
             });
         };
         
-        /* @function Determine if the current state is inconsistent or not.
-         * @param {Symbol} symbol Symbol use to make the transition, like the name of the transition
-         * @returns {Boolean} true if the state is inconsistent (invalid), false otherwise (valid) */
-        state.prototype.isInconsistent = function() {
+        /* @function Determine if the current state is valid or not.
+         * @returns {Boolean} true if the state is valid (invalid), false otherwise (inconsistent) */
+        state.prototype.isValid = function() {
             //TODO TEST THIS
             //TODO Take into account when the state have items WITH LOOK-AHEAD!!
             
@@ -186,7 +185,7 @@ define(['../utils/obj', './grammar'], function(k) {
                 return item.dotLocation === item.rule.tail.length;
             });
             //If the state has more thatn one item and amonth them there are reduce item, the state is inconsistent
-            return this._items.length > 1 && reduceItems.length > 0;
+            return !(this._items.length > 1 && reduceItems.length > 0);
         };
 
         return state;

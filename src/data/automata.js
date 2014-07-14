@@ -12,6 +12,7 @@ define(['../utils/obj', './state'], function(k)
         *
         * @constructor
         * @param {[State]} options.states Array of initial states
+        * @param {State} options.initialState Initial state of the automata.
         */
         var automata = function (options)
         {
@@ -20,14 +21,17 @@ define(['../utils/obj', './state'], function(k)
 			k.utils.obj.defineProperty(this, 'states');
 			k.utils.obj.defineProperty(this, 'initialState');
 			k.utils.obj.defineProperty(this, 'hasLookAhead'); //In case the generate Automata is not LR(0) valid, it is extended to be LALR(1) which means add look-ahead
+			
+			k.utils.obj.defineProperty(this, '_index');
+			k.utils.obj.defineProperty(this, '_registerStates');
 
             this.states = options.states || [];
             this._index = 0; //Index used to traversal the states of the current instance
-            this._registerStates = {};
-
-            for (var i = 0; i < this.states.length; i++) {
-                this._registerStates[this.states[i].getIdentity()] = this.states[i];
-            }
+            this._registerStates = k.utils.obj.groupBy(this.states, function (state) {return state.getIdentity();});
+            // k.utils.obj.each(this.states, function(state)
+            // {
+            //     this._registerStates[state.getIdentity()] = state;
+            // }, this);
         };
 
         /* @function Convert the current automata to its string representation
@@ -44,7 +48,7 @@ define(['../utils/obj', './state'], function(k)
         };
 
         /* @function Get the next unprocessed state
-        * @returns {State} A State not processed yet */
+        * @returns {State} A State not processed yet if any or null otherwise */
         automata.prototype.getNextState = function()
         {
             return this._index < this.states.length ? this.states[this._index++] : null;
@@ -55,10 +59,9 @@ define(['../utils/obj', './state'], function(k)
         * @returns {Boolean} true in case th automata is valid, false otherwise */
         automata.prototype.isValid = function()
         {
-            //TODO TEST THIS
             return !k.utils.obj.any(this.states, function (state)
             {
-                return state.isInconsistent();
+                return !state.isValid();
             });
         };
         
@@ -67,7 +70,6 @@ define(['../utils/obj', './state'], function(k)
         * @returns {State} In case that none state is specifed returnes the initial state previously set */
         automata.prototype.initialStateAccessor = function(state)
         {
-            //TODO TEST THIS
             if (!state) {
                 return this.initialState;
             }

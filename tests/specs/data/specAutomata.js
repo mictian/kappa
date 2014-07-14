@@ -42,7 +42,7 @@ define(['../../../src/data/automata'], function(k)
 				expect(a.states[2].getIdentity()).toBe(3);
 			});
 
-			it('shoud save the specified optioins', function()
+			it('should save the specified options', function()
 			{
 				var options = {
 						name: 'testing',
@@ -105,6 +105,150 @@ define(['../../../src/data/automata'], function(k)
 				var result = a.getNextState();
 				expect(result).toBe(null);
 			});
+		});
+		
+		describe('isValid', function()
+		{
+		    it('should return false if there is one invalid state', function()
+			{
+				var a = new k.data.Automata({
+					states: [
+						{
+							getIdentity: function() {
+								return '1';
+							},
+							isValid: function ()
+							{
+								return false;
+							}
+						},
+						{
+							getIdentity: function() {
+								return '2';
+							},
+							isValid: function ()
+							{
+								return true;
+							}
+						},
+						{
+							getIdentity: function() {
+								return '3';
+							},
+							isValid: function ()
+							{
+								return true;
+							}
+						}
+					]
+				});
+
+				expect(a.isValid()).toBe(false);
+			});
+			
+			it('should return false if all states are invalid', function ()
+			{
+				var a = new k.data.Automata({
+					states: [
+						{
+							getIdentity: function() {
+								return '1';
+							},
+							isValid: function ()
+							{
+								return false;
+							}
+						},
+						{
+							getIdentity: function() {
+								return '2';
+							},
+							isValid: function ()
+							{
+								return false;
+							}
+						},
+						{
+							getIdentity: function() {
+								return '3';
+							},
+							isValid: function ()
+							{
+								return false;
+							}
+						}
+					]
+				});
+
+				expect(a.isValid()).toBe(false);
+			});
+			
+			it('should return TRUE if the automata has no states', function ()
+			{
+				var a = new k.data.Automata({});
+				expect(a.isValid()).toBe(true);
+			});
+			
+			it('should return true if all states are valid', function()
+			{
+			    var a = new k.data.Automata({
+					states: [
+						{
+							getIdentity: function() {
+								return '1';
+							},
+							isValid: function ()
+							{
+								return true;
+							}
+						},
+						{
+							getIdentity: function() {
+								return '2';
+							},
+							isValid: function ()
+							{
+								return true;
+							}
+						},
+						{
+							getIdentity: function() {
+								return '3';
+							},
+							isValid: function ()
+							{
+								return true;
+							}
+						}
+					]
+				});
+
+				expect(a.isValid()).toBe(true);
+			});
+		});
+		
+		describe('initialStateAccessor', function()
+		{
+		    it('should set the initial state if it is passed', function()
+		    {
+		        var a = new k.data.Automata({}),
+		        	expectedResult = {
+						mock:true
+					};
+					
+				a.initialStateAccessor(expectedResult);
+				expect(a.initialStateAccessor()).toBe(expectedResult);
+		    });
+		    
+		    it('should return the initial state if nothing is passed', function()
+		    {
+		        var expectedResult = {
+						mock:true
+					},
+					a = new k.data.Automata({initialState: expectedResult});
+		        	
+				expect(a.initialStateAccessor()).toBe(expectedResult);
+		    });
 		});
 
 		describe('addState', function()

@@ -39,7 +39,6 @@ define(['../utils/str', '../utils/obj', '../data/grammar'], function(k)
         * @returns {Void} */
         lexer.prototype.setStream = function (stream)
         {
-        	//TODO TEST THIS
         	this.inputStream = (!this.notIgnoreSpaces && this.stream) ? k.utils.str.ltrim(this.stream) : this.stream;
         	if (!this.notIgnoreSpaces && this.inputStream === '')
         	{
@@ -62,8 +61,6 @@ define(['../utils/str', '../utils/obj', '../data/grammar'], function(k)
         * @returns {Object} An object representing the current finded token. The object can not have a rule associated if there is any match */
         lexer.prototype.getNext = function()
         {
-        	//TODO TEST THIS
-        	//TODO return EMPTY whne the string is empty, and then return EOF!, or OEF cuando es null or undefined
             var result = {
 					length: -1
 				},
@@ -111,18 +108,18 @@ define(['../utils/str', '../utils/obj', '../data/grammar'], function(k)
 							result = {
 								length: match.length,
 								string: match,
-								terminal: terminals[i].rule.tail[0]
+								terminal: terminals[i]//.rule.tail[0]
 							};
 						}
 					}
 					
-					//if it is a string check if there are the same
+					//if it is a string check if they are the same
 					else if (k.utils.obj.isString(body) && k.utils.str.startsWith(this.inputStream, body) && result.length < body.length)
 					{
 						result = {
 							length: body.length,
 							string: body,
-							terminal: terminals[i].rule.tail[0]
+							terminal: terminals[i]//.rule.tail[0]
 						};
 					}
 				}

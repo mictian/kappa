@@ -94,7 +94,8 @@ define(['../utils/obj', '../data/grammar', '../data/itemRule', '../data/automata
 		/** @function Internal method which resive an inital automata with only it inital state and generate a full automata
 		* @param {Automata} automata Automatma to be expanded
 		* @returns {Automata} A full automata */
-		automataGenerator.prototype._expandAutomata = function(automata) {
+		automataGenerator.prototype._expandAutomata = function(automata)
+		{
 			var currentState = automata.getNextState();
 			
 			while (currentState) {
@@ -142,9 +143,8 @@ define(['../utils/obj', '../data/grammar', '../data/itemRule', '../data/automata
 		* Sample: table[<state>][<symbol>] = [undefined = error|<state id - string>]
 		* @param {Automata} automata Automatma used as a base of the calculation
 		* @returns {Object} A GOTO Table */
-		automataGenerator.prototype.generateGOTOTable = function(automata) {
-			//TODO TEST THIS
-			//TODO Think how to represent the acceptance state!!
+		automataGenerator.prototype.generateGOTOTable = function(automata)
+		{
 			var table = {
 					toString: function ()
 					{
@@ -182,8 +182,8 @@ define(['../utils/obj', '../data/grammar', '../data/itemRule', '../data/automata
 		/* @function Given an automata returnes its ACTION Table. 
 		* @param {Automata} automata Automatma used as a base of the calculation
 		* @returns {Function} Function that given the a state id and a lookAhead returns the action to take */
-		automataGenerator.prototype.generateACTIONTable = function (automata) {
-			//TODO TEST THIS
+		automataGenerator.prototype.generateACTIONTable = function (automata)
+		{
 			var table = {};
 			
 			if (!automata.hasLookAhead)
@@ -191,7 +191,7 @@ define(['../utils/obj', '../data/grammar', '../data/itemRule', '../data/automata
 				k.utils.obj.each(automata.states, function(state){
 					var stateItems = state.getItems();
 					
-					// If it is a reduce state
+					// If it is a REDUCE state
 					if (stateItems.length === 1 && stateItems[0].dotLocation === (stateItems[0].rule.tail.length))
 					{
 						// S'--> S#*
@@ -208,6 +208,7 @@ define(['../utils/obj', '../data/grammar', '../data/itemRule', '../data/automata
 								rule: stateItems[0].rule
 							};
 						}
+					// SHIFT state
 					} else {
 						table[state.getIdentity()] = {
 							action: tableAction.SHIFT

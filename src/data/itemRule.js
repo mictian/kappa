@@ -1,4 +1,4 @@
-define(['../utils/obj'], function(k)
+define(['../utils/obj', './grammar'], function(k)
 {
 	'use strict';
 
@@ -26,13 +26,22 @@ define(['../utils/obj'], function(k)
 			//Define alias for the next properties
 			k.utils.obj.defineProperty(this, 'rule');
 			k.utils.obj.defineProperty(this, 'dotLocation');
+			k.utils.obj.defineProperty(this, 'lookAhead');
+			
 			k.utils.obj.defineProperty(this, '_id');
 
+			this.lookAhead = this.lookAhead || [];
 			this.dotLocation = options.dotLocation || 0;
+			
+			if (this.rule && this.rule.tail.length === 1 && this.rule.tail[0].name === k.data.specialSymbol.EMPTY)
+			{
+				//Empty rules are reduce items
+				this.dotLocation = 1;
+			}
 		};
 
-		/** @function Convert the current item rule to its string representation
-		* @returns formatted string */
+		/* @function Convert the current item rule to its string representation
+		* @returns {String} formatted string */
 		itemRule.prototype.toString = function()
 		{
 			var aux = this.rule.head.name +'-->';
@@ -51,7 +60,7 @@ define(['../utils/obj'], function(k)
 		* @param {Booelan} cloneUpdateOptions.copyRuleIndex IIndicate if the internal index's rule shouls be preserve or not. Default: false
 		* @param {Booelan} cloneUpdateOptions.dontCloneRule Indicate if the internal grammatical rule should be cloned or just use te same. Default: false
 		* @param {Object} creationOptions Optional object use to expand current option used to create the returned clone
-		* @returns A clean new item */
+		* @returns {ItemRule} A clean new item */
 		itemRule.prototype.clone = function(cloneUpdateOptions, creationOptions)
 		{
 			var updateOptions = k.utils.obj.extendInNew(defaultCloneOptions, cloneUpdateOptions || {}),
@@ -67,10 +76,13 @@ define(['../utils/obj'], function(k)
 		/* @function Clone the current item's options
 		* @param {Object} cloneUpdateOptions Optional object use to control the way the options are being cloned
 		* @param {Object} extendedOptions Optional object use to expand current options and create the returned clone
-		* @returns A copy of the current options */
+		* @returns {Object} A copy of the current options */
 		itemRule.prototype._cloneCurrentOptions = function(cloneUpdateOptions, extendedOptions)
 		{
+			var ruleAux = this.rule;
+			this.rule = null;
 			var result = k.utils.obj.extendInNew(this.options, extendedOptions || {});
+			this.rule = ruleAux;
 
 			if ((!cloneUpdateOptions || !cloneUpdateOptions.dontCloneRule) && this.rule)
 			{
@@ -114,29 +126,35 @@ define(['../utils/obj'], function(k)
 			return this.rule.index + '(' + this.dotLocation + ')';
 		};
 
-		/** @function Returns the right next symbol to the dot location
-		* @returns Next symbol or null if there is not next symbol */
+		/* @function Returns the right next symbol to the dot location
+		* @returns {Symbol} Next symbol or null if there is not next symbol */
 		itemRule.prototype.getCurrentSymbol = function ()
 		{
 			// When the dot location is the same as tail length is a reduce item.
 			// In this case the next item is null
 			return this.dotLocation < (this.rule.tail.length + 1) ? this.rule.tail[this.dotLocation] : null;
 		};
+		
+		/* @function Determines if the current item rule is a reduce one or not
+		* @returns {Boolean} True if the current item is a reduce item, false otherwise */
+		itemRule.prototype.isReduce = function ()
+		{
+			return this.dotLocation === this.rule.tail.length;
+		};
 
-		/** @function Create an array of item rules from an array of rules
+		/* @function Create an array of item rules from an array of rules
 		* @param {[Rule]} rules Array of rules used to create the item rules. Each new item rule will have 0 as dot location
-		* @returns array of new Item Rules */
+		* @returns {[ItemRule]} Array of new Item Rules */
 		itemRule.newFromRules = function(rules)
 		{
-			var itemRules = [];
-			for (var i = 0; i < rules.length; i++)
+			return k.utils.obj.reduce(rules, function (acc, rule)
 			{
-				itemRules.push(new ItemRule({
-					rule:rules[i],
+				acc.push(new ItemRule({
+					rule: rule,
 					dotLocation: 0
 				}));
-			}
-			return itemRules;
+				return acc;
+			}, []);
 		};
 
 		return itemRule;

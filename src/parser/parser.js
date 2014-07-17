@@ -14,6 +14,7 @@ define(['../utils/obj', '../data/stackItem', '../lexer/lexer', './automataLR0Gen
 		* @param {Object} options.gotoTable The GOTO Table of the current grammar
 		* @param {Grammar} options.grammar The grammar used to generate all the parser
 		* @param {Function} options.actionTable Action table used to control the parsing process
+		* @param {State} options.initialState Initial state of the automata the describe the current grammar
 		*/
 		var parser = function(options) {
 			this.options = options;
@@ -21,10 +22,10 @@ define(['../utils/obj', '../data/stackItem', '../lexer/lexer', './automataLR0Gen
 			k.utils.obj.defineProperty(this, 'gotoTable');
 			k.utils.obj.defineProperty(this, 'grammar');
 			k.utils.obj.defineProperty(this, 'actionTable');
+			k.utils.obj.defineProperty(this, 'initialState');
+			
 			k.utils.obj.defineProperty(this, 'stack');
 			k.utils.obj.defineProperty(this, 'currentInput');
-			k.utils.obj.defineProperty(this, 'automata');
-			k.utils.obj.defineProperty(this, 'initialState');
 			
 			if (!this.gotoTable) {
 				throw new Error('Invalid initialization values for a Parser, please provide a GOTO Table');
@@ -42,7 +43,7 @@ define(['../utils/obj', '../data/stackItem', '../lexer/lexer', './automataLR0Gen
 				throw new Error('Invalid initialization values for a Parser, please provide a Initial State');
 			}
 			
-			this.stack = !this.stack ? [] : this.stack;
+			this.stack = this.stack || [];
 		};
 		
 		/* @function Parse an input
@@ -144,6 +145,7 @@ define(['../utils/obj', '../data/stackItem', '../lexer/lexer', './automataLR0Gen
 		
 		return parser;
 	})();
+
 	
 	/* Parser Creator
 	* @class

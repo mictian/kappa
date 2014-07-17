@@ -16,12 +16,13 @@ define(['../utils/obj', './grammar'], function(k) {
             this.options = options;
 
             k.utils.obj.defineProperty(this, 'transitions');
+            k.utils.obj.defineProperty(this, 'isAcceptanceState'); // This is set by the automata generator
+            
             k.utils.obj.defineProperty(this, '_items');
             k.utils.obj.defineProperty(this, '_index');
             k.utils.obj.defineProperty(this, '_registerItems');
             k.utils.obj.defineProperty(this, '_id');
             k.utils.obj.defineProperty(this, '_condencedView');
-            k.utils.obj.defineProperty(this, 'isAcceptanceState'); // This is set by the automata generator
 
             this.isAcceptanceState = false;
             this.transitions = options.transitions || [];
@@ -36,7 +37,7 @@ define(['../utils/obj', './grammar'], function(k) {
         };
 
         /* @function Get the next unprocessed item rule
-         * @returns Item Rule */
+         * @returns {ItemRule} Next Item Rule */
         state.prototype.getNextItem = function() {
             return this._index < this._items.length ? this._items[this._index++] : null;
         };
@@ -76,7 +77,6 @@ define(['../utils/obj', './grammar'], function(k) {
         /* @function Returns the condenced (one line) string that reprenset the current 'state' of the current state
          * @returns {String} State Representation in one line  */
         state.prototype.getCondencedString = function() {
-            //TODO TEST THIS
             if(!this._condencedView)
             {
                 this._condencedView = this._generateCondencedString();
@@ -109,7 +109,6 @@ define(['../utils/obj', './grammar'], function(k) {
         /* @function Generates an ID that identify this state from any other state
          * @returns {String} Generated ID  */
         state.prototype._generateIdentity = function() {
-            //TODO TEST THIS
             
             if (this._items.length === 1 && this._items[0].rule.name === k.data.Grammar.constants.AugmentedRuleName && this._items[0].dotLocation === 2)
             {
@@ -135,7 +134,7 @@ define(['../utils/obj', './grammar'], function(k) {
         };
 
         /** @function Get the list of all supported symbol which are valid to generata transition from the current state.
-         * @returns Array of object of the form: {symbol, items} where items have an array of item rules  */
+         * @returns {[Object]} Array of object of the form: {symbol, items} where items have an array of item rules  */
         state.prototype.getSupportedTransitionSymbols = function() {
             var itemsAux = {},
                 result = [],
@@ -180,12 +179,23 @@ define(['../utils/obj', './grammar'], function(k) {
             //TODO TEST THIS
             //TODO Take into account when the state have items WITH LOOK-AHEAD!!
             
-            //Shif-Reduce or Reduce-Reduce Conflicts
             var reduceItems = k.utils.obj.filter(this._items, function (item) {
-                return item.dotLocation === item.rule.tail.length;
+                return item.isReduce();
             });
-            //If the state has more thatn one item and amonth them there are reduce item, the state is inconsistent
-            return !(this._items.length > 1 && reduceItems.length > 0);
+            
+            if (reduceItems.length !== this._items.length && reduceItems.length > 0 || reduceItems.length > 1)
+            {
+                // // TODO THINK THIS, probably shift item wont have look-ahead!
+                // // Check if the items have look-ahead or not
+                // // we just validate the first reduce item to see if this item rules have look-ahead
+                // if (reduceItems[0].lookAhead.length > 0)
+                // {
+                //     //TODO
+                // }
+                return false;
+            }
+            
+            return true;
         };
 
         return state;

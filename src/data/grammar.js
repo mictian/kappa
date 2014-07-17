@@ -39,7 +39,7 @@ define(['../utils/obj'],  function (k)
                 throw new Error('Invalid initialization values for a symbol, please provide a string name a symbol');
             }
         };
-
+        
         /* @function Shows the symbol's name
         * @returns {String} this.name */
         symbol.prototype.toString = function() {
@@ -48,8 +48,14 @@ define(['../utils/obj'],  function (k)
 
         /* @function Creates a deep copy of the current instance
         * @returns {Symbol} Deep copy */
-        symbol.prototype.clone = function() {
-			return new Symbol(k.utils.obj.clone(this.options));
+        symbol.prototype.clone = function()
+        {
+            var ruleAux = this.rule;
+            this.rule = null;
+			var cloneOptions = k.utils.obj.clone(this.options);
+			this.rule = cloneOptions.rule = ruleAux;
+			
+			return new Symbol(cloneOptions);
         };
 
         return symbol;
@@ -98,8 +104,14 @@ define(['../utils/obj'],  function (k)
 
         /* @function Creates a deep copy of the current instance
         * @returns {NonTerminal} Deep copy */
-        nonTerminal.prototype.clone = function() {
-			return new NonTerminal(k.utils.obj.clone(this.options));
+        nonTerminal.prototype.clone = function()
+        {
+            var ruleAux = this.rule;
+            this.rule = null;
+			var cloneOptions = k.utils.obj.clone(this.options);
+			this.rule = cloneOptions.rule = ruleAux;
+			
+			return new NonTerminal(cloneOptions);
         };
 
         return nonTerminal;
@@ -138,14 +150,20 @@ define(['../utils/obj'],  function (k)
 
         /* @function Shows the terminal's name between < and >
         * @returns {String} Fromatted string */
-        terminal.prototype.toString = function() {
+        terminal.prototype.toString = function()
+        {
             return '<' + this.name + '>';
         };
 
 		/* @function Creates a deep copy of the current instance
         * @returns {Terminal} Deep copy */
-        terminal.prototype.clone = function() {
+        terminal.prototype.clone = function()
+        {
+            var ruleAux = this.rule;
+            this.rule = null;
 			var cloneOptions = k.utils.obj.clone(this.options);
+			this.rule = cloneOptions.rule = ruleAux;
+			
 			cloneOptions.body = k.utils.obj.isRegExp(this.body) ? new RegExp(this.body.source) : this.body;
 
 			return new Terminal(cloneOptions);
@@ -228,10 +246,13 @@ define(['../utils/obj'],  function (k)
 			    cloneOptions;
 
 			// We conserve the head and the tail because the symbol know at what rule it belongs, cause cyclic references
-			this.options.head = null;
-			this.options.tail = null;
+			this.head = null;
+			this.tail = null;
 
 		    cloneOptions = k.utils.obj.clone(this.options);
+		    
+		    this.head = auxHead;
+		    this.tail = auxTail;
 
 			cloneOptions.head = auxHead.clone();
 			cloneOptions.tail = k.utils.obj.map(auxTail, function(symbol) {

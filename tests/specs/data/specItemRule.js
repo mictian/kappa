@@ -1,10 +1,10 @@
 /* global expect: true, describe: true, it:  true, beforeEach: true */
 define(['../../../src/data/itemRule'], function(k)
 {
-    'use strict';
+	'use strict';
 
-    describe('itemRule', function()
-    {
+	describe('itemRule', function()
+	{
 		it('shoud override toString', function()
 		{
 			var i = new k.data.ItemRule({});
@@ -13,9 +13,11 @@ define(['../../../src/data/itemRule'], function(k)
 
 		describe('constructor', function()
 		{
-			it('should define copy rule form options', function()
+			it('should define a rule property accesor from the passed in options object', function()
 			{
-				var rule = {},
+				var rule = {
+						tail: []
+					},
 					i = new k.data.ItemRule({
 						rule: rule
 					});
@@ -53,6 +55,19 @@ define(['../../../src/data/itemRule'], function(k)
 
 				expect(i.options).toBe(options);
 			});
+			
+			it('should set dot location in 1 when the rule is an empty rule', function ()
+			{
+				var i = new k.data.ItemRule({
+					rule: {
+						tail: [{
+							name: k.data.specialSymbol.EMPTY
+						}]
+					}
+				});
+
+				expect(i.dotLocation).toBe(1);
+			})
 		});
 
 		describe('clone', function()
@@ -63,11 +78,12 @@ define(['../../../src/data/itemRule'], function(k)
 						dotLocation: 42,
 						name: 'testing',
 						rule: {
-						    index: 0,
-						    clone: function ()
-						    {
-						        return this;
-						    }
+							index: 0,
+							tail: [],
+							clone: function ()
+							{
+								return this;
+							}
 						}
 					},
 					i = new k.data.ItemRule(options);
@@ -145,7 +161,9 @@ define(['../../../src/data/itemRule'], function(k)
 
 			it('should return the symbol in the tails at the dot locations when dot location lower than the tail\'s legnth', function()
 			{
-				var symbol = {},
+				var symbol = {
+						name: 'foo'
+					},
 					i = new k.data.ItemRule({
 						rule: {
 							tail: [symbol]
@@ -183,6 +201,39 @@ define(['../../../src/data/itemRule'], function(k)
 				expect(i.getCurrentSymbol()).toBeUndefined();
 			});
 		});
+		
+		describe('isReduce', function ()
+		{
+			it('should return true when the dot location is at the end of the rule', function()
+			{
+				var symbol = {
+						name: 'foo'
+					},
+					i = new k.data.ItemRule({
+						dotLocation: 1,
+						rule: {
+							tail: [symbol]
+						}
+					});
+
+				expect(i.isReduce()).toBe(true);
+			});
+			
+			it ('should return false when the dot location is not at the end of the rule', function()
+			{
+				var symbol = {
+						name: 'foo'
+					},
+					i = new k.data.ItemRule({
+						dotLocation: 1,
+						rule: {
+							tail: [symbol, symbol]
+						}
+					});
+
+				expect(i.isReduce()).toBe(false);	
+			});
+		});
 
 		describe('newFromRules', function()
 		{
@@ -195,14 +246,14 @@ define(['../../../src/data/itemRule'], function(k)
 
 			it('shoud for each rule create a new item rule with dot location at 0', function()
 			{
-				var result = k.data.ItemRule.newFromRules([{},{test:true}]);
+				var result = k.data.ItemRule.newFromRules([{tail:[]},{test:true,tail:[]}]);
 
 				expect(result.length).toBe(2);
-				expect(result[0].options).toEqual({rule:{}, dotLocation:0});
+				expect(result[0].options).toEqual({rule:{tail:[]}, lookAhead:[], dotLocation:0});
 				expect(result[0].dotLocation).toBe(0);
-				expect(result[1].options).toEqual({rule:{test:true}, dotLocation:0});
+				expect(result[1].options).toEqual({rule:{test:true, tail:[]}, lookAhead:[], dotLocation:0});
 				expect(result[1].dotLocation).toBe(0);
 			});
 		});
-    });
+	});
 });

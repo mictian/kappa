@@ -11,12 +11,13 @@ define(['../utils/obj'],  function(k)
         * Creates an instance of a Parser 
         *
         * @constructor
-        * @param {Object} options.state The current state
-        * @param {Object} options.currentValue The result of getting this stack Item
-        * @param {Symbol} options.symbol The Current Symbol of the stack item
-        * @param {Automata} options.AST The underprocessing AST. The Sub-tree AST for the current node
+        * @param {Object} options.state (Require) The current state
+        * @param {Object} options.currentValue The Optional result of getting this stack Item
+        * @param {Symbol} options.symbol The Optional Current Symbol of the stack item
+        * @param {Automata} options.AST Optional underprocessing AST. The Sub-tree AST for the current node
         */
 	    var stackItem = function(options) {
+	    	//TODO TEST THIS
 	    	this.options = options;
 
             k.utils.obj.defineProperty(this, 'state');

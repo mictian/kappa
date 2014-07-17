@@ -9,7 +9,7 @@
 
     require(['./data/sampleGrammars', './parser/automataLR0Generator'], function (sampleGrammars, k)
     {
-        var grammar = sampleGrammars.aPlusb.g,//aPlusb.g,
+        var grammar = sampleGrammars.aPlusb.g, //aPlusb.g,
             automataGenerator = new k.parser.AutomataLR0Generator({
                 grammar: grammar
             }),

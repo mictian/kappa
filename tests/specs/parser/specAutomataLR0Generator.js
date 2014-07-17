@@ -1,4 +1,4 @@
-/* global expect: true, describe: true, it:  true, beforeEach: true */
+/* global jasmine: true, expect: true, describe: true, it:  true, beforeEach: true */
 define(['../../../src/parser/automataLR0Generator', '../../../src/data/sampleGrammars'], function(k, sampleGrammars)
 {
 	'use strict';
@@ -55,6 +55,7 @@ define(['../../../src/parser/automataLR0Generator', '../../../src/data/sampleGra
 				});
 					
 				state = ag.expandItem(initialState);
+				
 				itemsState = state.getItems();
 					
 				expect(itemsState.length).toBe(3);
@@ -123,7 +124,7 @@ define(['../../../src/parser/automataLR0Generator', '../../../src/data/sampleGra
 
 				var itemExps2 = getItemByRuleName(itemsState, 'EXPS2RULE');
 				expect(itemExps2).toBeDefined();
-				expect(itemExps2.dotLocation).toBe(0);
+				expect(itemExps2.dotLocation).toBe(1);
 				expect(itemExps2.rule).toEqual(sampleGrammars.idsList.EXPS2.clone());
 			});
 
@@ -181,7 +182,7 @@ define(['../../../src/parser/automataLR0Generator', '../../../src/data/sampleGra
 
 				var itemExp2 = getItemByRuleName(itemsState, 'EXPS2RULE'); //This name is defined in the rule inside the sampleGrammar file
 				expect(itemExp2).toBeDefined();
-				expect(itemExp2.dotLocation).toBe(0);
+				expect(itemExp2.dotLocation).toBe(1);
 				expect(itemExp2.rule).toEqual(sampleGrammars.idsList.EXPS2.clone());
 			});
 		});
@@ -203,13 +204,15 @@ define(['../../../src/parser/automataLR0Generator', '../../../src/data/sampleGra
 				expect(state.getItems().length).toBe(expectedItemsLength);
 			}
 
-			it('should return the correct automata form the simple grammar num divs', function ()
+			it('should return the correct automata for the simple grammar num divs', function ()
 			{
 				var ag = new k.parser.AutomataLR0Generator({
 						grammar: sampleGrammars.numDivs.g
 					}),
 					result = ag.generateAutomata(),
 					states = result.states;
+					
+				expect(result.hasLookAhead).toBe(true);
 
 				expect(result).toBeInstanceOf(k.data.Automata);
 				expect(states.length).toBe(9);
@@ -225,13 +228,15 @@ define(['../../../src/parser/automataLR0Generator', '../../../src/data/sampleGra
 				validateState(states, 'AcceptanceState', 1);
 			});
 			
-			it('should return the correct automata form the simple grammar NUM DIFF', function ()
+			it('should return the correct automata for the simple grammar NUM DIFF', function ()
 			{
 				var ag = new k.parser.AutomataLR0Generator({
 						grammar: sampleGrammars.numDiff.g
 					}),
 					result = ag.generateAutomata(),
 					states = result.states;
+					
+				expect(result.hasLookAhead).toBe(true);
 
 				expect(result).toBeInstanceOf(k.data.Automata);
 				expect(states.length).toBe(12);
@@ -249,6 +254,82 @@ define(['../../../src/parser/automataLR0Generator', '../../../src/data/sampleGra
 				validateState(states, '0(1)', 1);
 				validateState(states, 'AcceptanceState', 1);
 			});
+			
+			it('should return the correct automata for the simple grammar A+B', function ()
+			{
+				var ag = new k.parser.AutomataLR0Generator({
+						grammar: sampleGrammars.aPlusb.g
+					}),
+					result = ag.generateAutomata(),
+					states = result.states;
+
+				expect(result).toBeInstanceOf(k.data.Automata);
+				expect(states.length).toBe(6);
+				
+				validateState(states, '0(0)1(0)2(0)', 3);
+				validateState(states, '1(1)1(0)2(0)', 3);
+				validateState(states, '2(1)', 1);
+				validateState(states, '0(1)', 1);
+				validateState(states, '1(2)', 1);
+				validateState(states, 'AcceptanceState', 1);
+			});
+		});
+		
+		describe('generateGOTOTable', function ()
+		{
+			it('should return the expected table for the simple LR0 grammar a+b', function ()
+			{
+				var ag = new k.parser.AutomataLR0Generator({
+						grammar: sampleGrammars.aPlusb.g
+					}),
+					automata = ag.generateAutomata(),
+					gotoTable = ag.generateGOTOTable(automata);
+				
+				expect(gotoTable).toEqual(jasmine.any(Object));
+				expect(gotoTable['0(1)']).toEqual(jasmine.any(Object));
+				
+				var keys = k.utils.obj.keys(gotoTable);
+				
+				expect(keys.length).toBe(7); //6 states plus toString function
+				expect(k.utils.obj.indexOf(keys, '0(0)1(0)2(0)') >= 0).toBe(true);
+				expect(k.utils.obj.indexOf(keys, '2(1)') >= 0).toBe(true);
+				expect(k.utils.obj.indexOf(keys, '1(1)1(0)2(0)') >= 0).toBe(true);
+				expect(k.utils.obj.indexOf(keys, '1(2)') >= 0).toBe(true);
+				expect(k.utils.obj.indexOf(keys, '0(1)') >= 0).toBe(true);
+				expect(k.utils.obj.indexOf(keys, 'AcceptanceState') >= 0).toBe(true);
+			});
+			
+			//TODO ADD AT LEAST 2 MORE LR(0) GRAMMARS!
+		});
+		
+		describe('generateACTIONTable', function ()
+		{
+			it('should return the expected action function for the simple LR0 grammar a+b', function ()
+			{
+				var ag = new k.parser.AutomataLR0Generator({
+						grammar: sampleGrammars.aPlusb.g
+					}),
+					automata = ag.generateAutomata(),
+					actionTable = ag.generateACTIONTable(automata);
+				
+				expect(actionTable).toEqual(jasmine.any(Function));
+				
+				expect(actionTable('0(1)')).toEqual({action: k.parser.tableAction.SHIFT});
+				
+				expect(actionTable('1(1)1(0)2(0)')).toEqual({action: k.parser.tableAction.SHIFT});
+				
+				expect(actionTable('0(0)1(0)2(0)')).toEqual({action: k.parser.tableAction.SHIFT});
+				
+				expect(actionTable('2(1)').action).toEqual(k.parser.tableAction.REDUCE);
+				expect(actionTable('2(1)').rule.name).toEqual(sampleGrammars.aPlusb.A2.name);
+				
+				expect(actionTable('1(2)').action).toEqual(k.parser.tableAction.REDUCE);
+				expect(actionTable('1(2)').rule.name).toEqual(sampleGrammars.aPlusb.A1.name);
+				
+				expect(actionTable('AcceptanceState').action).toEqual('ACCEPT');
+			});
+			
+			//TODO ADD AT LEAST 2 MORE LR(0) GRAMMARS SAMPLES!
 		});
 	});
 });

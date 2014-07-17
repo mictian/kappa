@@ -5,22 +5,25 @@ define(['../../../src/lexer/lexer', '../../../src/data/sampleGrammars'], functio
 
 	describe('Lexer', function ()
 	{
-        it ('should ignore spaces by default', function() {
-             var lexer = new k.lexer.Lexer({
-				grammar: sampleGrammar.idsList.g,
-				stream: ''
-             });
-             expect(lexer.options.notIgnoreSpaces).toBe(false);
-        });
-
-        it ('should manage spaces as specified', function() {
-            var lexer = new k.lexer.Lexer({
-				grammar: sampleGrammar.idsList,
-				stream: '',
-                notIgnoreSpaces: true
-            });
-            expect(lexer.options.notIgnoreSpaces).toBe(true);
-        });
+		describe('constructor', function ()
+		{
+			it ('should ignore spaces by default', function() {
+	             var lexer = new k.lexer.Lexer({
+					grammar: sampleGrammar.idsList.g,
+					stream: ''
+	             });
+	             expect(lexer.options.notIgnoreSpaces).toBe(false);
+	        });
+	
+	        it ('should manage spaces as specified', function() {
+	            var lexer = new k.lexer.Lexer({
+					grammar: sampleGrammar.idsList,
+					stream: '',
+	                notIgnoreSpaces: true
+	            });
+	            expect(lexer.options.notIgnoreSpaces).toBe(true);
+	        });	
+		});
 
         describe('getNext', function()
         {
@@ -76,13 +79,13 @@ define(['../../../src/lexer/lexer', '../../../src/data/sampleGrammars'], functio
             
             it ('should return ERROR if the only remaining string is "" and not ignoring spaced and there are NOT rule with empty', function ()
             {
-            	var sort = new k.data.Rule({
-	                    head: 'sort',
+            	var short = new k.data.Rule({
+	                    head: 'short',
 	                    tail: [new k.data.Terminal({name:'hi', body: 'hi'})]
 					}),
 					grammar = new k.data.Grammar({
-						startSymbol: sort.head,
-						rules: [sort]
+						startSymbol: short.head,
+						rules: [short]
 					}),
 					lexer = new k.lexer.Lexer({
 						grammar: grammar,
@@ -169,58 +172,59 @@ define(['../../../src/lexer/lexer', '../../../src/data/sampleGrammars'], functio
             });
 
             it ('shoud return the larget possible match when regexp', function() {
-                var sort = new k.data.Rule({
-                    head: 'sort',
-                    tail: [new k.data.Terminal({name:'hel', body: /hel/})]
-				});
-
-				var large = new k.data.Rule({
-					head: 'large',
-					tail: [new k.data.Terminal({name:'LARGE', body: /hello/})]
-				});
-
-				var gramar = new k.data.Grammar({
-					startSymbol: sort.head,
-					rules:[sort, large]
-				});
-
-				var lexer = new k.lexer.Lexer({
-					grammar: gramar,
-					stream: 'hello world'
-				});
+                var init = new k.data.Rule({
+	                    head: 'init',
+	                    tail: k.data.NonTerminal.fromArray(['short','large'])
+					}),
+                	short = new k.data.Rule({
+	                    head: 'short',
+	                    tail: [new k.data.Terminal({name:'SHORT_TERMINAL', body: /hel/})]
+					}),
+					large = new k.data.Rule({
+						head: 'large',
+						tail: [new k.data.Terminal({name:'LARGE_TERMINAL', body: /hello/})]
+					}),
+					gramar = new k.data.Grammar({
+						startSymbol: init.head,
+						rules:[init, short, large]
+					}),
+					lexer = new k.lexer.Lexer({
+						grammar: gramar,
+						stream: 'hello world'
+					});
 
 				var result = lexer.getNext();
 
 				expect(result.string).toBe('hello');
-				expect(result.terminal.name).toBe('LARGE');
-
+				expect(result.terminal.name).toBe('LARGE_TERMINAL');
             });
 
             it ('shoud return the larget possible match when string', function() {
-				var short = new k.data.Rule({
-                    head: 'sort',
-                    tail: [new k.data.Terminal({name:'SHORT', body: 'he;'})]
-				});
-
-				var large = new k.data.Rule({
-					head: 'large',
-					tail: [new k.data.Terminal({name:'LARGE', body: 'hello'})]
-				});
-
-				var grammar = new k.data.Grammar({
-					startSymbol: short.head,
-					rules: [short, large]
-				});
-
-				var lexer = new k.lexer.Lexer({
-					grammar: grammar,
-					stream: 'hello world'
-				});
+				 var init = new k.data.Rule({
+	                    head: 'init',
+	                    tail: k.data.NonTerminal.fromArray(['short','large'])
+					}),
+                	short = new k.data.Rule({
+	                    head: 'short',
+	                    tail: [new k.data.Terminal({name:'SHORT_TERMINAL', body: 'hel'})]
+					}),
+					large = new k.data.Rule({
+						head: 'large',
+						tail: [new k.data.Terminal({name:'LARGE_TERMINAL', body: 'hello'})]
+					}),
+					gramar = new k.data.Grammar({
+						startSymbol: init.head,
+						rules:[init, short, large]
+					}),
+					lexer = new k.lexer.Lexer({
+						grammar: gramar,
+						stream: 'hello world'
+					});
 
 				var result = lexer.getNext();
 
 				expect(result.string).toBe('hello');
-				expect(result.terminal.name).toBe('LARGE');
+				expect(result.terminal.name).toBe('LARGE_TERMINAL');
             });
 
             it('should return OPAREN, ID, ID, ID, ID, CPAREN for a simple gramar with ( THIS IS A TEST )', function()
@@ -254,6 +258,7 @@ define(['../../../src/lexer/lexer', '../../../src/data/sampleGrammars'], functio
                 expect(n.string).toBe(')');
                 expect(n.terminal.name).toBe('cparen_terminal');
             });
+            
             
         });
 

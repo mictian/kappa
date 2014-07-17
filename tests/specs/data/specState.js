@@ -1,4 +1,4 @@
-/* global expect: true, describe: true, it:  true, beforeEach: true */
+/* global spyOn:true, expect: true, describe: true, it:  true, beforeEach: true */
 define(['../../../src/data/sampleGrammars', '../../../src/data/state', '../../../src/data/itemRule'], function(sampleGrammars, k)
 {
     'use strict';
@@ -35,7 +35,8 @@ define(['../../../src/data/sampleGrammars', '../../../src/data/state', '../../..
 				var s = new k.data.State({
 					items: [new k.data.ItemRule({
 						rule: {
-							index: 0
+							index: 0,
+							tail:[]
 						}
 					})]
 				});
@@ -50,7 +51,8 @@ define(['../../../src/data/sampleGrammars', '../../../src/data/state', '../../..
 			{
 				var expectedResultOptions = {
 						rule: {
-							index: 0
+							index: 0,
+							tail:[]
 						}
 					},
 					items = [new k.data.ItemRule(expectedResultOptions)],
@@ -67,7 +69,8 @@ define(['../../../src/data/sampleGrammars', '../../../src/data/state', '../../..
 			{
 				var expectedResultOptions = {
 						rule: {
-							index: 0
+							index: 0,
+							tail:[]
 						}
 					},
 					items = [new k.data.ItemRule(expectedResultOptions)],
@@ -94,7 +97,8 @@ define(['../../../src/data/sampleGrammars', '../../../src/data/state', '../../..
 				var s = new k.data.State({}),
 					item = new k.data.ItemRule({
 						rule: {
-							index: 0
+							index: 0,
+							tail:[]
 						}
 					});
 
@@ -108,7 +112,8 @@ define(['../../../src/data/sampleGrammars', '../../../src/data/state', '../../..
 			{
 				var items = [new k.data.ItemRule({
 						rule: {
-							index:0
+							index:0,
+							tail:[]
 						}
 					})],
 					s = new k.data.State({
@@ -116,7 +121,8 @@ define(['../../../src/data/sampleGrammars', '../../../src/data/state', '../../..
 					}),
 					item = new k.data.ItemRule({
 							rule: {
-								index: 0
+								index: 0,
+								tail:[]
 							}
 						});
 
@@ -133,7 +139,8 @@ define(['../../../src/data/sampleGrammars', '../../../src/data/state', '../../..
 				var s = new k.data.State({}),
 					item = new k.data.ItemRule({
 							rule: {
-								index: 0
+								index: 0,
+								tail:[]
 							}
 						});
 
@@ -156,12 +163,14 @@ define(['../../../src/data/sampleGrammars', '../../../src/data/state', '../../..
 				var s = new k.data.State({
 					items: [new k.data.ItemRule({
 							rule: {
-								index: 0
+								index: 0,
+								tail:[]
 							}
 						}),
 						new k.data.ItemRule({
 							rule: {
-								index: 1
+								index: 1,
+								tail:[]
 							}
 						})
 					]
@@ -172,7 +181,8 @@ define(['../../../src/data/sampleGrammars', '../../../src/data/state', '../../..
 
 				s.addItems([new k.data.ItemRule({
 					rule: {
-						index: 2
+						index: 2,
+						tail:[]
 					}
 				})]);
 
@@ -180,6 +190,33 @@ define(['../../../src/data/sampleGrammars', '../../../src/data/state', '../../..
 
 				expect(result).not.toBe(id2);
 				expect(id2).toEqual('0(0)1(0)2(0)');
+			});
+		});
+		
+		describe('getItems', function()
+		{
+			it('should return empty array if there is no items in the state', function()
+			{
+				var s = new k.data.State({});
+
+				expect(s.getItems()).toEqual([]);
+			});
+
+			it('should return a copy of the state\'s items', function()
+			{
+				var item = new k.data.ItemRule({rule: sampleGrammars.numDivs.F}),
+					s = new k.data.State({
+						items: [item]
+					});
+
+				var items2 = s.getItems();
+				expect(items2.length).toBe(1);
+				expect(items2[0]).not.toBe(item);
+
+				items2[0].rule.index = item.rule.index; //The index is NOT copied
+				items2[0].getIdentity(); //Calculate id
+				expect(items2[0]).toBeInstanceOf(k.data.ItemRule);
+				expect(items2[0].getIdentity()).toEqual(item.getIdentity());
 			});
 		});
 
@@ -197,7 +234,8 @@ define(['../../../src/data/sampleGrammars', '../../../src/data/state', '../../..
 				var item = new k.data.ItemRule(
 					{
 						rule: {
-							index: 0
+							index: 0,
+							tail:[]
 						}
 					}),
 					s = new k.data.State({
@@ -225,12 +263,14 @@ define(['../../../src/data/sampleGrammars', '../../../src/data/state', '../../..
 			{
 				var item1 = new k.data.ItemRule({
 						rule: {
-							index: 0
+							index: 0,
+							tail:[]
 						}
 					}),
 					item2 = new k.data.ItemRule({
 						rule: {
-							index: 1
+							index: 1,
+							tail:[]
 						}
 					}),
 					s = new k.data.State({
@@ -269,17 +309,20 @@ define(['../../../src/data/sampleGrammars', '../../../src/data/state', '../../..
 			{
 				var item1 = new k.data.ItemRule({
 						rule: {
-							index: 0
+							index: 0,
+							tail:[]
 						}
 					}),
 					item2 = new k.data.ItemRule({
 						rule: {
-							index: 1
+							index: 1,
+							tail:[]
 						}
 					}),
 					item3 = new k.data.ItemRule({
 						rule: {
-							index: 1
+							index: 1,
+							tail:[]
 						}
 					}),
 					s = new k.data.State({
@@ -318,7 +361,6 @@ define(['../../../src/data/sampleGrammars', '../../../src/data/state', '../../..
 				expect(ts[1].items[0]).toBe(item2);
 				expect(ts[1].items[1]).toBe(item3);
 			});
-
 		});
 
 		describe('addTransition', function()
@@ -338,32 +380,207 @@ define(['../../../src/data/sampleGrammars', '../../../src/data/state', '../../..
 			});
 		});
 
-		describe('getItems', function()
+		describe('getCondencedString', function ()
 		{
-			it('should return empty array if there is no items in the state', function()
+			it ('should return 1-5 when having only two rules with that indexes', function ()
 			{
-				var s = new k.data.State({});
-
-				expect(s.getItems()).toEqual([]);
-			});
-
-			it('should return a copy of the state\'s items', function()
-			{
-				var item = new k.data.ItemRule({rule: sampleGrammars.numDivs.F}),
+				var items = [
+					new k.data.ItemRule(
+					{
+						rule: {
+							index: 1,
+							tail:[]
+						}
+					}),
+					new k.data.ItemRule(
+					{
+						rule: {
+							index: 5,
+							tail:[]
+						}
+					})
+					],
 					s = new k.data.State({
-						items: [item]
-					});
-
-				var items2 = s.getItems();
-				expect(items2.length).toBe(1);
-				expect(items2[0]).not.toBe(item);
-
-				items2[0].rule.index = item.rule.index; //The index is NOT copied
-				items2[0].getIdentity(); //Calculate id
-				expect(items2[0]).toEqual(item);
-				expect(items2[0]).toBeInstanceOf(k.data.ItemRule);
+						items: items
+					});	
+					
+				expect(s.getCondencedString()).toEqual('1-5');
+			});
+			
+			it ('should return 0-15 when having only two rules with that indexes in inverse order', function ()
+			{
+				var items = [
+					new k.data.ItemRule(
+					{
+						rule: {
+							index: 15,
+							tail:[]
+						}
+					}),
+					new k.data.ItemRule(
+					{
+						rule: {
+							index: 0,
+							tail:[]
+						}
+					})
+					],
+					s = new k.data.State({
+						items: items
+					});	
+					
+				expect(s.getCondencedString()).toEqual('0-15');
+			});
+			
+			it ('should calculate the result only once', function ()
+			{
+				var items = [
+					new k.data.ItemRule(
+					{
+						rule: {
+							index: 15,
+							tail:[]
+						}
+					}),
+					new k.data.ItemRule(
+					{
+						rule: {
+							index: 0,
+							tail:[]
+						}
+					})
+					],
+					s = new k.data.State({
+						items: items
+					});	
+					
+				expect(s.getCondencedString()).toEqual('0-15');
+				
+				items[1].rule.index = 33;
+				
+				expect(s.getCondencedString()).toEqual('0-15');
 			});
 		});
-
+		
+		describe('isValid', function ()
+		{
+			it('should return true if the state does not have any reduce item', function()
+			{
+				var item1 = new k.data.ItemRule(
+					{
+						rule: {
+							index: 1,
+							tail:[]
+						}
+					}),
+					item2 = new k.data.ItemRule(
+					{
+						rule: {
+							index: 5,
+							tail:[]
+						}
+					}),
+					s = new k.data.State({
+						items: [item1, item2]
+					});
+				
+				spyOn(item1, 'isReduce').and.returnValue(false);
+				spyOn(item2, 'isReduce').and.returnValue(false);
+					
+				expect(s.isValid()).toBe(true);
+			});
+			
+			it('should return true if the state has just one reduce item', function()
+			{
+				var item1 = new k.data.ItemRule(
+					{
+						rule: {
+							index: 1,
+							tail:[]
+						}
+					}),
+					s = new k.data.State({
+						items: [item1]
+					});
+				
+				spyOn(item1, 'isReduce').and.returnValue(true);
+					
+				expect(s.isValid()).toBe(true);
+			});
+			
+			it('should return false if it has two reduce items without look-ahead', function()
+			{
+				var item1 = new k.data.ItemRule(
+					{
+						rule: {
+							index: 1,
+							tail:[]
+						}
+					}),
+					item2 = new k.data.ItemRule(
+					{
+						rule: {
+							index: 5,
+							tail:[]
+						}
+					}),
+					s = new k.data.State({
+						items: [item1, item2]
+					});
+				
+				spyOn(item1, 'isReduce').and.returnValue(true);
+				spyOn(item2, 'isReduce').and.returnValue(true);
+				
+				expect(s.isValid()).toBe(false);
+			});
+			
+			it('should return false if it has one reduce item and one shift item without look-ahead', function()
+			{
+				var item1 = new k.data.ItemRule(
+					{
+						rule: {
+							index: 1,
+							tail:[]
+						}
+					}),
+					item2 = new k.data.ItemRule(
+					{
+						rule: {
+							index: 5,
+							tail:[]
+						}
+					}),
+					s = new k.data.State({
+						items: [item1, item2]
+					});
+				
+				spyOn(item1, 'isReduce').and.returnValue(false);
+				spyOn(item2, 'isReduce').and.returnValue(true);
+					
+				expect(s.isValid()).toBe(false);
+			});
+			
+			// TODO FINISH THIS TESTS
+			//The next tests cannot be completed yet. LALR need to be completed
+			xit('should return true if the state has one reduce item, one shift item that does not share anything between them', function()
+			{
+				
+			});
+			
+			xit('should return true if the state has two reduce items but with different look-ahead', function()
+			{
+				
+			});
+			
+			xit('should return true if the state has one reduce rule and a shift rule that differ in their look-aheads', function()
+			{
+				
+			});
+			
+			xit('should return true if the state has two reduce rule and one shift rule but their look-ahead is different', function()
+			{
+				
+			});
+		});
     });
 });

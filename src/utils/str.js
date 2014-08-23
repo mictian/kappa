@@ -9,7 +9,6 @@ define(['../core'], function(k)
 
 	k.utils.str = (function()
 	{
-
 		/*
         * @func Util function used to determine if a string starts with anotherone
         *
@@ -60,13 +59,30 @@ define(['../core'], function(k)
 		var __fulltrim = function(str){
 			return str.replace(/(?:(?:^|\n)\s+|\s+(?:$|\n))/g,'').replace(/\s+/g,' ');
 		};
+		
+		/*
+        * @func Generates a stirng that is composed by various tabs
+        *
+        * @param {String} counter Number of tabs to add
+        * @returns {String} string composed by counter tabs
+        */
+		var __tabs = function (counter)
+		{
+			//TODO TESET THIS
+			var result = '';
+			for (var i = counter; i--; ) {
+				result += '\t';
+			}
+			return result;
+		};
 
         return {
             startsWith: __startsWith,
             trim: __trim,
             ltrim: __ltrim,
             rtrim: __rtrim,
-            fulltrim: __fulltrim
+            fulltrim: __fulltrim,
+            tabs: __tabs
         };
 
     })();

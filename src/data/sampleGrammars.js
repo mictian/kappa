@@ -49,7 +49,8 @@ define(['./grammar'], function(k)
 		return {
 			g: new k.data.Grammar({
 				startSymbol: S.head,
-				rules: [S, E1, E2, Q, F]
+				rules: [S, E1, E2, Q, F],
+				name: 'numDivs'
 			}),
 			S: S,
 			E1: E1,
@@ -66,12 +67,12 @@ define(['./grammar'], function(k)
 	{
 		/*
 		LR(1)
-		0. S --> OPAREN EXPS CPAREN
-		1. EXPS --> EXPS EXP
-		2. EXPS --> <EMPTY>
-		3. EXP --> 'id'
-		4. OPAREN --> '('
-		5. CPAREN --> ')'
+		1. S --> OPAREN EXPS CPAREN
+		2. EXPS --> EXPS EXP
+		3. EXPS --> <EMPTY>
+		4. EXP --> 'id'
+		5. OPAREN --> '('
+		6. CPAREN --> ')'
 		*/
 		var S = new k.data.Rule({
 			head: 'S',
@@ -111,7 +112,8 @@ define(['./grammar'], function(k)
 		return {
 			g: new k.data.Grammar({
 				startSymbol: S.head,
-				rules: [S, EXPS1, EXPS2, EXP, OPAREN, CPAREN]
+				rules: [S, EXPS1, EXPS2, EXP, OPAREN, CPAREN],
+				name: 'idsList'
 			}),
 			S: S,
 			EXPS1: EXPS1,
@@ -175,7 +177,8 @@ define(['./grammar'], function(k)
 		return {
 			g: new k.data.Grammar({
 				startSymbol: S.head,
-				rules: [S, E1, E2, Q1, Q2, F]
+				rules: [S, E1, E2, Q1, Q2, F],
+				name: 'numDivsEmpty'
 			}),
 			S: S,
 			E1: E1,
@@ -253,7 +256,8 @@ define(['./grammar'], function(k)
 		return {
 			g: new k.data.Grammar({
 				startSymbol: S.head,
-				rules: [S, E1, E2, T1, T2, R, OPAREN, CPAREN]
+				rules: [S, E1, E2, T1, T2, R, OPAREN, CPAREN],
+				name: 'numDiff'
 			}),
 			S: S,
 			E1: E1,
@@ -291,10 +295,139 @@ define(['./grammar'], function(k)
 		return {
 			g: new k.data.Grammar({
 				startSymbol: A1.head,
-				rules: [A1, A2]
+				rules: [A1, A2],
+				name: 'aPlusb'
 			}),
 			A1: A1,
 			A2: A2
+		};
+	})();
+	
+	/*
+	006. Very simple grammar for a*
+	*/
+	var aPlusEMPTY = (function ()
+	{
+		/*
+		LR(0)
+		1. S --> 'a' S
+		2. S --> EMPTY
+		*/
+		var S1 = new k.data.Rule({
+				head: 'S',
+				tail: [new k.data.Terminal({name:'A_LET', body: 'a'}), new k.data.NonTerminal({name: 'S'})],
+				name: 'S1RULE'
+			}),
+			S2 = new k.data.Rule({
+				head: 'S',
+				tail: [new k.data.Symbol({name:k.data.specialSymbol.EMPTY})],
+				name: 'S2RULE'
+			});
+
+		return {
+			g: new k.data.Grammar({
+				startSymbol: S1.head,
+				rules: [S1, S2],
+				name:'aPlusEMPTY'
+			}),
+			S1: S1,
+			S2: S2
+		};
+	})();
+
+	/*
+	007. Condenced version of the grammar numDiff (same language)
+	*/
+	var numDiffCondenced = (function()
+	{
+		/*
+		LR(1)
+		1. S --> E
+		2. E --> E '-' T
+		3. E --> T
+		4. T --> 'number'
+		5. T --> '(' E ')'
+		*/
+		var S = new k.data.Rule({
+				head: 'S',
+				tail: k.data.NonTerminal.fromArray(['E']),
+				name: 'SRULE'
+			}),
+	
+			E1 = new k.data.Rule({
+				head: 'E',
+				tail: [new k.data.NonTerminal({name: 'E'}), new k.data.Terminal({name:'DIFF', body: '-'}), new k.data.NonTerminal({name: 'T'})],
+				name: 'E1RULE'
+			}),
+	
+			E2 = new k.data.Rule({
+				head: 'E',
+				tail: k.data.NonTerminal.fromArray(['T']),
+				name: 'E2RULE'
+			}),
+	
+			T1 = new k.data.Rule({
+				head: 'T',
+				tail: [new k.data.Terminal({name:'NUMBER', body: /\d/})],
+				name: 'T1RULE'
+			}),
+			
+			T2 = new k.data.Rule({
+				head: 'T',
+				tail: [new k.data.Terminal({name:'OPAREN', body: /\(/}), new k.data.NonTerminal({name: 'E'}), new k.data.Terminal({name:'CPAREN', body: /\)/})],
+				name: 'T2RULE'
+			});
+
+		return {
+			g: new k.data.Grammar({
+				startSymbol: S.head,
+				rules: [S, E1, E2, T1, T2],
+				name: 'numDiffCondenced'
+			}),
+			S: S,
+			E1: E1,
+			E2: E2,
+			T1: T1,
+			T2: T2
+		};
+	})();
+	
+	/*
+	0008. Simple a^(n+1)b^(n) Grammar
+	*/
+	var aPowN1b = (function ()
+	{
+		var S = new k.data.Rule({
+				head: 'S',
+				tail: k.data.NonTerminal.fromArray(['A','D']),
+				name: 'SRULE'
+			}),
+			A1 = new k.data.Rule({
+				head: 'A',
+				tail: [new k.data.Terminal({name:'a_terminal', body: 'a'}), new k.data.NonTerminal({name: 'A'}), new k.data.Terminal({name:'b_terminal', body: 'b'})],
+				name: 'A1RULE'
+			}),
+			A2 = new k.data.Rule({
+				head: 'A',
+				tail: [new k.data.Terminal({name:'a_terminal', body: 'a'})],
+				name: 'A2RULE'
+			}),
+			D = new k.data.Rule({
+				head: 'D',
+				tail: [new k.data.Terminal({name:'d_terminal', body: 'd'})],
+				name: 'DRULE'
+			});
+			
+		return  {
+			g: new k.data.Grammar({
+				startSymbol: S.head,
+				rules:[S,A1,A2,D],
+				name:'aPowN1b'
+			}),
+			S:S,
+			A1:A1,
+			A2:A2,
+			D:D
 		};
 	})();
 	
@@ -303,6 +436,9 @@ define(['./grammar'], function(k)
 		idsList: idsList,
 		numDivsEmpty: numDivsEmpty,
 		numDiff: numDiff,
-		aPlusb: aPlusb
+		aPlusb: aPlusb,
+		aPlusEMPTY: aPlusEMPTY,
+		numDiffCondenced: numDiffCondenced,
+		aPowN1b: aPowN1b
 	};
 });

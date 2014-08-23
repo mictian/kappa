@@ -615,6 +615,27 @@ define(['../../../src/utils/obj'], function(k)
 				expect(k.utils.obj.isObject(function(){})).toBe(false);
 			});
 		});
+		
+		describe('isUndefined', function ()
+		{
+			it('should return true if the passed in parameter is Undefined', function()
+			{
+				expect(k.utils.obj.isUndefined()).toBe(true);
+				//Warning remove to support Object cretion without using object literal notation
+				/*jshint -W010 */
+				expect(k.utils.obj.isUndefined(undefined)).toBe(true);
+			});
+
+			it('should return false if the passed in parameter is not Undefined', function()
+			{
+				expect(k.utils.obj.isUndefined(12)).toBe(false);
+				expect(k.utils.obj.isUndefined(null)).toBe(false);
+				expect(k.utils.obj.isUndefined(false)).toBe(false);
+				expect(k.utils.obj.isUndefined(true)).toBe(false);
+				expect(k.utils.obj.isUndefined({})).toBe(false);
+				expect(k.utils.obj.isUndefined(function(){})).toBe(false);
+			});
+		});
 
 		describe('has', function ()
 		{
@@ -1053,8 +1074,7 @@ define(['../../../src/utils/obj'], function(k)
 			it('should return the same passed list if no sort function is specifed', function ()
 			{
 				var expectedList = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
-				
-				expect(k.utils.obj.sortBy(expectedList)).toEqual(expectedList);
+				expect(k.utils.obj.sortBy(expectedList)).toEqual([1,2,3,4,5,6,7,8,9,10]);
 			});
 			
 		});
@@ -1288,6 +1308,103 @@ define(['../../../src/utils/obj'], function(k)
 			{
 				var result = k.utils.obj.groupBy(['one', 'two', 'three'], 'length');
 				expect(result).toEqual({3: ['one', 'two'], 5: ['three']});
+			});
+		});
+		
+		describe('sortedIndex', function ()
+		{
+			it('should return the correct index when the items are integers', function ()
+			{
+				var result = k.utils.obj.sortedIndex([10, 20, 30, 40, 50], 35);
+				expect(result).toBe(3);
+			});
+			
+			it('should accept a string as an iterator that should be used as the property name when using objects', function ()
+			{
+				var stooges = [{name: 'moe', age: 40}, {name: 'curly', age: 60}];
+				var result = k.utils.obj.sortedIndex(stooges, {name: 'larry', age: 50}, 'age');
+				
+				expect(result).toBe(1);
+			});
+			
+			it('should return the correct index when using a function iterator', function ()
+			{
+				var stooges = [{name: 'moe', age: 40}, {name: 'curly', age: 60}];
+				var result = k.utils.obj.sortedIndex(stooges, {name: 'larry', age: 50}, function (item) {return item.age;});
+				
+				expect(result).toBe(1);
+			});
+			
+			it('should trow an exception when passing null', function ()
+			{
+				expect(function () {return k.utils.obj.sortedIndex(null, 1);} ).toThrow();
+			});
+		});
+		
+		describe('indexOf', function ()
+		{
+			it('should return the valid index when present in a number array', function ()
+			{
+				expect(k.utils.obj.indexOf([1,2,3],2)).toBe(1);
+			});
+			
+			it('should return -1 when the parameter is not present in a number array', function ()
+			{
+				expect(k.utils.obj.indexOf([1,2,3],5)).toBe(-1);
+			});
+			
+			it('should return the correct index in an object array', function ()
+			{
+				var p = {
+					name: 'A',
+					lastName: 'B'
+				};
+				
+				expect(k.utils.obj.indexOf([{
+					name: '1',
+					lastName: '2'
+				},{
+					name:'3',
+					lastName:'4'
+				},
+				p
+				],p)).toBe(2);
+			});
+			
+			it('should return -1 if not passing the same (identity) object when in an object array', function ()
+			{
+				var p = {
+					name: 'A',
+					lastName: 'B'
+				};
+				
+				expect(k.utils.obj.indexOf([{
+					name: '1',
+					lastName: '2'
+				},{
+					name:'3',
+					lastName:'4'
+				},
+				{nane:'A', lastName:'B'}
+				],p)).toBe(-1);
+			});
+		});
+		
+		describe('uniqueId', function () 
+		{
+			it('should return a value with the specified prefix', function ()
+			{
+				var result = k.utils.obj.uniqueId('test');
+				expect(result.lastIndexOf('test', 0)).toBe(0);
+			});
+			
+			it ('return when getting twice, 2 differente values', function ()
+			{
+				var res1 = k.utils.obj.uniqueId(),
+					res2 = k.utils.obj.uniqueId();
+					
+				expect(res1).not.toBe(res2);
+				expect(res1).not.toEqual(res2);
 			});
 		});
 	});

@@ -194,49 +194,20 @@ define(['../core'], function(k)
 			return obj === Object(obj) && !__isFunction(obj);
 		};
 		
-		// //Code extracted from: http://stackoverflow.com/a/8683287
-		// var intersectionObjects = function(list1, list2, areEqual) {
-		// 	var result = [],
-		// 		existsInList2 = false;
-			
-		// 	__each(list1, function (item1)
-		// 	{
-		// 		existsInList2 = __any(list2, function (item2) { return areEqual(item2, item1); });
-				
-		// 		if (existsInList2) {
-		// 			result.push(item1);
-		// 		}
-		// 	});
-			
-		// 	return result;
-		// };
-
-		// var __intersectionObjects() {
-			
-		// 	var results = arguments[0],
-		// 		lastArgument = arguments[arguments.length - 1],
-		// 		arrayCount = arguments.length,
-		// 		areEqualFunction = __isEqual;
-			
-		// 	if(__isFunction(lastArgument)) {
-		// 		areEqualFunction = lastArgument;
-		// 		arrayCount--;
-		// 	}
-			
-		// 	for (var i = 1; i < arrayCount ; i++) {
-		// 		var array = arguments[i];
-		// 		results = intersectionObjects(results, array, areEqualFunction);
-		// 		if(results.length === 0) 
-		// 		{
-		// 			break;
-		// 		}
-		// 	}
-		// 	return results;
-		// };
+		/*
+        * @func Util function to determine if a thing is or not defined
+        * @param {Thing} obj object to check its state
+        * @returns {Boolean} True if the thing passed in is Undefined, false otherwise
+        */
+		var __isUndefined = function(obj) {
+			return obj === void 0;
+		};
 		
-
-		/*The next function are copied from underscorejs.org. These function are here because I want to be in control of all the code I manage.
-		Besides I like that I my code pass my JSHint rule, which are much more stringer that the onces applied by underscore.js */
+		/*
+		====================================================================================================================================
+		The next function are copied from underscorejs.org. These function are here because I want to be in control of all the code I manage.
+		Besides I like that I my code pass my JSHint rule, which are much more stringer that the onces applied by underscore.js
+		*/
 
 		/*General Variables*/
 		var breaker = {};
@@ -495,7 +466,7 @@ define(['../core'], function(k)
         * @returns {Object} Object lookup
         */
 		var lookupIterator = function(value) {
-			if (value === null) {
+			if (value === null || value === undefined) {
 				return __identity;
 			}
 			if (__isFunction(value)) {
@@ -506,7 +477,7 @@ define(['../core'], function(k)
 		
 		/* @func Sort the object’s values by a criterion produced by an iterator.
         * @param {Object} obj object to traverse
-        * @param {Function} iterator function called per each item founded in obj
+        * @param {Function} iterator function called per each item founded in obj. Called with value, index, list
         * @param {Object} context object from which extract keys
         * @returns {Object} The same obj passed in but sorted as specified by the iterator function
         */
@@ -644,60 +615,6 @@ define(['../core'], function(k)
 			});
 		};
 		
-		/* @func Uses a binary search to determine the index at which the value should be inserted into the list in order to maintain the list's sorted order.
-        * @param {Array} array List of items to traverse
-        * @param {Object} obj object to traverse
-        * @param {Function} iterator Optional function that will be used to compute the sort ranking of each value, including the value (obj param) you pass.
-        	Iterator may also be the string name of the property to sort by
-        * @param {Object} context Used as a context when executing the iterator function
-        * @returns {Integer} The location/index at which the pass value should be inserted.
-        */
-		var __sortedIndex = function(array, obj, iterator, context) {
-			//TODO TEST THIS
-			iterator = lookupIterator(iterator);
-			var value = iterator.call(context, obj);
-			var low = 0, high = array.length;
-			
-			while (low < high) {
-				var mid = (low + high) >>> 1;
-				iterator.call(context, array[mid]) < value ? low = mid + 1 : high = mid;
-			}
-			return low;
-		};
-		
-		/* @func Returns the index at which value can be found in the array, or -1 if value is not present in the array.
-        * @param {Array} array List of items to traverse
-        * @param {Object} item Object to find into the array
-        * @param {Booelan} isSorted When the array is sorted pass true and the algorithm will perform a faster approach
-        * @returns {Integer} The location/index at which the pass value is present, and -1 if the value is not present
-        */
-		var __indexOf = function (array, item, isSorted) {
-			//TODO TEST THIS
-			if (array === null) {
-				return -1;
-			}
-			var i = 0, length = array.length;
-			if (isSorted) {
-				if (typeof isSorted == 'number') {
-					i = (isSorted < 0 ? Math.max(0, length + isSorted) : isSorted);
-				} else {
-					i = _.sortedIndex(array, item);
-					return array[i] === item ? i : -1;
-				}
-			}
-			
-			if (nativeIndexOf && array.indexOf === nativeIndexOf) {
-				return array.indexOf(item, isSorted);
-			}
-			
-			for (; i < length; i++) {
-				if (array[i] === item) {
-					return i;
-				}
-			}
-			return -1;
-		};
-		
 		/* @func Produce a duplicate-free version of the array. If the array has already been sorted, you have the option of using a faster algorithm.
         * @param {Array} array object to traverse
         * @param {Boolean} isSorted indicate if the array is osrted or not
@@ -739,6 +656,76 @@ define(['../core'], function(k)
 				result[key] = [value];
 			}
 		});
+		
+		/* @func Uses a binary search to determine the index at which the value should be inserted into the list in order to maintain the list's sorted order.
+        * @param {Array} array List of items to traverse
+        * @param {Object} obj object to traverse
+        * @param {Function} iterator Optional function that will be used to compute the sort ranking of each value, including the value (obj param) you pass.
+        	Iterator may also be the string name of the property to sort by
+        * @param {Object} context Used as a context when executing the iterator function
+        * @returns {Integer} The location/index at which the pass value should be inserted.
+        */
+		var __sortedIndex = function(array, obj, iterator, context) {
+			iterator = lookupIterator(iterator);
+			var value = iterator.call(context, obj);
+			var low = 0,
+				high = array.length;
+			
+			while (low < high) {
+				var mid = (low + high) >>> 1;
+				if (iterator.call(context, array[mid]) < value)
+				{
+					low = mid + 1;
+				}
+				else
+				{
+					high = mid;	
+				}
+			}
+			return low;
+		};
+		
+		/* @func Returns the index at which value can be found in the array, or -1 if value is not present in the array.
+        * @param {Array} array List of items to traverse
+        * @param {Object} item Object to find into the array
+        * @param {Booelan} isSorted When the array is sorted pass true and the algorithm will perform a faster approach
+        * @returns {Integer} The location/index at which the pass value is present, and -1 if the value is not present
+        */
+		var __indexOf = function (array, item, isSorted) {
+			if (array === null) {
+				return -1;
+			}
+			var i = 0, length = array.length;
+			if (isSorted) {
+				if (typeof isSorted === 'number') {
+					i = (isSorted < 0 ? Math.max(0, length + isSorted) : isSorted);
+				} else {
+					i = __sortedIndex(array, item);
+					return array[i] === item ? i : -1;
+				}
+			}
+			
+			if (nativeIndexOf && array.indexOf === nativeIndexOf) {
+				return array.indexOf(item, isSorted);
+			}
+			
+			for (; i < length; i++) {
+				if (array[i] === item) {
+					return i;
+				}
+			}
+			return -1;
+		};
+		
+		var idCounter = 0;
+		/* @func Generate a unique integer id (unique within the entire client session).
+        * @param {String} prefix Optional prefix name
+        * @returns {String} Unique identifier
+        */
+		var __uniqueId = function (prefix) {
+			var id = ++idCounter + '';
+			return prefix ? prefix + id : id;
+		};
 
         return {
             inherit: __inherit,
@@ -753,6 +740,7 @@ define(['../core'], function(k)
             isFunction: __isFunction,
             isArguments: __isArguments,
             isBoolean: __isBoolean,
+            isUndefined: __isUndefined,
             keys: __keys,
             each: __each,
             map: __map,
@@ -772,9 +760,9 @@ define(['../core'], function(k)
             contains: __contains,
             uniq: __uniq,
             sortedIndex: __sortedIndex,
-            indexOf: __indexOf
+            indexOf: __indexOf,
+            uniqueId: __uniqueId
         };
-
     })();
 
     return k;

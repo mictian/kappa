@@ -23,16 +23,15 @@ define(['../../../src/data/sampleGrammars', '../../../src/parser/parser'], funct
 		
 		describe('parse', function ()
 		{
-			it('should accept the string "aaab" for the grammar a+b', function()
+			it('should accept the string "aab" for the grammar a+b', function()
 			{
 				var p = k.parser.parserCreator.create(
 				    {
 						grammar: sampleGrammars.aPlusb.g,
-						strInput: 'aaab'
+						strInput: 'aab'
 					});
 		        
 		        var result = p.parser.parse(p.lexer);
-		        
 		        expect(result).toBeTruthy();
 			});
 			
@@ -62,6 +61,26 @@ define(['../../../src/data/sampleGrammars', '../../../src/parser/parser'], funct
 		        expect(result).toBe(false);
 			});
 
+			xit('should accept the string "aab" for the grammar aPlusEMPTY', function()
+			{
+				var p = k.parser.parserCreator.create(
+				    {
+						grammar: sampleGrammars.aPlusEMPTY.g,
+						strInput: ''
+					});
+		        
+		        // debugger;
+		        var result = p.parser.parse(p.lexer);
+		        expect(result).toBeTruthy();
+			});
+		});
+	});
+	
+	describe('parserCreator', function ()
+	{
+		describe('create', function ()
+		{
+		//TODO Finish this!	
 		});
 	});
 });

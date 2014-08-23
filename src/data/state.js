@@ -1,40 +1,46 @@
-define(['../utils/obj', './grammar'], function(k) {
+define(['../utils/obj', './node', './grammar'], function(k) {
+    
     'use strict';
 
     /* State
      * @class
-     * @classdesc This class reprensent an automata state */
-    var State = (function()
+     * @classdesc This class reprensent an automata state, a sub-type of a generic Node */
+    var State = (function(_super)
     {
+        /* jshint latedef:false */
+        k.utils.obj.inherit(state, _super);
+        
         /*
          * Constructor Automata State
          *
          * @constructor
          * @param {[ItemRule]} options.items Array of item rules that initialy compone this state
+         * @param {[Object]} options.transitions Array of object that initialy compone this node
+         * @param {[Node]} options.nodes Array of State instances that are children of this State
          */
-        var state = function(options) {
-            this.options = options;
+        function state (options) {
+            
+            _super.apply(this, arguments);
 
-            k.utils.obj.defineProperty(this, 'transitions');
+            
             k.utils.obj.defineProperty(this, 'isAcceptanceState'); // This is set by the automata generator
             
             k.utils.obj.defineProperty(this, '_items');
-            k.utils.obj.defineProperty(this, '_index');
             k.utils.obj.defineProperty(this, '_registerItems');
-            k.utils.obj.defineProperty(this, '_id');
+            k.utils.obj.defineProperty(this, '_index');
             k.utils.obj.defineProperty(this, '_condencedView');
 
             this.isAcceptanceState = false;
-            this.transitions = options.transitions || [];
+            
             this._items = options.items || [];
             this._index = 0;
             this._registerItems = {};
 
             k.utils.obj.each(this._items, function (itemRule)
             {
-                this._registerItems[itemRule.getIdentity()] = true;
+                this._registerItems[itemRule.getIdentity()] = itemRule;
             }, this);
-        };
+        }
 
         /* @function Get the next unprocessed item rule
          * @returns {ItemRule} Next Item Rule */
@@ -49,10 +55,18 @@ define(['../utils/obj', './grammar'], function(k) {
             this._id = null;
             k.utils.obj.each(itemRules, function (itemRule)
             {
+                // The same item rule can be added more than once if the grammar has loops.
+                // For sample: (1)S -> A *EXPS B      (2)EXPS -> *EXPS
                 if (!this._registerItems[itemRule.getIdentity()])
                 {
-                    this._registerItems[itemRule.getIdentity()] = true;
+                    this._registerItems[itemRule.getIdentity()] = itemRule;
                     this._items.push(itemRule);
+                }
+                else
+                {
+                    //As the way to of generating a LR(1) automata adds a item rule for each lookAhead we simply merge its lookAheads
+                    var mergedLookAheads = this._registerItems[itemRule.getIdentity()].lookAhead.concat(itemRule.lookAhead);
+                    this._registerItems[itemRule.getIdentity()].lookAhead = k.utils.obj.uniq(mergedLookAheads, function (item) { return item.name;});
                 }
             }, this);
         };
@@ -60,13 +74,10 @@ define(['../utils/obj', './grammar'], function(k) {
         /* @function Convert the current state to its string representation
          * @returns {String} formatted string */
         state.prototype.toString = function() {
-            var strResult = 'ID: ' + this.getIdentity() + '\n';
-            k.utils.obj.each(this._items, function (item)
-            {
-                strResult += item.toString() + '\n';
-            });
-            
-            strResult += '\nTRANSITIONS:\n';
+            var strResult = 'ID: ' + this.getIdentity() + '\n' +
+                            this._items.join('\n') +
+                            '\nTRANSITIONS:\n';
+                            
             k.utils.obj.each(this.transitions, function (transition)
             {
                 strResult += '*--' + transition.symbol + '-->' + transition.state.getIdentity() + '\n';
@@ -88,22 +99,13 @@ define(['../utils/obj', './grammar'], function(k) {
          * @returns {String} State Representation in one line  */
         state.prototype._generateCondencedString = function() {
             return  k.utils.obj.map(
-                k.utils.obj.sortBy(this._items, function(item) 
+                k.utils.obj.sortBy(this._items, function(item)
                 {
                     return item.rule.index;
                 }),
                 function (item) {
                     return item.rule.index;
                 }).join('-');
-        };
-        
-        /* @function Returns the string ID of the current state
-         * @returns {String} ID  */
-        state.prototype.getIdentity = function() {
-            if (!this._id) {
-                this._id = this._generateIdentity();
-            }
-            return this._id;
         };
         
         /* @function Generates an ID that identify this state from any other state
@@ -116,7 +118,7 @@ define(['../utils/obj', './grammar'], function(k) {
             }
         
             return k.utils.obj.reduce(
-                k.utils.obj.sortBy(this._items, function(item) 
+                k.utils.obj.sortBy(this._items, function(item)
                 {
                     return item.rule.index;
                 }),
@@ -125,12 +127,28 @@ define(['../utils/obj', './grammar'], function(k) {
                 }, '');
         };
 
-        /* @function Returns a copy the items contained in the current state )
+        /* @function Returns a copy the items contained in the current state
          * @returns {[ItemRule]} Array of cloned item rules  */
         state.prototype.getItems = function() {
             return k.utils.obj.map(this._items, function(item) {
                 return item.clone();
             });
+        };
+        
+        /* @function Returns an orignal item rule based on its id.
+            This method is intended to be use as READ-ONLY, editing the returned items will affect the state and the rest of the automata at with this state belongs to.
+         * @returns {[ItemRule]} Array of current item rules  */
+        state.prototype.getOriginalItems = function() {
+            //TODO TEST THIS
+            return this._items;
+        };
+        
+        /* @function Returns an orignal item rule based on its id.
+            This method is intended to be use as READ-ONLY, editing the returned items will affect the state and the rest of the automata at with this state belongs to.
+         * @returns {ItemRule} Item rule corresponding to the id passed in if present or null otherwise  */
+        state.prototype.getOriginalItemById = function(id) {
+            //TODO TEST THIS
+            return this._registerItems[id];
         };
 
         /** @function Get the list of all supported symbol which are valid to generata transition from the current state.
@@ -162,15 +180,26 @@ define(['../utils/obj', './grammar'], function(k) {
             return result;
         };
 
-        /* @function Add a new transaction into the list of transactions of the current state
+        /* @function Responsible of new transitions. We override this method to use the correct variable names and be more meanful
          * @param {Symbol} symbol Symbol use to make the transition, like the name of the transition
          * @param {State} state Destination state arrived when moving with the specified tranisiotn
-         * @returns {Void}  */
-        state.prototype.addTransition = function(symbol, state) {
-            this.transitions.push({
+         * @returns {Object} Transition object  */
+        state.prototype._generateNewTransition = function (symbol, state)
+        {
+            return {
                 symbol: symbol,
                 state: state
-            });
+            };
+        };
+        
+        /* @function Returns the list of item rules contained in the current state that are reduce item rules.
+         * @returns {[ItemRule]} Recude Item Rules  */
+        state.prototype.getRecudeItems = function ()
+        {
+            //TODO TEST THIS
+            return k.utils.obj.filter(this._items, function (item) {
+                return item.isReduce();
+            });   
         };
         
         /* @function Determine if the current state is valid or not.
@@ -179,27 +208,13 @@ define(['../utils/obj', './grammar'], function(k) {
             //TODO TEST THIS
             //TODO Take into account when the state have items WITH LOOK-AHEAD!!
             
-            var reduceItems = k.utils.obj.filter(this._items, function (item) {
-                return item.isReduce();
-            });
+            var reduceItems = this.getRecudeItems();
             
-            if (reduceItems.length !== this._items.length && reduceItems.length > 0 || reduceItems.length > 1)
-            {
-                // // TODO THINK THIS, probably shift item wont have look-ahead!
-                // // Check if the items have look-ahead or not
-                // // we just validate the first reduce item to see if this item rules have look-ahead
-                // if (reduceItems[0].lookAhead.length > 0)
-                // {
-                //     //TODO
-                // }
-                return false;
-            }
-            
-            return true;
+            return !(reduceItems.length !== this._items.length && reduceItems.length > 0 || reduceItems.length > 1);
         };
 
         return state;
-    })();
+    })(k.data.Node);
 
     k.data = k.utils.obj.extend(k.data || {}, {
         State: State

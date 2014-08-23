@@ -1,5 +1,5 @@
 /* global expect: true, describe: true, it:  true, beforeEach: true */
-define(['../../../src/data/grammar'], function(k)
+define(['../../../src/data/grammar', '../../../src/data/sampleGrammars'], function (k, samppleGrammars)
 {
 	'use strict';
 
@@ -74,25 +74,6 @@ define(['../../../src/data/grammar'], function(k)
 
 			expect(s+'').toBe('result');
 		});
-
-		describe('clone', function()
-		{
-			it('should duplicate each object value in its options property', function()
-			{
-				var options = {
-						name: 'TEST',
-						anotherValue: 'YES',
-						isATest: true
-					},
-					s = new k.data.Symbol(options);
-
-				var clone = s.clone();
-
-				expect(clone.options).toEqual(options);
-				expect(clone.options).not.toBe(options);
-				expect(clone).toBeInstanceOf(k.data.Symbol);
-			});
-		});
 	});
 
 	describe('NonTerminal', function()
@@ -164,24 +145,6 @@ define(['../../../src/data/grammar'], function(k)
 			});
 
 			expect(nonTerminal.isSpecial).toBeFalsy();
-		});
-
-		describe('clone', function ()
-		{
-			it ('should duplicate each object value in its options property', function()
-			{
-				var options= {
-						name: 'TEST'
-					},
-					nt = new k.data.NonTerminal(options);
-
-				var clone = nt.clone();
-
-				expect(clone.options).toEqual(options);
-				expect(clone.options).not.toBe(options);
-				expect(clone).toBeInstanceOf(k.data.NonTerminal);
-				expect(clone).toBeInstanceOf(k.data.Symbol);
-			});
 		});
 	});
 
@@ -268,54 +231,6 @@ define(['../../../src/data/grammar'], function(k)
 
 			expect(t.toString()).toBe('<'+re.toString()+'>');
 		});
-
-		describe('clone', function()
-		{
-			it('should maintain the same name', function ()
-			{
-				var options= {
-						name: 'TEST',
-						body: 'B'
-					},
-					t = new k.data.Terminal(options);
-
-				var clone = t.clone();
-
-				expect(clone.options.body).toEqual('B');
-				expect(clone.options.name).toEqual('TEST');
-			});
-
-			it('should maintain the same body', function ()
-			{
-				var options= {
-						name: 'TEST',
-						body: /a.[1,2]/
-					},
-					t = new k.data.Terminal(options);
-
-				var clone = t.clone();
-
-				expect(clone.options.body.source).toEqual('a.[1,2]');
-				expect(clone.options.body).toBeInstanceOf(RegExp);
-				expect(clone.options.name).toEqual('TEST');
-			});
-
-			it('should clone all standard options values', function ()
-			{
-				var options= {
-						name: 'TEST',
-						body: 'THIS IS THE BODY'
-					},
-					t = new k.data.Terminal(options);
-
-				var clone = t.clone();
-
-				expect(clone.options).toEqual(options);
-				expect(clone.options).not.toBe(options);
-				expect(clone).toBeInstanceOf(k.data.Terminal);
-				expect(clone).toBeInstanceOf(k.data.Symbol);
-			});
-		});
 	});
 
 	describe('Rule', function()
@@ -383,82 +298,6 @@ define(['../../../src/data/grammar'], function(k)
 		it('should have toString method overriden', function () {
 			expect(Object.getPrototypeOf(r).hasOwnProperty('toString')).toBe(true);
 		});
-
-		describe('clone', function ()
-		{
-			it('should clone with index -1', function()
-			{
-				var r = new k.data.Rule({
-					head: new k.data.NonTerminal({
-						name: 'HEAD'
-					})
-				});
-
-				r.index = 12;
-
-				var clone = r.clone();
-
-				expect(clone.index).toBe(-1);
-				expect(clone).toBeInstanceOf(k.data.Rule);
-			});
-
-			it('should returns a head instance', function()
-			{
-				var r = new k.data.Rule({
-					head: new k.data.NonTerminal({
-						name: 'HEAD'
-					})
-				});
-
-				var clone = r.clone();
-
-				expect(clone.index).toBe(-1);
-				expect(clone.head).toBeInstanceOf(k.data.NonTerminal);
-			});
-
-			it('should return an array of instances in its tail', function()
-			{
-				var r = new k.data.Rule({
-					head: new k.data.NonTerminal({
-						name: 'HEAD'
-					}),
-					tail: k.data.NonTerminal.fromArray(['ONE', 'TWO'])
-				});
-
-				var clone = r.clone();
-
-				expect(clone.head).toBeInstanceOf(k.data.NonTerminal);
-				expect(clone.tail).toBeInstanceOf(Array);
-				expect(clone.tail.length).toBe(2);
-				expect(clone.tail[0]).toBeInstanceOf(k.data.NonTerminal);
-				expect(clone.tail[0].name).toEqual('ONE');
-				expect(clone.tail[1]).toBeInstanceOf(k.data.NonTerminal);
-				expect(clone.tail[1].name).toEqual('TWO');
-			});
-
-			it('shoud copy each property in the options value', function()
-			{
-				var r = new k.data.Rule({
-					head: new k.data.NonTerminal({
-						name: 'HEAD'
-					}),
-					tail: k.data.NonTerminal.fromArray(['ONE', 'TWO']),
-					TEST: true,
-					REALLY: 'YES',
-					OK: {}
-				});
-
-				var clone = r.clone();
-
-				expect(clone.options.TEST).toBeDefined();
-				expect(clone.options.TEST).toBe(true);
-				expect(clone.options.REALLY).toBeDefined();
-				expect(clone.options.REALLY).toEqual('YES');
-				expect(clone.options.OK).toBeDefined();
-				expect(clone.options.OK).toEqual({});
-			});
-
-		});
 	});
 
 	describe('Grammar', function()
@@ -517,7 +356,7 @@ define(['../../../src/data/grammar'], function(k)
 		{
 			it('should have an empty name if it\'s not specified', function (){
 				var gr = new k.data.Grammar({
-					startSymbol: new k.data.Symbol({name: k.data.specialSymbol.EOF, isSpecial:true}), //Because a grammar requires a start symbol
+					startSymbol: new k.data.Symbol({name: k.data.specialSymbol.EMPTY, isSpecial:true}), //Because a grammar requires a start symbol
 					rules: []
 				});
 
@@ -656,7 +495,7 @@ define(['../../../src/data/grammar'], function(k)
 							
 						expect(g1.rules.length).toBe(1);
 						expect(g1.rules[0].name).toEqual(k.data.Grammar.constants.AugmentedRuleName);
-						expect(g1.rules[0].tail.length).toBe(1);
+						expect(g1.rules[0].tail.length).toBe(2);
 						expect(g1.rules[0].tail[0].name).toEqual(k.data.specialSymbol.EMPTY);
 				});
 				
@@ -755,6 +594,52 @@ define(['../../../src/data/grammar'], function(k)
 					expect(g1.rules.length).toBe(6);
 					expect(Sa.tail.length).toBe(1);
 					expect(A.tail.length).toBe(1);
+				});
+				
+				it ('should preseve epsilon in the initial rule', function ()
+				{
+					var Sa = new k.data.Rule({
+							head: 'Sa'
+						}),
+						Sa2 = new k.data.Rule({
+							head: 'Sa',
+							tail: k.data.NonTerminal.fromArray(['B'])
+						}),
+						B = new k.data.Rule({
+							head: 'B',
+							tail: [new k.data.Terminal({name:'b_terminal', body: 'b'})]
+						}),
+						g1 = new k.data.Grammar({
+							startSymbol: Sa.head,
+							rules: [Sa, Sa2, B]
+						});
+						
+					expect(Sa.tail.length).toBe(1);
+					expect(Sa.tail[0].name).toBe(k.data.specialSymbol.EMPTY);
+					expect(g1.rules.length).toBe(4);
+					expect(B.tail.length).toBe(1);
+				});
+				
+				it ('should preseve epsilon in the initial GENERATED (when the specifeid rules are all removed) rule', function ()
+				{
+					var Sa = new k.data.Rule({
+							head: 'Sa',
+							tail: k.data.NonTerminal.fromArray(['B'])
+						}),
+						B = new k.data.Rule({
+							head: 'B',
+							tail: k.data.NonTerminal.fromArray(['FAKE'])
+						}),
+						g1 = new k.data.Grammar({
+							startSymbol: Sa.head,
+							rules: [Sa, B]
+						});
+					
+					expect(g1.rules.length).toBe(1);
+					expect(g1.rules[0].tail.length).toBe(2);
+					expect(g1.rules[0].index).toBe(0);
+					expect(g1.rules[0].tail[0].name).toBe(k.data.specialSymbol.EMPTY);
+					expect(g1.rules[0].tail[1].name).toBe(k.data.specialSymbol.EOF);
 				});
 				
 				it ('should preserve epsilon in rules where it is the only element in the tail', function ()
@@ -909,6 +794,98 @@ define(['../../../src/data/grammar'], function(k)
 					expect(g1.rules.length).toBe(4);
 					expect(A.head.isNullable).toBe(false);
 					expect(B.head.isNullable).toBe(true);
+				});
+			});
+			
+			describe('pre calculate FIRST SETs', function ()
+			{
+				it('Should include terminal "a" with the simple rule A->"a"', function ()
+				{
+					var B = new k.data.Rule({
+							head: 'B',
+							tail: [new k.data.Terminal({name:'b_terminal', body: 'b'})]
+						}),
+						g1 = new k.data.Grammar({
+							startSymbol: B.head,
+							rules: [B]
+						});
+					
+					expect(g1.rules.length).toBe(2);
+					expect(g1.firstSetsByHeader[B.head.name].length).toBe(1);
+					expect(g1.firstSetsByHeader[B.head.name][0].name).toBe('b_terminal');
+				});
+				
+				it('Should return epsilon for a simple rule S->EMPTY', function ()
+				{
+					var B = new k.data.Rule({
+							head: 'B'
+						}),
+						g1 = new k.data.Grammar({
+							startSymbol: B.head,
+							rules: [B]
+						});
+					
+					expect(g1.rules.length).toBe(2);
+					expect(g1.firstSetsByHeader[B.head.name].length).toBe(1);
+					expect(g1.firstSetsByHeader[B.head.name][0].name).toBe('EMPTY');
+				});
+				
+				it('Should return terminals and EMPTY if the non terminal is nullable', function ()
+				{
+					var B = new k.data.Rule({
+							head: 'B',
+							tail: [new k.data.Terminal({name:'b_terminal', body: 'b'})]
+						}),
+						B1 = new k.data.Rule({
+							head: 'B'
+						}),
+						g1 = new k.data.Grammar({
+							startSymbol: B.head,
+							rules: [B, B1]
+						});
+					
+					expect(g1.rules.length).toBe(3);
+					var head_firstset = g1.firstSetsByHeader[B.head.name];
+					expect(head_firstset.length).toBe(2);
+					expect(head_firstset[0].name).toBe('b_terminal');
+				});
+				
+				it('Should supprt valid recursions', function ()
+				{
+					//This grammar contains recursive rules: EXPS -> EXPS EXP
+					var g = samppleGrammars.idsList.g,
+						expsNT = samppleGrammars.idsList.EXPS1.head;
+					
+					expect(g.rules.length).toBe(7);
+					expect(g.firstSetsByHeader[expsNT.name].length).toBe(2);
+					var exps_firsset = g.firstSetsByHeader[expsNT.name];
+					expect(exps_firsset[0].name).toBe('id_terminal');
+					expect(exps_firsset[1].name).toBe('EMPTY');
+				});
+				
+				it('Should return multiples terminals when needed', function ()
+				{
+					var Sa = new k.data.Rule({
+							head: 'Sa',
+							tail: [new k.data.Terminal({name:'a_terminal', body: 'a'})]
+						}),
+						Sa2 = new k.data.Rule({
+							head: 'Sa',
+							tail: k.data.NonTerminal.fromArray(['B'])
+						}),
+						B = new k.data.Rule({
+							head: 'B',
+							tail: [new k.data.Terminal({name:'b_terminal', body: 'b'})]
+						}),
+						g1 = new k.data.Grammar({
+							startSymbol: Sa.head,
+							rules: [Sa, Sa2, B]
+						});
+					
+					var head_firstset = g1.firstSetsByHeader[Sa.head.name];
+					expect(head_firstset.length).toBe(2);
+					expect(head_firstset[0].name).toBe('a_terminal');
+					expect(head_firstset[1].name).toBe('b_terminal');
 				});
 			});
 		});

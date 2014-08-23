@@ -67,7 +67,7 @@ define(['../../../src/data/itemRule'], function(k)
 				});
 
 				expect(i.dotLocation).toBe(1);
-			})
+			});
 		});
 
 		describe('clone', function()

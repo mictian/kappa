@@ -13,6 +13,7 @@ define(['../utils/obj', './state'], function(k)
         * @constructor
         * @param {[State]} options.states Array of initial states
         * @param {State} options.initialState Initial state of the automata.
+        * @param {Bool} options.hasLookAhead Boolean value used to indicate if the items if the state use or not look ahead.
         */
         var automata = function (options)
         {
@@ -20,6 +21,7 @@ define(['../utils/obj', './state'], function(k)
 
 			k.utils.obj.defineProperty(this, 'states');
 			k.utils.obj.defineProperty(this, 'initialState');
+			//TODO Determine if this property is valid and in used
 			k.utils.obj.defineProperty(this, 'hasLookAhead'); //In case the generate Automata is not LR(0) valid, it is extended to be LALR(1) which means add look-ahead
 			
 			k.utils.obj.defineProperty(this, '_index');
@@ -28,23 +30,13 @@ define(['../utils/obj', './state'], function(k)
             this.states = options.states || [];
             this._index = 0; //Index used to traversal the states of the current instance
             this._registerStates = k.utils.obj.groupBy(this.states, function (state) {return state.getIdentity();});
-            // k.utils.obj.each(this.states, function(state)
-            // {
-            //     this._registerStates[state.getIdentity()] = state;
-            // }, this);
         };
 
         /* @function Convert the current automata to its string representation
         * @returns {String} formatted string */
         automata.prototype.toString = function () {
 
-			var result = '';
-            k.utils.obj.each(this.states, function (state)
-            {
-				result += state.toString() + '\n';
-            });
-
-            return result;
+            return this.states.join('\n');
         };
 
         /* @function Get the next unprocessed state
@@ -76,18 +68,27 @@ define(['../utils/obj', './state'], function(k)
             this.initialState = state;
         };
 
-        /* @function Add a new state into the automata controlling if it is duplicated or not
-        * @param {State} state State to add
+        /* @function Add a new state into the automata controlling if it is duplicated or not. If the new state is duplicated we merge its look-ahead
+        * @param {State} newState State to add
         * @returns {State} The added state, if the state is duplicated returns the already created state */
-        automata.prototype.addState = function(state)
+        automata.prototype.addState = function(newState)
         {
-            if (!this._registerStates[state.getIdentity()])
+            if (!this._registerStates[newState.getIdentity()])
             {
-                this._registerStates[state.getIdentity()] = state;
-                this.states.push(state);
-                return state;
+                this._registerStates[newState.getIdentity()] = newState;
+                this.states.push(newState);
             }
-            return this._registerStates[state.getIdentity()];
+            else
+            {
+                //When the states are the same in rules but its only difference is in its the look aheads, as a easy-to-implement a LALR(1) parser, we merge this look-aheads
+                var currentState = this._registerStates[newState.getIdentity()];
+                k.utils.obj.each(currentState.getOriginalItems(), function (originalItemRule)
+                {
+                    var newItemRule = newState.getOriginalItemById(originalItemRule.getIdentity());
+                    originalItemRule.lookAhead = k.utils.obj.uniq(originalItemRule.lookAhead.concat(newItemRule.lookAhead), function (item) { return item.name;});
+                });
+            }
+            return this._registerStates[newState.getIdentity()];
         };
 
         return automata;

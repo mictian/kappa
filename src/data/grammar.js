@@ -46,18 +46,6 @@ define(['../utils/obj'],  function (k)
             return this.name.toString();
         };
 
-        /* @function Creates a deep copy of the current instance
-        * @returns {Symbol} Deep copy */
-        symbol.prototype.clone = function()
-        {
-            var ruleAux = this.rule;
-            this.rule = null;
-			var cloneOptions = k.utils.obj.clone(this.options);
-			this.rule = cloneOptions.rule = ruleAux;
-			
-			return new Symbol(cloneOptions);
-        };
-
         return symbol;
     })();
 
@@ -102,22 +90,10 @@ define(['../utils/obj'],  function (k)
             return result;
         };
 
-        /* @function Creates a deep copy of the current instance
-        * @returns {NonTerminal} Deep copy */
-        nonTerminal.prototype.clone = function()
-        {
-            var ruleAux = this.rule;
-            this.rule = null;
-			var cloneOptions = k.utils.obj.clone(this.options);
-			this.rule = cloneOptions.rule = ruleAux;
-			
-			return new NonTerminal(cloneOptions);
-        };
-
         return nonTerminal;
     })(Symbol);
 
-	/** Terminal
+	/* Terminal
     * @class
     * @classdesc Use this class to repsent Termianls (like 'a', 'B', 'Hola', etc.) */
     var Terminal = (function(_super)
@@ -153,20 +129,6 @@ define(['../utils/obj'],  function (k)
         terminal.prototype.toString = function()
         {
             return '<' + this.name + '>';
-        };
-
-		/* @function Creates a deep copy of the current instance
-        * @returns {Terminal} Deep copy */
-        terminal.prototype.clone = function()
-        {
-            var ruleAux = this.rule;
-            this.rule = null;
-			var cloneOptions = k.utils.obj.clone(this.options);
-			this.rule = cloneOptions.rule = ruleAux;
-			
-			cloneOptions.body = k.utils.obj.isRegExp(this.body) ? new RegExp(this.body.source) : this.body;
-
-			return new Terminal(cloneOptions);
         };
 
         return terminal;
@@ -236,43 +198,10 @@ define(['../utils/obj'],  function (k)
             return this.head.toString() + ' --> ' + this.tail.join(' ');
         };
 
-        /* @function Clone the current item, generating a deep copy of it.
-        * @param {Boolean} options.copyRuleIndex Indicate if the index should be copied or not. Default: false
-        * @returns {Rule} A deep copy of the current item */
-        rule.prototype.clone = function(options)
-        {
-            var auxHead = this.head,
-                auxTail = this.tail,
-			    cloneOptions;
-
-			// We conserve the head and the tail because the symbol know at what rule it belongs, cause cyclic references
-			this.head = null;
-			this.tail = null;
-
-		    cloneOptions = k.utils.obj.clone(this.options);
-		    
-		    this.head = auxHead;
-		    this.tail = auxTail;
-
-			cloneOptions.head = auxHead.clone();
-			cloneOptions.tail = k.utils.obj.map(auxTail, function(symbol) {
-			    return symbol.clone();
-			});
-
-			var result = new Rule(cloneOptions);
-
-			if (options && options.copyRuleIndex)
-			{
-				result.index = this.index;
-			}
-
-			return result;
-        };
-
         return rule;
     })();
 
-    /*  Grammar
+    /* Grammar
     * @class
     * @classdesc This class is used to represent grammars */
     var Grammar = (function ()
@@ -305,6 +234,7 @@ define(['../utils/obj'],  function (k)
             k.utils.obj.defineProperty(this, 'specifiedStartSymbol'); //After augmented the grammar this property save the specified start symbol (it should be read only)
             k.utils.obj.defineProperty(this, 'terminals');
             k.utils.obj.defineProperty(this, 'rulesByHeader');
+            k.utils.obj.defineProperty(this, 'firstSetsByHeader');
             k.utils.obj.defineProperty(this, 'nullableNonTerminals');
 
             if (!(this.startSymbol instanceof Symbol))
@@ -322,7 +252,7 @@ define(['../utils/obj'],  function (k)
         
         /* @function Determines if a rule is productive or not based on the CURRENT state of all the rest of the rules in the grammar
         * @param {Rule} rule Rule that will be analized
-        * @returns {Boolean} True if the rule is productive,, false otherwise */
+        * @returns {Boolean} True if the rule is productive, false otherwise */
         grammar.prototype._isRuleProductive = function (rule)
         {
             //find NONProductive tail symbols
@@ -349,20 +279,8 @@ define(['../utils/obj'],  function (k)
         * @returns {Void} */
         grammar.prototype._generateRequireRequisites = function ()
         {
-            /*jshint -W083 */
-            var areChanges = false;
-            var ruleIndex = 0;
-
             // augment the grammar
-            this.specifiedStartSymbol = this.startSymbol;
-            var augmentedRule = new Rule({
-                head: 'S\'',
-                tail: [this.startSymbol, new k.data.Symbol({name: specialSymbol.EOF})],
-                name: grammar.constants.AugmentedRuleName
-            });
-
-            this.rules.unshift(augmentedRule);
-            this.startSymbol = augmentedRule.head;
+           var augmentedRule = this._augmentGrammar(this.startSymbol, this.startSymbol);
 
             //set rules index
             k.utils.obj.each(this.rules, function (rule, i) {
@@ -371,13 +289,150 @@ define(['../utils/obj'],  function (k)
 
 
             // index rule by its rule's head name
+            this._indexRulesByHead();
+            
+            
+            // determine which rules are productive and remove unproductive ones
+            augmentedRule = this._cleanUnProductiveRules() || augmentedRule;
+            this._indexRulesByHead();
+            
+            
+            //Remove unreachabel rules
+            this._cleanUnReachableRules(augmentedRule);
+            this._indexRulesByHead();
+            
+            
+            // remove middle tail epsilons
+            this._removeMiddleTailEpsilons();
+
+
+            //Determines nullable non-terminals
+            this._determineNullableNonTerminals();
+            
+            
+            // get all terminals & determine if it has empty rules
+            this.terminals = this._generateListOfTerminals();
+            
+            
+            //Pre-Calculate First Sets
+            this.firstSetsByHeader = this._precalculateFirstTerminals();
+        };
+        
+        /* @function Index all the current rules in the rulesByHeader local property 
+        * @returns {Void} It does not return anything as the values are stored in this.rulesByHeader. */
+        grammar.prototype._indexRulesByHead = function ()
+        {
             this.rulesByHeader = k.utils.obj.groupBy(this.rules, function (rule)
             {
                 return rule.head.name;
             });
+        };
+        
+        /* @function Calculate the first set for all non-terminals of the current grammar
+        * @returns {Object} Object when each property is a non-terminal name and its values are the first sets. */
+        grammar.prototype._precalculateFirstTerminals = function ()
+        {
+            var result = {};
             
+            k.utils.obj.each(k.utils.obj.keys(this.rulesByHeader), function (ruleHead)
+            {
+                result[ruleHead] = this._calculateFirstSetForHead(ruleHead);
+            }, this);
             
-            // determine which rules are productive and remove unproductive ones
+            return result;
+        };
+        
+        /* @function Calculate the first set for specific non-terminal symbol
+        * @param {String} head Name of the head rule to which the First Set will be determined
+        * @param {[String]} recursionStack Internal recursion array used to control infinite loops
+        * @returns {[Terminals]} Array of terminals (possibly plus EMPTY - the special symbol) FIRST SET */
+        grammar.prototype._calculateFirstSetForHead = function (head, recursionStack)
+        {
+            /*
+            This method has as a preconditions:
+            -All duplicated epsilon have already being removed
+            -Unreachabel rules have been removed
+            -Nullable non terminals detected
+            -The rulesByHeader object
+            */
+            
+            var result = [];
+                
+            recursionStack = recursionStack || {};
+            
+            k.utils.obj.each(this.rulesByHeader[head], function(rule) {
+                
+                k.utils.obj.find(rule.tail, function (symbol)
+                {
+                    if (symbol instanceof NonTerminal)
+                    {
+                        if (recursionStack[symbol.name])
+                        {
+                            //When we found a recursive (or just a symbol that apear more than one in a same rule or in different rules of the same symbol head) symbol (non-terminal) we SKIP IT (continue with the next item in the tail) IF it is NULLABLE,
+                            //otherwise if it is NOT NULLABLE we STOP our SEARCH of first item as the current rule will not generate the desire first items (because we are in a recursive case)
+                            return !symbol.isNullable;
+                        }
+                        
+                        recursionStack[symbol.name] = true;
+                    }
+                    else if (symbol.isSpecial && symbol.name === specialSymbol.EOF)
+                    {
+                        return true; //finish the search of terminal first symbols for the current rule
+                    }
+                    
+                    if (symbol instanceof Terminal || (symbol.name === specialSymbol.EMPTY && symbol.isSpecial))
+                    {
+                        result.push(symbol);
+                    }
+                    else if (symbol instanceof NonTerminal)
+                    {
+                        result = result.concat(k.utils.obj.flatten(this._calculateFirstSetForHead(symbol.name, recursionStack), true));
+                    }
+                    else
+                    {
+                        throw new Error('Impossible to calculate FIRST Set, some rules have invalid tail symbols');
+                    }
+                    
+                    //Continue adding items to the FIRST Set if the current result contains EMPTY
+                    return !k.utils.obj.find(result, function (possible_empty_symbol)
+                    {
+                        return possible_empty_symbol.name === specialSymbol.EMPTY;
+                    });
+                    
+                }, this);
+                
+            }, this);
+            
+            return k.utils.obj.uniq(result, false, function (item) {return item.name;});
+        };
+        
+        /* @function Augments the current grammar by adding a new initial production of the form S' -> S #
+        * @returns {Rule} The new generated rule */
+        grammar.prototype._augmentGrammar = function (newSubStartSymbol, oldStartSymbol)
+        {
+            this.specifiedStartSymbol = oldStartSymbol;
+            var augmentedRule = new Rule({
+                head: 'S\'',
+                tail: [newSubStartSymbol, new k.data.Symbol({name: specialSymbol.EOF, isSpecial: true})],
+                name: grammar.constants.AugmentedRuleName
+            });
+
+            this.rules.unshift(augmentedRule);
+            this.startSymbol = augmentedRule.head;
+            
+            return augmentedRule;
+        };
+        
+        /* @function Determiens which rules are non-productive and remove them based on the current options
+        * @returns {Rule} In case the affter applying this cleaning process all rule are removed, a new augmented rule is generated and returned */
+        grammar.prototype._cleanUnProductiveRules = function ()
+        {
+            //Remove "Don't make functions within a loop" warning
+            /*jshint -W083 */
+            var areChanges = false,
+                ruleIndex = 0,
+                augmentedRule;
+            
             do {
                 areChanges = false;
                 k.utils.obj.each(this.rules, function (rule)
@@ -403,18 +458,52 @@ define(['../utils/obj'],  function (k)
                 
                 if (this.rules.length === 0)
                 {
-                    //In this case the augmentation rule does not have a tail! S' --> <EMPTY>
-                    augmentedRule = new Rule({
-                        head: 'S\'',
-                        name: grammar.constants.AugmentedRuleName
-                    });
-        
-                    this.rules.unshift(augmentedRule);
+                    //In this case the augmentation rule does not have a tail! S' --> <EMPTY> EOF
+                    augmentedRule = this._augmentGrammar(new k.data.Symbol({name: specialSymbol.EMPTY, isSpecial: true}), this.specifiedStartSymbol);
+                    augmentedRule.index = 0;
                 }
             }
             
+            return augmentedRule;
+        };
+        
+        /* @function Removes each epsilon located in the middle of a rule's tail, as they no add any value but make more complicated the rest of the parser
+        * @returns {Void} */
+        grammar.prototype._removeMiddleTailEpsilons = function ()
+        {
+            var tailIndex = 0;
+            k.utils.obj.each(this.rules, function (rule)
+            {
+                tailIndex = 0;
+                
+                while (tailIndex < rule.tail.length)
+                {
+                    // if the current tail symbol is an empty one
+                    if (rule.tail[tailIndex].isSpecial && rule.tail[tailIndex].name === k.data.specialSymbol.EMPTY)
+                    {
+                        //if it is not the last one or the previous one is not empty
+                        if ( ((tailIndex + 1) < rule.tail.length && (!rule.tail[tailIndex + 1].isSpecial || rule.tail[tailIndex + 1].name !== specialSymbol.EOF)) || 
+                            (tailIndex === (rule.tail.length -1) && tailIndex > 0 && !rule.tail[tailIndex-1].isSpecial) )
+                        {
+                            rule.tail.splice(tailIndex, 1);
+                            --tailIndex;
+                        }
+                    }
+                    tailIndex++;
+                }
+            });
+        };
+        
+        /* @function Determine which rules are unreachable and based on the current options remove this rules
+        * @param {Rule} augmentedRule The extra added new initial rule
+        * @returns {Void} */
+        grammar.prototype._cleanUnReachableRules = function (augmentedRule)
+        {
+            //Remove "Don't make functions within a loop" warning
+            /*jshint -W083 */
+            var areChanges = false,
+                ruleIndex = 0;
             
-            //Remove unreachabel rules
             augmentedRule.isReachable = true;
             do
             {
@@ -440,6 +529,7 @@ define(['../utils/obj'],  function (k)
                     }
                 }, this);
             } while (areChanges);
+            
             if (!this.preserveUnReachableRules)
             {
                 ruleIndex = 0;
@@ -452,36 +542,43 @@ define(['../utils/obj'],  function (k)
                     }
                 }
             }
-            
-            
-            // remove middle tail epsilons
-            var tailIndex = 0;
-            k.utils.obj.each(this.rules, function (rule)
-            {
-                tailIndex = 0;
-                
-                while (tailIndex < rule.tail.length)
-                {
-                    // if the current tail su,bol is an empty one
-                    if (rule.tail[tailIndex].isSpecial && rule.tail[tailIndex].name === k.data.specialSymbol.EMPTY)
+        };
+        
+        /* @function Generate a list of all the terminals the current grammar has. This list is used by the Lexer
+        * @returns {[Terminal]} An array of all uniq terminals in the current grammar  */
+        grammar.prototype._generateListOfTerminals = function ()
+        {
+            var tailSymbols = k.utils.obj.flatten(
+                    k.utils.obj.map(this.rules, function (rule)
                     {
-                        //if it is not last one or the previous one is not empty
-                        if ( (tailIndex + 1) < rule.tail.length || (tailIndex === (rule.tail.length -1) && tailIndex > 0 && !rule.tail[tailIndex-1].isSpecial) )
-                        {
-                            rule.tail.splice(tailIndex, 1);
-                            --tailIndex;
-                        }
-                    }
-                    tailIndex++;
-                }
-            });
+                        return rule.tail;
+                    }),
+                    false);
 
+            // remove duplicated symbol (by its name) and filter all non terminals
+            return k.utils.obj.filter(
+                k.utils.obj.uniq(tailSymbols, false, function (symbol)
+                {
+                    return symbol.name;
+                }),
+                function (symbol)
+                {
+                    return symbol.isTerminal;
+                });
+        };
 
-            //Determines nullable non-terminals
-            var allNonTerminalAreNullablesInRule = false;
+        /* @function Mark all non-terminales that are nullable with a flag isNullable set in true
+        * @returns {Void} */
+        grammar.prototype._determineNullableNonTerminals = function ()
+        {
+            //Remove "Don't make functions within a loop" warning
+            /*jshint -W083 */
+            var allNonTerminalAreNullablesInRule = false,
+                areChanges = false;
+                
             do {
                 areChanges = false;
-                // debugger;
+                
                 k.utils.obj.each(this.rules, function (rule)
                 {
                     if (rule.tail.length === 1 && rule.tail[0].name === k.data.specialSymbol.EMPTY && !rule.head.isNullable)
@@ -496,6 +593,7 @@ define(['../utils/obj'],  function (k)
                         {
                             return this.nullableNonTerminals.indexOf(nonTerminal.name) >= 0;
                         }, this);
+                        
                         if (allNonTerminalAreNullablesInRule && !rule.head.isNullable)
                         {
                             rule.head.isNullable = true;
@@ -517,30 +615,10 @@ define(['../utils/obj'],  function (k)
             var allNullablesNonTerminals = k.utils.obj.filter(allRulesSymbols, function (symbol) {
                return symbol instanceof NonTerminal && this.nullableNonTerminals.indexOf(symbol.name) >= 0;
             }, this);
+            
             k.utils.obj.each(allNullablesNonTerminals, function(nonTerminal) {
                 nonTerminal.isNullable = true;
             });
-            
-            
-            // get all terminals & determine if it has empty rules
-            //flat all rules to get a list of symbol (its tails)
-            var tailSymbols = k.utils.obj.flatten(
-                    k.utils.obj.map(this.rules, function (rule)
-                    {
-                        return rule.tail;
-                    }),
-                    false);
-
-            // remove duplicated symbol (by its name) and filter all non terminals
-            this.terminals = k.utils.obj.filter(
-                k.utils.obj.uniq(tailSymbols, false, function (symbol)
-                {
-                    return symbol.name;
-                }),
-                function (symbol)
-                {
-                    return symbol.isTerminal;
-                });
         };
 
         /* @function Returns the list of rules that start with the specified symbols as the head
@@ -553,8 +631,9 @@ define(['../utils/obj'],  function (k)
 
         /* @function Convert a Grammar to its pritty string representation
         * @returns {String} Formatted string */
-        grammar.prototype.toString = function() {
-            var strResult = this.name ? 'Name: ' + this.name : '';
+        grammar.prototype.toString = function()
+        {
+            var strResult = this.name ? 'Name: ' + this.name + '\n' : '';
             strResult += 'Start Symbol: ' + this.startSymbol.name +'\n';
 
             strResult += k.utils.obj.reduce(k.utils.obj.sortBy(this.rules, function(rule) {return rule.index;}), function (strAcc, rule) {

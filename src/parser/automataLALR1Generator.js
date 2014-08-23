@@ -32,7 +32,7 @@ define(['../utils/obj', '../data/grammar', '../data/itemRule', '../data/automata
 
 			if (!(this.grammar instanceof k.data.Grammar))
 			{
-				throw new Error('In order to create a new Automata LR(0) Generator please provide a grammar!');
+				throw new Error('In order to create a new Automata LALR(1) Generator please provide a grammar!');
 			}
 		};
 

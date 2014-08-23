@@ -44,21 +44,20 @@ define(['../utils/obj', './grammar'], function(k)
 		* @returns {String} formatted string */
 		itemRule.prototype.toString = function()
 		{
-			var aux = this.rule.head.name +'-->';
+			var aux = this.getIdentity() + '.  ' + this.rule.head.name +'-->';
 			for (var i = 0; i < this.rule.tail.length; i++)
 			{
 				aux += (this.dotLocation === i ? '*': ' ') + this.rule.tail[i].toString();
 			}
 			if (this.dotLocation === i) {
-					aux += '*';
+				aux += '*';
 			}
+			aux += ',    [' + this.lookAhead.join(', ') + ']';
 			return aux;
 		};
 
 		/* @function Clone the current item, altering its state by the params specified in cloneUpdateOptions
 		* @param {Integer} cloneUpdateOptions.dotLocationIncrement Increment that will be applied into the dot location of the new item. Default: 0
-		* @param {Booelan} cloneUpdateOptions.copyRuleIndex IIndicate if the internal index's rule shouls be preserve or not. Default: false
-		* @param {Booelan} cloneUpdateOptions.dontCloneRule Indicate if the internal grammatical rule should be cloned or just use te same. Default: false
 		* @param {Object} creationOptions Optional object use to expand current option used to create the returned clone
 		* @returns {ItemRule} A clean new item */
 		itemRule.prototype.clone = function(cloneUpdateOptions, creationOptions)
@@ -76,22 +75,18 @@ define(['../utils/obj', './grammar'], function(k)
 		/* @function Clone the current item's options
 		* @param {Object} cloneUpdateOptions Optional object use to control the way the options are being cloned
 		* @param {Object} extendedOptions Optional object use to expand current options and create the returned clone
-		* @returns {Object} A copy of the current options */
+		* @returns {Object} A copy of the current options (The referenced rule is not copied, hte same rule instance is used) */
 		itemRule.prototype._cloneCurrentOptions = function(cloneUpdateOptions, extendedOptions)
 		{
-			var ruleAux = this.rule;
-			this.rule = null;
+			var ruleAux = this.rule,
+				lookAheadAux = this.lookAhead;
+				
+			this.rule = this.lookAhead = null;
+			
 			var result = k.utils.obj.extendInNew(this.options, extendedOptions || {});
-			this.rule = ruleAux;
-
-			if ((!cloneUpdateOptions || !cloneUpdateOptions.dontCloneRule) && this.rule)
-			{
-				result.rule = this.rule.clone(cloneUpdateOptions);
-			}
-			else if (this.rule)
-			{
-				result.rule = this.rule;
-			}
+			
+			this.rule = result.rule = ruleAux;
+			this.lookAhead = result.lookAhead = lookAheadAux;
 
 			return result;
 		};
@@ -99,7 +94,7 @@ define(['../utils/obj', './grammar'], function(k)
 		/* @function Increase the dot location by the number specified by parameter
 		* @param {Integer} increment Increment that will be applied into the dot location of the new item. Default: 1
 		* @returns {Void} */
-		itemRule.prototype._incrementDotLocation= function(increment)
+		itemRule.prototype._incrementDotLocation = function(increment)
 		{
 			var optionsValue = k.utils.obj.isNumber(this.options.dotLocation) ? this.options.dotLocation : 0,
 				incrementValue = k.utils.obj.isNumber(increment) ? increment : 1;
@@ -144,14 +139,17 @@ define(['../utils/obj', './grammar'], function(k)
 
 		/* @function Create an array of item rules from an array of rules
 		* @param {[Rule]} rules Array of rules used to create the item rules. Each new item rule will have 0 as dot location
+		* @param {[Symbol]} lookAhead Array of symbols that will be set to each of the item rules created as its lookahead array
 		* @returns {[ItemRule]} Array of new Item Rules */
-		itemRule.newFromRules = function(rules)
+		itemRule.newFromRules = function(rules, lookAhead)
 		{
+			//TODO TEST look ahead parameter!
 			return k.utils.obj.reduce(rules, function (acc, rule)
 			{
 				acc.push(new ItemRule({
 					rule: rule,
-					dotLocation: 0
+					dotLocation: 0,
+					lookAhead: lookAhead || []
 				}));
 				return acc;
 			}, []);

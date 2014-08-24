@@ -21,8 +21,8 @@ define(['../utils/obj', './state'], function(k)
 
 			k.utils.obj.defineProperty(this, 'states');
 			k.utils.obj.defineProperty(this, 'initialState');
-			//TODO Determine if this property is valid and in used
-			k.utils.obj.defineProperty(this, 'hasLookAhead'); //In case the generate Automata is not LR(0) valid, it is extended to be LALR(1) which means add look-ahead
+			k.utils.obj.defineProperty(this, 'hasLookAhead');
+			//Determines if the current autamata has or not lookAhead. This is set by the automata Generator
 			
 			k.utils.obj.defineProperty(this, '_index');
 			k.utils.obj.defineProperty(this, '_registerStates');
@@ -34,8 +34,8 @@ define(['../utils/obj', './state'], function(k)
 
         /* @function Convert the current automata to its string representation
         * @returns {String} formatted string */
-        automata.prototype.toString = function () {
-
+        automata.prototype.toString = function ()
+        {
             return this.states.join('\n');
         };
 
@@ -51,6 +51,13 @@ define(['../utils/obj', './state'], function(k)
         * @returns {Boolean} true in case th automata is valid, false otherwise */
         automata.prototype.isValid = function()
         {
+            //TODO TEST THIS
+            //TODO Implement validation with lookAhead!
+            if (this.hasLookAhead)
+            {
+                return true;
+            }
+            
             return !k.utils.obj.any(this.states, function (state)
             {
                 return !state.isValid();
@@ -78,7 +85,7 @@ define(['../utils/obj', './state'], function(k)
                 this._registerStates[newState.getIdentity()] = newState;
                 this.states.push(newState);
             }
-            else
+            else if (this.hasLookAhead)
             {
                 //When the states are the same in rules but its only difference is in its the look aheads, as a easy-to-implement a LALR(1) parser, we merge this look-aheads
                 var currentState = this._registerStates[newState.getIdentity()];

@@ -14,6 +14,7 @@ define(['../utils/obj'], function(k) {
          *
          * @constructor
          * @param {[Object]} options.transitions Array of object that initialy compone this node
+         * @param {String} options.name Optioanl node identifiation
          * @param {[Node]} options.nodes Array of node instances that are children of this current node
          */
         var node = function (options)
@@ -22,6 +23,7 @@ define(['../utils/obj'], function(k) {
             
             k.utils.obj.defineProperty(this, 'transitions');
             k.utils.obj.defineProperty(this, 'nodes');
+            k.utils.obj.defineProperty(this, 'name');
             
             k.utils.obj.defineProperty(this, '_id');
             
@@ -41,7 +43,7 @@ define(['../utils/obj'], function(k) {
         /* @function Generates an ID that identify this node from any other state
          * @returns {String} Generated ID  */
         node.prototype._generateIdentity = function() {
-            return k.utils.obj.uniqueId('node_');
+            return this.name || k.utils.obj.uniqueId('node_');
         };
         
         /* @function Add a new transaction into the list of transactions of the current state

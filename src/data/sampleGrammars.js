@@ -309,7 +309,7 @@ define(['./grammar'], function(k)
 	var aPlusEMPTY = (function ()
 	{
 		/*
-		LR(0)
+		LR(1)
 		1. S --> 'a' S
 		2. S --> EMPTY
 		*/
@@ -393,10 +393,17 @@ define(['./grammar'], function(k)
 	})();
 	
 	/*
-	0008. Simple a^(n+1)b^(n) Grammar
+	008. Simple a^(n+1)b^(n) Grammar
 	*/
 	var aPowN1b = (function ()
 	{
+		/*
+		LR(1)
+		1. S --> AD
+		2. A --> 'a' A 'b'
+		3. A --> 'a'
+		4. D --> 'd'
+		*/
 		var S = new k.data.Rule({
 				head: 'S',
 				tail: k.data.NonTerminal.fromArray(['A','D']),
@@ -431,6 +438,52 @@ define(['./grammar'], function(k)
 		};
 	})();
 	
+	/*
+	009. Simple a^(n+1)b^(n) Grammar
+	*/
+	var selectedBs = (function ()
+	{
+		/*
+		LR(0)
+		1. S --> 'b'
+		2. S --> '(' L ')'
+		3. L --> S
+		4. L --> L ';' S
+		*/
+		var S1 = new k.data.Rule({
+				head: 'S',
+				tail: [new k.data.Terminal({name:'b_terminal', body: 'b'})],
+				name: 'S1RULE'
+			}),
+			S2 = new k.data.Rule({
+				head: 'S',
+				tail: [new k.data.Terminal({name:'oparen_terminal', body: '('}), new k.data.NonTerminal({name: 'L'}), new k.data.Terminal({name:'cparen_terminal', body: ')'})],
+				name: 'S2RULE'
+			}),
+			L1 = new k.data.Rule({
+				head: 'L',
+				tail: [new k.data.NonTerminal({name:'S'})],
+				name: 'L1RULE'
+			}),
+			L2 = new k.data.Rule({
+				head: 'L',
+				tail: [new k.data.NonTerminal({name:'L'}), new k.data.Terminal({name:'semicol_terminal', body: ';'}), new k.data.NonTerminal({name:'S'})],
+				name: 'L2RULE'
+			});
+			
+		return  {
+			g: new k.data.Grammar({
+				startSymbol: S1.head,
+				rules:[S1, S2, L1, L2],
+				name:'selectedBs'
+			}),
+			S1:S1,
+			S2:S2,
+			L1:L1,
+			L2:L2
+		};
+	})();
+	
 	return {
 		numDivs: numDivs,
 		idsList: idsList,
@@ -439,6 +492,7 @@ define(['./grammar'], function(k)
 		aPlusb: aPlusb,
 		aPlusEMPTY: aPlusEMPTY,
 		numDiffCondenced: numDiffCondenced,
-		aPowN1b: aPowN1b
+		aPowN1b: aPowN1b,
+		selectedBs:selectedBs
 	};
 });

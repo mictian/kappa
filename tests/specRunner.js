@@ -60,7 +60,9 @@
 		// specs.push(testRootPath + 'data/specItemRule');
 		// specs.push(testRootPath + 'data/specState');
 		// specs.push(testRootPath + 'data/specAutomata');
+		specs.push(testRootPath + 'parser/specAutomataLRGeneratorBase');
 		specs.push(testRootPath + 'parser/specAutomataLR0Generator');
+		specs.push(testRootPath + 'parser/specAutomataLALR1Generator');
 		// specs.push(testRootPath + 'parser/specParser');
 
         addMatchers(jasmine);

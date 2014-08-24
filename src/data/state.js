@@ -22,7 +22,6 @@ define(['../utils/obj', './node', './grammar'], function(k) {
             
             _super.apply(this, arguments);
 
-            
             k.utils.obj.defineProperty(this, 'isAcceptanceState'); // This is set by the automata generator
             
             k.utils.obj.defineProperty(this, '_items');
@@ -41,6 +40,10 @@ define(['../utils/obj', './node', './grammar'], function(k) {
                 this._registerItems[itemRule.getIdentity()] = itemRule;
             }, this);
         }
+        
+        state.constants = {
+            AcceptanceStateName: 'AcceptanceState'
+        };
 
         /* @function Get the next unprocessed item rule
          * @returns {ItemRule} Next Item Rule */
@@ -63,6 +66,8 @@ define(['../utils/obj', './node', './grammar'], function(k) {
                     this._items.push(itemRule);
                 }
                 else
+                //TODO Think a way to only do this when the automata begin generated is LR(k>=1), It should be a general way to pass more options to this method
+                //For the momento it doesnt matter as 
                 {
                     //As the way to of generating a LR(1) automata adds a item rule for each lookAhead we simply merge its lookAheads
                     var mergedLookAheads = this._registerItems[itemRule.getIdentity()].lookAhead.concat(itemRule.lookAhead);
@@ -112,9 +117,13 @@ define(['../utils/obj', './node', './grammar'], function(k) {
          * @returns {String} Generated ID  */
         state.prototype._generateIdentity = function() {
             
-            if (this._items.length === 1 && this._items[0].rule.name === k.data.Grammar.constants.AugmentedRuleName && this._items[0].dotLocation === 2)
+            if (this.isAcceptanceState)
             {
-                return 'AcceptanceState';
+                return state.constants.AcceptanceStateName;
+            }
+            else if (!this._items.length)
+            {
+                return _super.prototype._generateIdentity.apply(this, arguments);    
             }
         
             return k.utils.obj.reduce(
@@ -184,8 +193,7 @@ define(['../utils/obj', './node', './grammar'], function(k) {
          * @param {Symbol} symbol Symbol use to make the transition, like the name of the transition
          * @param {State} state Destination state arrived when moving with the specified tranisiotn
          * @returns {Object} Transition object  */
-        state.prototype._generateNewTransition = function (symbol, state)
-        {
+        state.prototype._generateNewTransition = function (symbol, state) {
             return {
                 symbol: symbol,
                 state: state
@@ -194,8 +202,7 @@ define(['../utils/obj', './node', './grammar'], function(k) {
         
         /* @function Returns the list of item rules contained in the current state that are reduce item rules.
          * @returns {[ItemRule]} Recude Item Rules  */
-        state.prototype.getRecudeItems = function ()
-        {
+        state.prototype.getRecudeItems = function () {
             //TODO TEST THIS
             return k.utils.obj.filter(this._items, function (item) {
                 return item.isReduce();

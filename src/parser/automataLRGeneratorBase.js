@@ -13,9 +13,9 @@ define(['../utils/obj', '../data/grammar', '../data/itemRule', '../data/automata
 		ACCEPT: 'ACCEPT'
 	};
 
-	/* Automata Generator
+	/* Abstract Base Automata Generator
 	* @class
-	* @classdesc This class is reponsible for given a grammar create a new LR(0) automata */
+	* @classdesc This is the base class for all LR automatas generator. The idea is simplify the autamata creation process */
 	var AutomataLRGeneratorBase = (function()
 	{
 		/*
@@ -38,22 +38,19 @@ define(['../utils/obj', '../data/grammar', '../data/itemRule', '../data/automata
 
 		/* @function Expands a state adding in it the full list of require items (item rules)
 		* @param {State} currentState State that will be expanded
-		* @returns The full state with all its require items */
+		* @returns {State} The full state with all its require items */
 		automataLRGeneratorBase.prototype.expandItem = function (currentState)
 		{
-			//TODO TEST THIS WITH LOOK AHEAD!!
 			// The inital rule is first added and then this method is called
 			var currentSymbol,
-				currentItem = currentState.getNextItem(),
-				lookAhead;
+				currentItem = currentState.getNextItem();
 
 			while (currentItem) {
 				currentSymbol = currentItem.getCurrentSymbol();
 
 				if (currentSymbol instanceof k.data.NonTerminal)
 				{
-					lookAhead = this._getFirstSet(currentItem);
-					currentState.addItems(k.data.ItemRule.newFromRules(this.grammar.getRulesFromNonTerminal(currentSymbol), lookAhead));
+					currentState.addItems(this._newItemRulesForStateExpansion(currentItem, currentSymbol));
 				}
 
 				currentItem = currentState.getNextItem();
@@ -61,45 +58,65 @@ define(['../utils/obj', '../data/grammar', '../data/itemRule', '../data/automata
 
 			return currentState;
 		};
-	
+		
+		/* @function When expanding an state, depending on the kind of automata that is being created (LR1/LALR1/LR0/etc), the way that is genrerated the list
+		* of new item rule to add to the current being processed state.
+		* This method is intended to be overwritten!.
+		* @param {ItemRule} currentItem The current item rule from which the new item rule are being generated.
+		* @param {Symbol} currentSymbol Is the symbol used to find new item rules.
+		* @returns {[ItemRule]} Array of item rule ready to be part of the current processing state */
+		automataLRGeneratorBase.prototype._newItemRulesForStateExpansion = function (currentItem, currentSymbol)
+		{};
 
-		/* @function Generate the LALR(1) automata
+		/* @function Generate the requested automata
+		* This method allows that son clases override it and have already almost all the implementation done in the method _generateAutomata()
+		* @param {Boolean} options.notValidate Indicate if the resulting automata should be validated for the current lookAhead or not. False by default (DO validate the automata).
 		* @returns {Automata} The corresponding automata for the specified grammar */
-		automataLRGeneratorBase.prototype.generateAutomata = function()
+		automataLRGeneratorBase.prototype.generateAutomata = function(options)
 		{
-			//TODO TEST THIS
+			var defaultAutomataCreationOptions = {
+					notValidate: false
+				};
+			options = k.utils.obj.extendInNew(defaultAutomataCreationOptions, options || {});
+			
 			var automata = this._generateAutomata();
 			
-			// if (automata.isValid())
-			// {
-			// 	return automata;
-			// }
-			
-			//TODO Factorize this class and this line put it only on the LR1+ generator
-			automata.hasLookAhead = true;
+			if (!options.notValidate && !automata.isValid())
+			{
+				return false;
+			}
 			
 			return automata;
 		};
 		
-		/* @function Generate the LR(0) automata
+		/* @function Actually Generate an automata
 		* @returns {Automata} The corresponding automata for the specified grammar */
 		automataLRGeneratorBase.prototype._generateAutomata = function()
 		{
-		    //EDIT THIS!!!!
 			var initialState = new k.data.State({
-					items: [new k.data.ItemRule({
-						rule: this.grammar.getRulesFromNonTerminal(this.grammar.startSymbol)[0],
-						lookAhead: [new k.data.Symbol({name: k.data.specialSymbol.EOF, isSpecial: true})]
-					})]
+					items: this._getInitialStateItemRules()
 				}),
-				automata = new k.data.Automata({
-				  states: [this.expandItem(initialState)]
-				});
+				automata = new k.data.Automata(this._getNewAutomataOptions(initialState));
 
 			automata.initialStateAccessor(initialState);
 			this._expandAutomata(automata);
 			return automata;
 		};
+		
+		/* @function Generate the construction object used to initialize the new automata
+		* @param {State} initialState State that only contains the items rules from the start symbol of the grammar. This is the initial state before being expanded.
+		* @returns {Object} Object containing all the options used to create the new automata */
+		automataLRGeneratorBase.prototype._getNewAutomataOptions = function (initialState)
+		{
+			return {
+					states: [this.expandItem(initialState)]
+				};
+		};
+		
+		/* @function Returns the initial list of item rules that will take part in the initial state of the automata. This can differ if the automata has or not lookahead
+		* @returns {[ItemRule]} The initial list of item rule. */
+		automataLRGeneratorBase.prototype._getInitialStateItemRules = function ()
+		{};
 
 		/* @function Internal method which resive an inital automata with only it inital state and generate a full automata
 		* @param {Automata} automata Automatma to be expanded
@@ -134,11 +151,13 @@ define(['../utils/obj', '../data/grammar', '../data/itemRule', '../data/automata
 					});
 
 					this.expandItem(newState);
+					
+					// We determien if the new state is an acceptance state, if it has only the augmented rule in reduce state.    
+					newState.isAcceptanceState = !!(newState.getOriginalItems().length === 1 && newState.getOriginalItems()[0].rule.name === k.data.Grammar.constants.AugmentedRuleName && newState.getOriginalItems()[0].dotLocation === 2);
+
 					// Add state controlling duplicated ones
 					addedState = automata.addState(newState);
-
-					// We determien if the new state is an acceptance state, if it has only the augmented rule in reduce state.    
-					addedState.isAcceptanceState = !!(addedState.getOriginalItems().length === 1 && addedState.getOriginalItems()[0].rule.name === k.data.Grammar.constants.AugmentedRuleName && addedState.getOriginalItems()[0].dotLocation === 2);
+					
 					currentState.addTransition(supportedTransition.symbol, addedState);
 
 					newItemRules = [];
@@ -154,10 +173,10 @@ define(['../utils/obj', '../data/grammar', '../data/itemRule', '../data/automata
 		* @returns {Object} A GOTO Table */
 		automataLRGeneratorBase.prototype.generateGOTOTable = function(automata)
 		{
-		    var table = {};
-		    
-		    k.utils.obj.each(automata.states, function (state)
-		    {
+			var table = {};
+			
+			k.utils.obj.each(automata.states, function (state)
+			{
 				table[state.getIdentity()] = {};
 				
 				k.utils.obj.each(state.transitions, function (transition) {
@@ -169,9 +188,11 @@ define(['../utils/obj', '../data/grammar', '../data/itemRule', '../data/automata
 		};
 		
 		/* @function Given an automata returnes its ACTION Table. 
+		* The intend of this method is to be overwriten by each son class
 		* @param {Automata} automata Automatma used as a base of the calculation
 		* @returns {Function} Function that given the a state id and a lookAhead returns the action to take */
-		automataLRGeneratorBase.prototype.generateACTIONTable = function (automata){};
+		automataLRGeneratorBase.prototype.generateACTIONTable = function (automata)
+		{};
 
 		return automataLRGeneratorBase;
 	})();

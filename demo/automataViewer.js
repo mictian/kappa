@@ -7,13 +7,13 @@
         baseUrl: '../src'
     });
 
-    require(['./data/sampleGrammars', './parser/automataLR0Generator'], function (sampleGrammars, k)
+    require(['./data/sampleGrammars', './parser/automataLALR1Generator'], function (sampleGrammars, k)
     {
-        var grammar = sampleGrammars.aPlusb.g, //aPlusb.g,
-            automataGenerator = new k.parser.AutomataLR0Generator({
+        var grammar = sampleGrammars.selectedBs.g, //aPlusb.g,
+            automataGenerator = new k.parser.AutomataLALR1Generator({
                 grammar: grammar
             }),
-            automata = automataGenerator.generateAutomata(),
+            automata = automataGenerator.generateAutomata({notValidate:true}),
             states = automata.states,
             indexedStates = {},
             graph = new Springy.Graph();

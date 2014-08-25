@@ -7,8 +7,6 @@ define(['../utils/obj'], function(k) {
      * @classdesc This class reprensent a generic Node class */
     var Node = (function ()
     {
-        //TODO TEST ALL THIS CLASS
-        
         /*
          * Constructor Generic Node for any kind of graph
          *
@@ -33,7 +31,8 @@ define(['../utils/obj'], function(k) {
         
         /* @function Returns the string ID of the current state
          * @returns {String} ID  */
-        node.prototype.getIdentity = function() {
+        node.prototype.getIdentity = function()
+        {
             if (!this._id) {
                 this._id = this._generateIdentity();
             }
@@ -42,7 +41,8 @@ define(['../utils/obj'], function(k) {
         
         /* @function Generates an ID that identify this node from any other state
          * @returns {String} Generated ID  */
-        node.prototype._generateIdentity = function() {
+        node.prototype._generateIdentity = function()
+        {
             return this.name || k.utils.obj.uniqueId('node_');
         };
         
@@ -66,6 +66,13 @@ define(['../utils/obj'], function(k) {
                 transitionValue: transitionValue,
                 node: node
             };
+        };
+        
+        /* @function Gets the node identity
+        * @returns {String} A formatted string id of the node */
+        node.prototype.toString = function ()
+        {
+            return this.getIdentity();
         };
         
         return node;

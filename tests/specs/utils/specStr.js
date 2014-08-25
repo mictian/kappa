@@ -94,5 +94,31 @@ define(['../../../src/utils/str'], function(k)
 				expect(function() { k.utils.str.rtrim(12);}).toThrow();
 			});
 		});
+		
+		describe('tabs', function ()
+		{
+			it('should return empty string if passed in nothing', function ()
+			{
+				expect(k.utils.str.tabs()).toEqual('');
+			});
+			
+			it('should return string with the count of tabs specified', function ()
+			{
+				expect(k.utils.str.tabs(2)).toEqual('		');
+			});
+			
+			it('should return empty string if any unexpected value', function ()
+			{
+				expect(k.utils.str.tabs(null)).toEqual('');
+				expect(k.utils.str.tabs({})).toEqual('');
+				expect(k.utils.str.tabs('h')).toEqual('');
+				expect(k.utils.str.tabs(false)).toEqual('');
+			});
+			
+			it('should return a string with one tab if pass a true value', function ()
+			{
+				expect(k.utils.str.tabs(true)).toEqual('	');
+			});
+		});
 	});
 });

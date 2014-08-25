@@ -106,7 +106,6 @@ define(['../utils/obj', './grammar'], function(k)
 		* @returns {String} Id */
 		itemRule.prototype.getIdentity = function ()
 		{
-			//TODO TEST THIS
 			if (!this._id)
 			{
 				this._id = this._generateIdentity();

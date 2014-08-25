@@ -195,68 +195,68 @@ define(['./grammar'], function(k)
 	var numDiff = (function()
 	{
 		/*
-		LR(1)
-		0. S --> E
-		1. E --> E R T
-		2. E --> T
-		3. T --> 'number'
-		4. T --> OPAREN E CPAREN
-		5. OPAREN --> '('
-		6. CPAREN --> ')'
-		7. R --> '-'
+		LR(k>1)
+		1. S --> E
+		2. E --> E R T
+		3. E --> T
+		4. T --> 'number'
+		5. T --> OPAREN E CPAREN
+		6. OPAREN --> '('
+		7. CPAREN --> ')'
+		8. R --> '-'
 		*/
 		var S = new k.data.Rule({
-			head: 'S',
-			tail: k.data.NonTerminal.fromArray(['E']),
-			name: 'SRULE'
-		}),
-
-		E1 = new k.data.Rule({
-			head: 'E',
-			tail: k.data.NonTerminal.fromArray(['E', 'R', 'T']),
-			name: 'E1RULE'
-		}),
-
-		E2 = new k.data.Rule({
-			head: 'E',
-			tail: k.data.NonTerminal.fromArray(['T']),
-			name: 'E2RULE'
-		}),
-
-		T1 = new k.data.Rule({
-			head: 'T',
-			tail: [new k.data.Terminal({name:'NUMBER', body: /\d/})],
-			name: 'T1RULE'
-		}),
-		
-		T2 = new k.data.Rule({
-			head: 'T',
-			tail: k.data.NonTerminal.fromArray(['OPAREN', 'E', 'CPAREN']),
-			name: 'T2RULE'
-		}),
-		
-		OPAREN = new k.data.Rule({
-			head: 'OPAREN',
-			tail: [new k.data.Terminal({name:'OPAREN', body: /\(/})],
-			name: 'OPARENRULE'
-		}),
-
-		CPAREN = new k.data.Rule({
-			head: 'CPAREN',
-			tail: [new k.data.Terminal({name:'CPAREN', body: /\)/})],
-			name: 'CPARENRULE'
-		}),
-
-		R = new k.data.Rule({
-			head: 'R',
-			tail: [new k.data.Terminal({name:'DIFF', body: '-'})],
-			name: 'RRULE'
-		});
+				head: 'S',
+				tail: k.data.NonTerminal.fromArray(['E']),
+				name: 'SRULE'
+			}),
+	
+			E1 = new k.data.Rule({
+				head: 'E',
+				tail: k.data.NonTerminal.fromArray(['E', 'R', 'T']),
+				name: 'E1RULE'
+			}),
+	
+			E2 = new k.data.Rule({
+				head: 'E',
+				tail: k.data.NonTerminal.fromArray(['T']),
+				name: 'E2RULE'
+			}),
+	
+			T1 = new k.data.Rule({
+				head: 'T',
+				tail: [new k.data.Terminal({name:'NUMBER', body: /\d/})],
+				name: 'T1RULE'
+			}),
+			
+			T2 = new k.data.Rule({
+				head: 'T',
+				tail: k.data.NonTerminal.fromArray(['OPAREN', 'E', 'CPAREN']),
+				name: 'T2RULE'
+			}),
+			
+			OPAREN = new k.data.Rule({
+				head: 'OPAREN',
+				tail: [new k.data.Terminal({name:'OPAREN', body: /\(/})],
+				name: 'OPARENRULE'
+			}),
+	
+			CPAREN = new k.data.Rule({
+				head: 'CPAREN',
+				tail: [new k.data.Terminal({name:'CPAREN', body: /\)/})],
+				name: 'CPARENRULE'
+			}),
+	
+			R = new k.data.Rule({
+				head: 'R',
+				tail: [new k.data.Terminal({name:'DIFF', body: '-'})],
+				name: 'RRULE'
+			});
 
 		return {
 			g: new k.data.Grammar({
 				startSymbol: S.head,
-				rules: [S, E1, E2, T1, T2, R, OPAREN, CPAREN],
+				rules: [S, E1, E2, T1, T2, OPAREN, CPAREN, R],
 				name: 'numDiff'
 			}),
 			S: S,

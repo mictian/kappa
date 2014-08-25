@@ -51,17 +51,10 @@ define(['../utils/obj', './state'], function(k)
         * @returns {Boolean} true in case th automata is valid, false otherwise */
         automata.prototype.isValid = function()
         {
-            //TODO TEST THIS
-            //TODO Implement validation with lookAhead!
-            if (this.hasLookAhead)
-            {
-                return true;
-            }
-            
             return !k.utils.obj.any(this.states, function (state)
             {
-                return !state.isValid();
-            });
+                return !state.isValid(this.hasLookAhead);
+            }, this);
         };
         
         /* @function Set or get the initial state.

@@ -68,7 +68,6 @@ define(['../core'], function(k)
         */
 		var __tabs = function (counter)
 		{
-			//TODO TESET THIS
 			var result = '';
 			for (var i = counter; i--; ) {
 				result += '\t';

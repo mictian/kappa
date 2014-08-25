@@ -7,8 +7,6 @@ define(['../utils/obj'],  function(k)
     * @classdesc Each instance of this class will be used by the parse to represent a state into the stack */
 	var StackItem = (function() {
 	    
-	    //TODO TEST ALL THIS CLASS
-	    
 	    /*
         * Creates an instance of a Parser 
         *
@@ -20,7 +18,6 @@ define(['../utils/obj'],  function(k)
         * @param {Automata} options.AST Optional underprocessing AST. The Sub-tree AST for the current node
         */
 	    var stackItem = function(options) {
-	    	//TODO TEST THIS
 	    	this.options = options;
 
             k.utils.obj.defineProperty(this, 'state');

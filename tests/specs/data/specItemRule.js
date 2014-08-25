@@ -1,5 +1,5 @@
 /* global expect: true, describe: true, it:  true, beforeEach: true */
-define(['../../../src/data/itemRule'], function(k)
+define(['../../../src/data/sampleGrammars', '../../../src/data/itemRule'], function(sampleGrammars, k)
 {
 	'use strict';
 
@@ -253,6 +253,38 @@ define(['../../../src/data/itemRule'], function(k)
 				expect(result[0].dotLocation).toBe(0);
 				expect(result[1].options).toEqual({rule:{test:true, tail:[]}, lookAhead:[], dotLocation:0});
 				expect(result[1].dotLocation).toBe(0);
+			});
+			
+			xit('shoud for each rule create a new item rule with the lookAhead specified', function()
+			{
+				//Verificar que si edito el lookAhead de un item el de otro no se altere!
+			});
+		});
+		
+		describe('getIdentity', function ()
+		{
+			it('should return the same string if consulted many times', function ()
+			{
+				var item = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S1])[0];
+					
+				var result = item.getIdentity();
+				
+				expect(item.getIdentity()).toEqual(result);
+				expect(item.getIdentity()).toEqual(result);
+				expect(item.getIdentity()).toEqual(result);
+				expect(item.getIdentity()).toEqual(result);
+			});
+			
+			it('should return different stirng for two different item rules', function ()
+			{
+				var reduceItem = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S1])[0],
+					shiftItem = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S2])[0];
+					
+				reduceItem.dotLocation = 1;
+				reduceItem._id = null;
+				reduceItem.lookAhead.push(sampleGrammars.selectedBs.S2.tail[2]);
+				
+				expect(reduceItem.getIdentity()).not.toEqual(shiftItem.getIdentity());
 			});
 		});
 	});

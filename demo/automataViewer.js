@@ -9,7 +9,7 @@
 
     require(['./data/sampleGrammars', './parser/automataLALR1Generator'], function (sampleGrammars, k)
     {
-        var grammar = sampleGrammars.selectedBs.g, //aPlusb.g,
+        var grammar = sampleGrammars.numDiff.g, //aPlusb.g,
             automataGenerator = new k.parser.AutomataLALR1Generator({
                 grammar: grammar
             }),

@@ -1,8 +1,6 @@
 define(['../utils/obj', '../utils/str', './node', './grammar'], function (k) {
     
     'use strict';
-    
-    //TODO TEST THIS ENTIRE CLASS
 
     /* ASTNode
      * @class
@@ -18,7 +16,7 @@ define(['../utils/obj', '../utils/str', './node', './grammar'], function (k) {
          * @constructor
          * @param {Rule} options.rule Asociated reduce rule that originate the node creation
          * @param {String} options.stringValue Optional string chunk that originate the node creation
-         * @param {Symbol} options.symbol Optional Symbol related 
+         * @param {Symbol} options.symbol Optional Symbol. Used ad the head of the rule that is related with the current ASTNode
          * @param {[Object]} options.transitions Array of object that initialy compone this node
          * @param {[Node]} options.nodes Array of Nodes instances (or just objects) that are children of this Node
          */

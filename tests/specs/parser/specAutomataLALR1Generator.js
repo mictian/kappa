@@ -259,7 +259,7 @@ define(['../../../src/parser/automataLALR1Generator', '../../../src/data/sampleG
 				var ag = new k.parser.AutomataLALR1Generator({
 						grammar: sampleGrammars.numDiff.g
 					}),
-					result = ag.generateAutomata(),
+					result = ag.generateAutomata({notValidate:true}),
 					states = result.states;
 					
 				expect(result.hasLookAhead).toBe(true);
@@ -267,7 +267,7 @@ define(['../../../src/parser/automataLALR1Generator', '../../../src/data/sampleG
 				expect(result).toBeInstanceOf(k.data.Automata);
 				expect(states.length).toBe(12);
 				
-				validateState(states, '0(0)1(0)2(0)3(0)4(0)5(0)7(0)', 7,
+				validateState(states, '0(0)1(0)2(0)3(0)4(0)5(0)6(0)', 7,
 				{
 					'0(0)':['EOF'],
 					'1(0)':['EOF'],
@@ -275,42 +275,42 @@ define(['../../../src/parser/automataLALR1Generator', '../../../src/data/sampleG
 					'3(0)':['EOF','DIFF'],
 					'4(0)':['EOF'],
 					'5(0)':['EOF'],
-					'7(0)':['NUMBER','OPAREN'],
+					'6(0)':['NUMBER','OPAREN'],
 				});
-				validateState(states, '2(0)3(0)4(0)5(1)5(0)7(1)7(0)', 7,
+				validateState(states, '2(0)3(0)4(0)5(1)5(0)6(1)6(0)', 7,
 				{
 					'2(0)':['CPAREN', 'DIFF'],
 					'3(0)':['CPAREN', 'DIFF'],
 					'4(0)':['CPAREN'],
 					'5(0)':['CPAREN'],
 					'5(1)':['CPAREN', 'EOF'],
-					'7(1)':['NUMBER', 'OPAREN'],
-					'7(0)':['NUMBER', 'OPAREN']
+					'6(1)':['NUMBER', 'OPAREN'],
+					'6(0)':['NUMBER', 'OPAREN']
 				});
-				validateState(states, '2(2)4(0)5(0)7(0)', 4,
+				validateState(states, '2(2)4(0)5(0)6(0)', 4,
 				{
 					'2(2)':['EOF','DIFF','CPAREN'],
 					'4(0)':['EOF','CPAREN'],
 					'5(0)':['EOF','CPAREN'],
-					'7(0)':['NUMBER','OPAREN']
+					'6(0)':['NUMBER','OPAREN']
 				});
-				validateState(states, '2(1)5(2)6(0)8(0)', 4,
+				validateState(states, '2(1)5(2)7(0)8(0)', 4,
 				{
 					'2(1)':['CPAREN','DIFF'],
 					'5(2)':['EOF'],
-					'6(0)':['NUMBER', 'OPAREN'],
-					'8(0)':['EOF']
+					'8(0)':['NUMBER', 'OPAREN'],
+					'7(0)':['EOF']
 				});
-				validateState(states, '1(1)2(1)6(0)', 3,
+				validateState(states, '1(1)2(1)8(0)', 3,
 				{
 					'1(1)':['EOF'],
 					'2(1)':['EOF', 'DIFF'],
-					'6(0)':['NUMBER', 'OPAREN']
+					'8(0)':['NUMBER', 'OPAREN']
 				});
-				validateState(states, '5(3)8(1)', 2,
+				validateState(states, '5(3)7(1)', 2,
 				{
 					'5(3)':['EOF'],
-					'8(1)':['EOF']
+					'7(1)':['EOF']
 				});
 				validateState(states, '2(3)', 1,
 				{
@@ -324,9 +324,9 @@ define(['../../../src/parser/automataLALR1Generator', '../../../src/data/sampleG
 				{
 					'4(1)':['EOF','CPAREN']
 				});
-				validateState(states, '6(1)', 1,
+				validateState(states, '8(1)', 1,
 				{
-					'6(1)':['NUMBER', 'OPAREN']
+					'8(1)':['NUMBER', 'OPAREN']
 				});
 				validateState(states, '0(1)', 1,
 				{

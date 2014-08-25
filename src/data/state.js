@@ -32,13 +32,14 @@ define(['../utils/obj', './node', './grammar'], function(k) {
             this.isAcceptanceState = false;
             
             this._items = options.items || [];
+            options.items = null;
             this._index = 0;
             this._registerItems = {};
 
             k.utils.obj.each(this._items, function (itemRule)
             {
                 this._registerItems[itemRule.getIdentity()] = itemRule;
-            }, this);
+        }, this);
         }
         
         state.constants = {
@@ -132,7 +133,7 @@ define(['../utils/obj', './node', './grammar'], function(k) {
                     return item.rule.index;
                 }),
                 function (acc, item) {
-                    return acc + item.rule.index + '(' + item.dotLocation + ')';
+                    return acc + item.getIdentity(); //.rule.index + '(' + item.dotLocation + ')';
                 }, '');
         };
 
@@ -148,7 +149,6 @@ define(['../utils/obj', './node', './grammar'], function(k) {
             This method is intended to be use as READ-ONLY, editing the returned items will affect the state and the rest of the automata at with this state belongs to.
          * @returns {[ItemRule]} Array of current item rules  */
         state.prototype.getOriginalItems = function() {
-            //TODO TEST THIS
             return this._items;
         };
         
@@ -156,7 +156,6 @@ define(['../utils/obj', './node', './grammar'], function(k) {
             This method is intended to be use as READ-ONLY, editing the returned items will affect the state and the rest of the automata at with this state belongs to.
          * @returns {ItemRule} Item rule corresponding to the id passed in if present or null otherwise  */
         state.prototype.getOriginalItemById = function(id) {
-            //TODO TEST THIS
             return this._registerItems[id];
         };
 
@@ -203,7 +202,6 @@ define(['../utils/obj', './node', './grammar'], function(k) {
         /* @function Returns the list of item rules contained in the current state that are reduce item rules.
          * @returns {[ItemRule]} Recude Item Rules  */
         state.prototype.getRecudeItems = function () {
-            //TODO TEST THIS
             return k.utils.obj.filter(this._items, function (item) {
                 return item.isReduce();
             });   
@@ -211,13 +209,60 @@ define(['../utils/obj', './node', './grammar'], function(k) {
         
         /* @function Determine if the current state is valid or not.
          * @returns {Boolean} true if the state is valid (invalid), false otherwise (inconsistent) */
-        state.prototype.isValid = function() {
-            //TODO TEST THIS
-            //TODO Take into account when the state have items WITH LOOK-AHEAD!!
+        state.prototype.isValid = function(considerLookAhead) {
             
             var reduceItems = this.getRecudeItems();
             
-            return !(reduceItems.length !== this._items.length && reduceItems.length > 0 || reduceItems.length > 1);
+            if (!considerLookAhead || !reduceItems.length)
+            {
+                return !(reduceItems.length !== this._items.length && reduceItems.length > 0 || reduceItems.length > 1);
+            }
+            
+            var shiftItems = k.utils.obj.filter(this._items, function (item)
+                {
+                    return !item.isReduce();
+                });
+            
+            //Check for SHIFT/REDUCE Conflicts
+            if (shiftItems.length && reduceItems.length)
+            {
+                //For each shift item
+                var isAnyShiftReduceConflict = k.utils.obj.any(shiftItems, function (shiftItem)
+                {
+                    //validate that the shift symbol is not in any lookAhead symbol of any reduce rule
+                    var shiftSymbol = shiftItem.getCurrentSymbol();
+                    
+                    return k.utils.obj.find(reduceItems, function (reduceItem)
+                    {
+                        return k.utils.obj.find(reduceItem.lookAhead, function (lookAheadSymbol) { return lookAheadSymbol.name === shiftSymbol.name});
+                    });
+                });
+                
+                if (isAnyShiftReduceConflict)
+                {
+                    return false;
+                }
+            }
+            //Check for REDUCE/REDUCE Conflicts
+            if (reduceItems.length > 1)
+            {
+                var listOfLookAheadSymbols = k.utils.obj.reduce(reduceItems, function (acc, reduceItem)
+                    {
+                        k.utils.obj.each(reduceItem.lookAhead, function (lookAheadSymbol) {acc.push(lookAheadSymbol.name);});
+                        return acc;
+                    }, []),
+                    lookAheadLength = listOfLookAheadSymbols.length;
+                
+                listOfLookAheadSymbols = k.utils.obj.uniq(listOfLookAheadSymbols);
+                
+                //Some lookAhead symbols are duplicated. It is require that all lookAhead symbols sets are DISJOIN!
+                if (listOfLookAheadSymbols.length !== lookAheadLength)
+                {
+                    return false;
+                }
+            }
+            
+            return true;
         };
 
         return state;

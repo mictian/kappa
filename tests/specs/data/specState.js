@@ -1,5 +1,5 @@
 /* global spyOn:true, expect: true, describe: true, it:  true, beforeEach: true */
-define(['../../../src/data/sampleGrammars', '../../../src/data/state', '../../../src/data/itemRule'], function(sampleGrammars, k)
+define(['../../../src/data/sampleGrammars', '../../../src/data/state', '../../../src/data/itemRule',, '../../../src/utils/str'], function(sampleGrammars, k)
 {
     'use strict';
 
@@ -155,7 +155,8 @@ define(['../../../src/data/sampleGrammars', '../../../src/data/state', '../../..
 			it('should return null if the state does not have any rule', function()
 			{
 				var s = new k.data.State({});
-				expect(s.getIdentity()).toBe('');
+				
+				expect(k.utils.str.startsWith(s.getIdentity(), 'node_')).toBe(true);
 			});
 
 			it('should NOT returns always the same regardless if its item where updated', function()
@@ -382,7 +383,7 @@ define(['../../../src/data/sampleGrammars', '../../../src/data/state', '../../..
 
 		describe('getCondencedString', function ()
 		{
-			it ('should return 1-5 when having only two rules with that indexes', function ()
+			it('should return 1-5 when having only two rules with that indexes', function ()
 			{
 				var items = [
 					new k.data.ItemRule(
@@ -407,7 +408,7 @@ define(['../../../src/data/sampleGrammars', '../../../src/data/state', '../../..
 				expect(s.getCondencedString()).toEqual('1-5');
 			});
 			
-			it ('should return 0-15 when having only two rules with that indexes in inverse order', function ()
+			it('should return 0-15 when having only two rules with that indexes in inverse order', function ()
 			{
 				var items = [
 					new k.data.ItemRule(
@@ -432,7 +433,7 @@ define(['../../../src/data/sampleGrammars', '../../../src/data/state', '../../..
 				expect(s.getCondencedString()).toEqual('0-15');
 			});
 			
-			it ('should calculate the result only once', function ()
+			it('should calculate the result only once', function ()
 			{
 				var items = [
 					new k.data.ItemRule(
@@ -560,26 +561,184 @@ define(['../../../src/data/sampleGrammars', '../../../src/data/state', '../../..
 				expect(s.isValid()).toBe(false);
 			});
 			
-			// TODO FINISH THIS TESTS
-			//The next tests cannot be completed yet. LALR need to be completed
-			xit('should return true if the state has one reduce item, one shift item that does not share anything between them', function()
+			it('should return true if the state has one reduce item, one shift item that does not share anything between them (using lookAhead)', function()
 			{
+				var reduceItem = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S1])[0],
+					shiftItem = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S2])[0],
+					state = new k.data.State({
+						items: [reduceItem, shiftItem]
+					});
+					
+				reduceItem.dotLocation = 1;
 				
+				expect(state.isValid(true)).toBe(true);
+				
+				reduceItem._id = null;
+				reduceItem.lookAhead.push(sampleGrammars.selectedBs.S2.tail[2]);
+				
+				expect(state.isValid(true)).toBe(true);
 			});
 			
-			xit('should return true if the state has two reduce items but with different look-ahead', function()
+			it('should return true if the state has two reduce items but with different look-ahead', function()
 			{
+				var reduceItem1 = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S1])[0],
+					reduceItem2 = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S2])[0],
+					state = new k.data.State({
+						items: [reduceItem1, reduceItem2]
+					});
+					
+				reduceItem1.dotLocation = 1;
+				reduceItem2.dotLocation = 3;
 				
+				reduceItem1._id = null;
+				reduceItem2._id = null;
+				reduceItem1.lookAhead.push(sampleGrammars.selectedBs.S2.tail[2]);
+				reduceItem2.lookAhead.push(sampleGrammars.selectedBs.S2.tail[1]);
+				
+				expect(state.isValid(true)).toBe(true);
 			});
 			
-			xit('should return true if the state has one reduce rule and a shift rule that differ in their look-aheads', function()
+			it('should return true if the state has two reduce rule and one shift rule but their look-ahead is different', function()
 			{
+				var reduceItem1 = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S1])[0],
+					shiftItem = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.L2])[0],
+					reduceItem2 = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S2])[0],
+					state = new k.data.State({
+						items: [reduceItem1, reduceItem2, shiftItem]
+					});
+					
+				reduceItem1.dotLocation = 1;
+				reduceItem2.dotLocation = 3;
 				
+				reduceItem1._id = null;
+				reduceItem2._id = null;
+				reduceItem1.lookAhead.push(sampleGrammars.selectedBs.S2.tail[2]);
+				reduceItem2.lookAhead.push(sampleGrammars.selectedBs.S2.tail[1]);
 			});
 			
-			xit('should return true if the state has two reduce rule and one shift rule but their look-ahead is different', function()
+			it('should return false if the state has two reduce rule with a non disjoin lookAhead set', function()
 			{
+				var reduceItem1 = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S1])[0],
+					reduceItem2 = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S2])[0],
+					state = new k.data.State({
+						items: [reduceItem1, reduceItem2]
+					});
+					
+				reduceItem1.dotLocation = 1;
+				reduceItem2.dotLocation = 3;
 				
+				reduceItem1._id = null;
+				reduceItem2._id = null;
+				reduceItem1.lookAhead.push(sampleGrammars.selectedBs.S2.tail[1]);
+				reduceItem2.lookAhead.push(sampleGrammars.selectedBs.S2.tail[1]);
+				
+				expect(state.isValid(true)).toBe(false);
+			});
+			
+			it('should return false if the state has one reduce rule and one shift rule with the same symbol', function()
+			{
+				var reduceItem = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S1])[0],
+					shiftItem = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S2])[0],
+					state = new k.data.State({
+						items: [reduceItem, shiftItem]
+					});
+					
+				reduceItem.dotLocation = 1;
+				
+				expect(state.isValid(true)).toBe(true);
+				
+				reduceItem._id = null;
+				reduceItem.lookAhead.push(shiftItem.getCurrentSymbol());
+				
+				expect(state.isValid(true)).toBe(false);
+			});
+		});
+		
+		describe('getOriginalItems', function ()
+		{
+			it('should return an empty array if there are no item', function ()
+			{
+				var s = new k.data.State({});
+				
+				expect(s.getOriginalItems().length).toBe(0);
+			});
+			
+			it('should return the item added into the state', function ()
+			{
+				var s = new k.data.State({
+					items: k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S1])
+				});
+				
+				expect(s.getOriginalItems().length).toBe(1);
+				
+				s.addItems(k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S2]));
+				
+				expect(s.getOriginalItems().length).toBe(2);
+			});
+			
+			it('should return the original items', function ()
+			{
+				var items = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S1]),
+					s = new k.data.State({
+						items: items
+					});
+					
+				expect(s.getOriginalItems().length).toBe(1);
+				expect(s.getOriginalItems()[0]).toBe(items[0]);
+			});
+		});
+		
+		describe('getRecudeItems', function ()
+		{
+			it('should return empty array the state has not reduce item', function ()
+			{
+				var shiftItem = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S2])[0],
+					state = new k.data.State({
+						items: [shiftItem]
+					});
+				
+				expect(state.getRecudeItems()).toEqual([]);
+			});
+			
+			it('shoudl return empty id the state has no item rule', function ()
+			{
+				var state = new k.data.State({});
+				
+				expect(state.getRecudeItems()).toEqual([]);
+			});
+			
+			it('should have one item if the state has one reduce item', function ()
+			{
+				var reduceItem = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S1])[0],
+					state = new k.data.State({
+						items: [reduceItem]
+					});
+					
+				reduceItem.dotLocation = 1;
+				reduceItem._id = null;
+				reduceItem.lookAhead.push(sampleGrammars.selectedBs.S2.tail[2]);
+				
+				expect(state.getRecudeItems()).toEqual([reduceItem]);
+			});
+		});
+		
+		describe('getOriginalItemById', function ()
+		{
+			it('should return undefined when te item is not present in the state', function()
+			{
+				var s = new k.data.State({});
+				
+				expect(s.getOriginalItemById('1(0)')).toBeUndefined();
+			});
+			
+			it('should return the item rule specified when it is present', function()
+			{
+				var items = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S1]),
+					s = new k.data.State({
+						items: items
+					});
+					
+				expect(s.getOriginalItemById(items[0].getIdentity())).toBe(items[0]);
 			});
 		});
     });

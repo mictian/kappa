@@ -50,13 +50,22 @@ define(['../utils/obj', '../data/grammar', '../data/itemRule', '../data/automata
 
 				if (currentSymbol instanceof k.data.NonTerminal)
 				{
-					currentState.addItems(this._newItemRulesForStateExpansion(currentItem, currentSymbol));
+					currentState.addItems(this._newItemRulesForStateExpansion(currentItem, currentSymbol), this._getExpansionItemNewItemsOptions());
 				}
 
 				currentItem = currentState.getNextItem();
 			}
 
 			return currentState;
+		};
+		
+		/* @function Generate the options used to add item rules into the states when thy are being expanded
+		* @returns {Object} An object specifying the options used by the state.addItems method to include methods */
+		automataLRGeneratorBase.prototype._getExpansionItemNewItemsOptions = function ()
+		{
+			return {
+				hasLookAhead: false
+			};
 		};
 		
 		/* @function When expanding an state, depending on the kind of automata that is being created (LR1/LALR1/LR0/etc), the way that is genrerated the list
@@ -150,7 +159,7 @@ define(['../utils/obj', '../data/grammar', '../data/itemRule', '../data/automata
 						items: newItemRules
 					});
 
-					this.expandItem(newState);
+					this.expandItem(newState, automata);
 					
 					// We determien if the new state is an acceptance state, if it has only the augmented rule in reduce state.    
 					newState.isAcceptanceState = !!(newState.getOriginalItems().length === 1 && newState.getOriginalItems()[0].rule.name === k.data.Grammar.constants.AugmentedRuleName && newState.getOriginalItems()[0].dotLocation === 2);

@@ -142,13 +142,12 @@ define(['../utils/obj', './grammar'], function(k)
 		* @returns {[ItemRule]} Array of new Item Rules */
 		itemRule.newFromRules = function(rules, lookAhead)
 		{
-			//TODO TEST look ahead parameter!
 			return k.utils.obj.reduce(rules, function (acc, rule)
 			{
 				acc.push(new ItemRule({
 					rule: rule,
 					dotLocation: 0,
-					lookAhead: lookAhead || []
+					lookAhead: [].concat(lookAhead || [])
 				}));
 				return acc;
 			}, []);

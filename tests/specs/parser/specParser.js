@@ -1,5 +1,5 @@
 /* global jasmine: true, expect: true, describe: true, it:  true, beforeEach: true */
-define(['../../../src/data/sampleGrammars', '../../../src/parser/parser'], function(sampleGrammars, k)
+define(['../../../src/data/sampleGrammars', '../../../src/parser/parser', , '../../../src/parser/automataLALR1Generator'], function(sampleGrammars, k)
 {
 	'use strict';
 
@@ -61,15 +61,15 @@ define(['../../../src/data/sampleGrammars', '../../../src/parser/parser'], funct
 		        expect(result).toBe(false);
 			});
 
-			xit('should accept the string "aab" for the grammar aPlusEMPTY', function()
+			it('should accept the string "aab" for the grammar aPlusEMPTY', function()
 			{
+		        debugger;
 				var p = k.parser.parserCreator.create(
 				    {
 						grammar: sampleGrammars.aPlusEMPTY.g,
-						strInput: ''
+						strInput: 'a'
 					});
 		        
-		        // debugger;
 		        var result = p.parser.parse(p.lexer);
 		        expect(result).toBeTruthy();
 			});
@@ -80,7 +80,65 @@ define(['../../../src/data/sampleGrammars', '../../../src/parser/parser'], funct
 	{
 		describe('create', function ()
 		{
-		//TODO Finish this!	
+			it('should throw an exception if a grammar is not specified', function ()
+			{
+				expect(function(){return k.parser.parserCreator.create();}).toThrow();	
+			});
+			
+			it('should create a parser and a lexer with the specified Automata constructor', function ()
+			{
+				//As the default Automata Generator is LALR1 and the grammar is LR1, when the automta gets validated will generate return false
+				var contructorFnc = function () {
+					return k.parser.parserCreator.create({
+						grammar: sampleGrammars.idsList.g,
+						automataGenerator: k.parser.AutomataLR0Generator
+					});
+				};
+				expect(contructorFnc).toThrow();
+				
+				var r = k.parser.parserCreator.create({
+					grammar: sampleGrammars.idsList.g
+				});
+				
+				expect(r).toBeDefined();
+				
+			});
+			
+			it('should use the Automata LALR 1 generator by default if one is not specified', function ()
+			{
+				var contructorFnc = function () {
+					return k.parser.parserCreator.create({
+						grammar: sampleGrammars.idsList.g
+					});
+				};
+				expect(contructorFnc).not.toThrow();
+				
+				var r = k.parser.parserCreator.create({
+					grammar: sampleGrammars.aPlusb.g	
+				});
+				
+				expect(r).toBeDefined();
+			});
+			
+			it('should accept an input string to be used by the lexer', function ()
+			{
+				var rStr = k.parser.parserCreator.create({
+						grammar: sampleGrammars.aPlusb.g,
+						strInput: 'aab'
+					}),
+					r = k.parser.parserCreator.create({
+						grammar: sampleGrammars.aPlusb.g
+					});
+				
+				var token = rStr.lexer.getNext();
+				
+				expect(token).toBeDefined();
+				expect(token.length).toBe(1);
+				expect(token.string).toEqual('a');
+				expect(token.terminal.name).toEqual('A_LET')
+				
+				expect(r.lexer.getNext).toThrow();
+			});
 		});
 	});
 });

@@ -1,4 +1,4 @@
-define(['../utils/obj', '../data/stackItem', '../data/astNode', '../lexer/lexer', './automataLR0Generator'],  function (k)
+define(['../utils/obj', '../data/stackItem', '../data/astNode', '../lexer/lexer', './automataLALR1Generator'],  function (k)
 {
 	'use strict';
 
@@ -65,10 +65,18 @@ define(['../utils/obj', '../data/stackItem', '../data/astNode', '../lexer/lexer'
 		* @param {Lexer} lexer The lexer which will lexically analize the input
 		* @returns {ASTNode|false} The generated AST in case of success or false otherwise */
 		parser.prototype._parse = function(lexer) {
-			//TODO TEST THIS
 			var stateToGo,
 				actionToDo,
 				lastItem = this.stack[this.stack.length-1];
+				
+			/*
+			Basic Functionality: 
+			Create an state, ask for an action todo based on the symbol lookAhead an the current state
+				if SHIFT, as we have already created the state we just update our current state
+				if ERROR, finish execution
+				if REDUCE shrink the stack, apply reduce function and update the stack based on the reduce rule
+			When the current state is updated ask for goto action and create the new stack item based on this answer.
+			*/
 
 			do {
 				//Action
@@ -76,7 +84,7 @@ define(['../utils/obj', '../data/stackItem', '../data/astNode', '../lexer/lexer'
 				
 				if (actionToDo.action === k.parser.tableAction.ERROR)
 				{
-					//TODO Think how to express an erroro description or give some details about what happend
+					//TODO Think how to express an error o description or give some details about what happend
 					return false;
 				} 
 				else if (actionToDo.action === k.parser.tableAction.SHIFT)
@@ -119,54 +127,49 @@ define(['../utils/obj', '../data/stackItem', '../data/astNode', '../lexer/lexer'
 		* @returns {Object} The last item in the stack already updated */
 		parser.prototype._reduce = function (actionToDo)
 		{
-			//TODO DO
-			//Generate AST!
-
 			var reduceFunctionParameters = {},
-				// lastItemAST,
 				newASTNode,
 				subASTNodes,
 				stackRange,
 				rule = actionToDo.rule,
+				isEMPTYRule = rule.tail.length === 1 && rule.tail[0].name === k.data.specialSymbol.EMPTY,
 				lastItem = this.stack[this.stack.length - 1];
-
-			if (rule.tail.length === 1 && rule.tail[0].name === k.data.specialSymbol.EMPTY) {
-				//TODO DO THIS
-				//Think what to do with empty rules reduction!!!
-			}
-			else
+				
+			stackRange = isEMPTYRule ? 
+							//If the reduce rule is the empty one, there is no values to collect
+							[] : 
+							// Get the last n (rule length) elements of the stack ignoring the last one, which is just there for the previous GoTo Action.
+							this.stack.slice(-1 * (rule.tail.length + 1), this.stack.length - 1);
+			reduceFunctionParameters.values = k.utils.obj.map(stackRange, function (stackItem)
 			{
-				// Get the last n (rule length) elements of the stack ignoring the last one, which is just there for the previous GoTo Action.
-				stackRange = this.stack.slice(-1 * (rule.tail.length + 1), this.stack.length - 1);
-				reduceFunctionParameters.values = k.utils.obj.map(stackRange, function (stackItem)
-				{
-					return stackItem.currentValue || stackItem.symbol;
-				});
-				reduceFunctionParameters.rule = rule;
+				return stackItem.currentValue || stackItem.symbol;
+			});
+			reduceFunctionParameters.rule = rule;
 
-				//Shrink stack based on the reduce rule
-				this.stack = this.stack.slice(0, -1 * rule.tail.length);
-				//Update last stack item
-				lastItem = this.stack[this.stack.length - 1];
-				lastItem.symbol = rule.head;
-				lastItem.currentValue = k.utils.obj.isFunction(rule.reduceFunc) ? rule.reduceFunc.call(this, reduceFunctionParameters) : lastItem.symbol;
-				
-				
-				// Update/Generate AST
-				subASTNodes = k.utils.obj.map(stackRange, function (stackItem)
-				{
-					return stackItem.AST || stackItem.stringValue;
-				});
-				
-				// lastItemAST = lastItem.AST;
-				newASTNode = new k.data.ASTNode({
-					nodes: subASTNodes,
-					rule: rule,
-					symbol: rule.head,
-					stringValue: lastItem.stringValue 
-				});
-				lastItem.AST = newASTNode;
-			}
+			//Shrink stack based on the reduce rule
+			this.stack = isEMPTYRule ? 
+							//Based on the Basic Functionality the last stack item used by the empty rule is already there and no item is require to be removed 
+							this.stack :
+							this.stack.slice(0, -1 * rule.tail.length);
+			//Update last stack item
+			lastItem = this.stack[this.stack.length - 1];
+			lastItem.symbol = rule.head;
+			lastItem.currentValue = k.utils.obj.isFunction(rule.reduceFunc) ? rule.reduceFunc.call(this, reduceFunctionParameters) : lastItem.symbol;
+			
+			
+			// Update/Generate AST
+			subASTNodes = k.utils.obj.map(stackRange, function (stackItem)
+			{
+				return stackItem.AST || stackItem.stringValue;
+			});
+			
+			newASTNode = new k.data.ASTNode({
+				nodes: subASTNodes,
+				rule: rule,
+				symbol: rule.head,
+				stringValue: lastItem.stringValue 
+			});
+			lastItem.AST = newASTNode;
 
 			return lastItem;
 		};
@@ -191,24 +194,29 @@ define(['../utils/obj', '../data/stackItem', '../data/astNode', '../lexer/lexer'
 
 		/* @function Helper method to instanciate a new parser and a lexer
 		* @param {Grammar} options.grammar The grammar used to generate the parser
-		* @param {String} options.strInput String to be processed
+		* @param {AutomataLRGeneratorBase} options.automataGenerator Optional class used to generate the automata. If not specified LR0 will be used
+		* @param {String} options.strInput Optional String to be processed
 		* @returns {Object} An object with two properties, parser and lexer */
 		creator.create = function (options)
 		{
-			//TODO TEST THIS
-			var	automataGenerator = new k.parser.AutomataLR0Generator({
-					grammar: options.grammar
+			options = k.utils.obj.extend({}, {
+				automataGenerator: k.parser.AutomataLALR1Generator
+			}, options || {});
+			
+			var	grammar = options.grammar,
+				automataGenerator = new options.automataGenerator({
+					grammar: grammar
 				}),
 				automata = automataGenerator.generateAutomata(),
 				gotoTable = automataGenerator.generateGOTOTable(automata),
 				actionTable = automataGenerator.generateACTIONTable(automata),
 				lexer = new k.lexer.Lexer({
-					grammar: options.grammar,
+					grammar: grammar,
 					stream: options.strInput
 				}),
 				parser = new k.parser.Parser({
 					gotoTable: gotoTable,
-					grammar: options.grammar,
+					grammar: grammar,
 					actionTable: actionTable,
 					initialState: automata.initialStateAccessor()
 				});

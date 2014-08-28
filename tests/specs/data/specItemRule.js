@@ -255,9 +255,25 @@ define(['../../../src/data/sampleGrammars', '../../../src/data/itemRule'], funct
 				expect(result[1].dotLocation).toBe(0);
 			});
 			
-			xit('shoud for each rule create a new item rule with the lookAhead specified', function()
+			it('shoud for each rule create a new item rule with the lookAhead specified', function()
 			{
-				//Verificar que si edito el lookAhead de un item el de otro no se altere!
+				var result = k.data.ItemRule.newFromRules([{tail:[]},{test:true,tail:[]}], [{name:'lookAhead1'}, {name:'lookAhead2'}]);
+
+				expect(result.length).toBe(2);
+				expect(result[0].options).toEqual({rule:{tail:[]}, dotLocation:0, lookAhead:[{name:'lookAhead1'}, {name:'lookAhead2'}]});
+				result[0].lookAhead.push({test:true});
+				expect(result[0].options).toEqual({rule:{tail:[]}, dotLocation:0, lookAhead:[{name:'lookAhead1'}, {name:'lookAhead2'}, {test:true}]});
+				expect(result[0].dotLocation).toBe(0);
+				expect(result[1].options).toEqual({rule:{test:true, tail:[]}, dotLocation:0,  lookAhead:[{name:'lookAhead1'}, {name:'lookAhead2'}]});
+				expect(result[1].dotLocation).toBe(0);
+			});
+			
+			it('should not share the same lookAhead instance', function ()
+			{
+				var result = k.data.ItemRule.newFromRules([{tail:[]},{test:true,tail:[]}], [{name:'lookAhead1'}, {name:'lookAhead2'}]);
+				
+				expect(result[0].lookAhead).not.toBe(result[1].lookAhead);
+				expect(result[0].lookAhead).toEqual(result[1].lookAhead);
 			});
 		});
 		

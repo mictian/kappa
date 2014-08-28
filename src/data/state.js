@@ -54,8 +54,9 @@ define(['../utils/obj', './node', './grammar'], function(k) {
 
         /* @function Adds an array of item rule into the state. Only the rules that are not already present in the state will be added
          * @param {[ItemRule]} itemRules Array of item rules to add into the state
+         * @param {Boolean} options.hasLookAhead Determines if the adding action should take into account lookAhead (to merge them) when the item rule are already present
          * @returns {void} Nothing */
-        state.prototype.addItems = function(itemRules) {
+        state.prototype.addItems = function(itemRules, options) {
             this._id = null;
             k.utils.obj.each(itemRules, function (itemRule)
             {
@@ -66,9 +67,7 @@ define(['../utils/obj', './node', './grammar'], function(k) {
                     this._registerItems[itemRule.getIdentity()] = itemRule;
                     this._items.push(itemRule);
                 }
-                else
-                //TODO Think a way to only do this when the automata begin generated is LR(k>=1), It should be a general way to pass more options to this method
-                //For the momento it doesnt matter as 
+                else if (options && options.hasLookAhead)
                 {
                     //As the way to of generating a LR(1) automata adds a item rule for each lookAhead we simply merge its lookAheads
                     var mergedLookAheads = this._registerItems[itemRule.getIdentity()].lookAhead.concat(itemRule.lookAhead);

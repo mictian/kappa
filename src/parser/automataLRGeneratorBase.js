@@ -78,24 +78,33 @@ define(['../utils/obj', '../data/grammar', '../data/itemRule', '../data/automata
 		{};
 
 		/* @function Generate the requested automata
-		* This method allows that son clases override it and have already almost all the implementation done in the method _generateAutomata()
+		* This method allows that sub-clases override it and have already almost all the implementation done in the method _generateAutomata()
 		* @param {Boolean} options.notValidate Indicate if the resulting automata should be validated for the current lookAhead or not. False by default (DO validate the automata).
+		* @param {[ConflicResolver]} options.conflictResolvers ORDERED List of conflicts resolvers used in case of conflicts in the state.
 		* @returns {Automata} The corresponding automata for the specified grammar */
 		automataLRGeneratorBase.prototype.generateAutomata = function(options)
 		{
-			var defaultAutomataCreationOptions = {
-					notValidate: false
+			var defaultAutomataGenerationOptions = {
+					notValidate: false,
+					conflictResolvers: []
 				};
-			options = k.utils.obj.extendInNew(defaultAutomataCreationOptions, options || {});
+			options = k.utils.obj.extendInNew(defaultAutomataGenerationOptions, options || {});
 			
 			var automata = this._generateAutomata();
 			
-			if (!options.notValidate && !automata.isValid())
+			if (!options.notValidate && !automata.isValid(defaultAutomataGenerationOptions))
 			{
 				return false;
 			}
 			
 			return automata;
+		};
+		
+		/* @function Generate the conflict resolvers list use to solve any possible conflict when validating the automata and when creating the Action table.
+		* @returns {Automata} The corresponding automata for the specified grammar */
+		automataLRGeneratorBase.prototype._getConflictResolvers = function ()
+		{
+			
 		};
 		
 		/* @function Actually Generate an automata

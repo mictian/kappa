@@ -17,7 +17,7 @@ define(['../core'], function(k)
         * @returns {Boolean} True if the source starts with input, false otherwise
         */
 		var __startsWith = function(source, input) {
-			return String.prototype.slice.call(source, 0, input.length) === input;
+			return source ? String.prototype.slice.call(source, 0, input.length) === input : false;
 		};
 
 		/*

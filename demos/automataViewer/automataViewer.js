@@ -4,12 +4,12 @@
     'use strict';
 
     require.config({
-        baseUrl: '../src'
+        baseUrl: '../../src'
     });
 
     require(['./data/sampleGrammars', './parser/automataLALR1Generator'], function (sampleGrammars, k)
     {
-        var grammar = sampleGrammars.numDiff.g, //aPlusb.g,
+        var grammar = sampleGrammars.arithmetic.g, //aPlusb.g,
             automataGenerator = new k.parser.AutomataLALR1Generator({
                 grammar: grammar
             }),

@@ -48,17 +48,26 @@ define(['../utils/obj', './state'], function(k)
         
         /* @function Function used to check if an automamta is valid.
         * Commonly used to check if an automata is an LR(0) valid one.
+        * @param {Boolean} options.considerLookAhead Indicate if the validation process should take into account lookAhead values in the rule items. This values is passed in to each state.
+        * @param {[ConflictResovler]} options.conflicResolvers List of conflict resolvers used by the states in conflict.
         * @returns {Boolean} true in case th automata is valid, false otherwise */
-        automata.prototype.isValid = function()
+        automata.prototype.isValid = function(options)
         {
+            var defaultValidationOptions = {
+                considerLookAhead: this.hasLookAhead
+            };
+            
+            options = k.utils.obj.extendInNew(defaultValidationOptions, options || {});
+            options.automata = this;
+            
             return !k.utils.obj.any(this.states, function (state)
             {
-                return !state.isValid(this.hasLookAhead);
+                return !state.isValid(options);
             }, this);
         };
         
         /* @function Set or get the initial state.
-        * @param {State} state If specified set the initial state of the automata
+        * @param {State} state If specified, set the initial state of the automata
         * @returns {State} In case that none state is specifed returnes the initial state previously set */
         automata.prototype.initialStateAccessor = function(state)
         {

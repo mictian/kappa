@@ -61,17 +61,55 @@ define(['../../../src/data/sampleGrammars', '../../../src/parser/parser', , '../
 		        expect(result).toBe(false);
 			});
 
-			it('should accept the string "aab" for the grammar aPlusEMPTY', function()
+			it('should accept the string "" for the grammar aPlusEMPTY', function()
 			{
-		        debugger;
 				var p = k.parser.parserCreator.create(
 				    {
 						grammar: sampleGrammars.aPlusEMPTY.g,
-						strInput: 'a'
+						strInput: ''
 					});
 		        
 		        var result = p.parser.parse(p.lexer);
 		        expect(result).toBeTruthy();
+		        expect(result.nodes.length).toBe(0); //The only rule that applies is the one present at the root!
+		        expect(result.rule.name).toEqual('S2RULE');
+			});
+			
+			it('should accept the string "aa" for the grammar aPlusEMPTY', function()
+			{
+				var p = k.parser.parserCreator.create(
+				    {
+						grammar: sampleGrammars.aPlusEMPTY.g,
+						strInput: 'aa'
+					});
+		        
+		        var result = p.parser.parse(p.lexer);
+		        expect(result).toBeTruthy();
+			});
+			
+			it('should FOO!!', function()
+			{
+				var	grammar = sampleGrammars.arithmetic.g,
+					automataGenerator = new k.parser.AutomataLALR1Generator({
+						grammar: grammar
+					}),
+					automata = automataGenerator.generateAutomata({notValidate:false, conflictResolvers: k.parser.ConflictResolver.getDefaultResolvers()}),
+					gotoTable = automataGenerator.generateGOTOTable(automata),
+					actionTable = automataGenerator.generateACTIONTable(automata),
+					lexer = new k.lexer.Lexer({
+						grammar: grammar,
+						stream: undefined
+					}),
+					parser = new k.parser.Parser({
+						gotoTable: gotoTable,
+						grammar: grammar,
+						actionTable: actionTable,
+						initialState: automata.initialStateAccessor()
+					});
+		        
+		        debugger;
+		        // var result = p.parser.parse(p.lexer);
+		        // expect(result).toBeTruthy();
 			});
 		});
 	});

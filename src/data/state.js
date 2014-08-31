@@ -207,12 +207,16 @@ define(['../utils/obj', './node', './grammar'], function(k) {
         };
         
         /* @function Determine if the current state is valid or not.
+         * @param {Boolean} options.considerLookAhead Indicate if the state should take into account look ahead to validate. Default: false
+         * @param {Automata} options.automata Optional automata instance used to pass to the conflict resolver in case there are conflict and resolvers.
+         * @param {[ConflictResolver]} options.conflictResolvers List of conflict resolvers used to resolve possible conflict at the current state.
          * @returns {Boolean} true if the state is valid (invalid), false otherwise (inconsistent) */
-        state.prototype.isValid = function(considerLookAhead) {
+        state.prototype.isValid = function(options) {
             
+            options = k.utils.obj.isObject(options) ? options : {};
             var reduceItems = this.getRecudeItems();
             
-            if (!considerLookAhead || !reduceItems.length)
+            if (!options.considerLookAhead || !reduceItems.length)
             {
                 return !(reduceItems.length !== this._items.length && reduceItems.length > 0 || reduceItems.length > 1);
             }
@@ -225,14 +229,18 @@ define(['../utils/obj', './node', './grammar'], function(k) {
             //Check for SHIFT/REDUCE Conflicts
             if (shiftItems.length && reduceItems.length)
             {
+                //For each shift item rule validate that the shift symbol is not in any lookAhead symbol of any reduce rule
+                
                 //For each shift item
                 var isAnyShiftReduceConflict = k.utils.obj.any(shiftItems, function (shiftItem)
                 {
-                    //validate that the shift symbol is not in any lookAhead symbol of any reduce rule
+                    //get the shift symbol
                     var shiftSymbol = shiftItem.getCurrentSymbol();
                     
+                    //find among all reduce items
                     return k.utils.obj.find(reduceItems, function (reduceItem)
                     {
+                        //if the shift symbol is in any reduce item rule's lookAhead set.
                         return k.utils.obj.find(reduceItem.lookAhead, function (lookAheadSymbol) { return lookAheadSymbol.name === shiftSymbol.name});
                     });
                 });
@@ -254,7 +262,7 @@ define(['../utils/obj', './node', './grammar'], function(k) {
                 
                 listOfLookAheadSymbols = k.utils.obj.uniq(listOfLookAheadSymbols);
                 
-                //Some lookAhead symbols are duplicated. It is require that all lookAhead symbols sets are DISJOIN!
+                //Some lookAhead symbols are duplicated. It is required that all lookAhead symbol sets are DISJOIN!
                 if (listOfLookAheadSymbols.length !== lookAheadLength)
                 {
                     return false;

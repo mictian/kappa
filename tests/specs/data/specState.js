@@ -571,12 +571,12 @@ define(['../../../src/data/sampleGrammars', '../../../src/data/state', '../../..
 					
 				reduceItem.dotLocation = 1;
 				
-				expect(state.isValid(true)).toBe(true);
+				expect(state.isValid({considerLookAhead:true})).toBe(true);
 				
 				reduceItem._id = null;
 				reduceItem.lookAhead.push(sampleGrammars.selectedBs.S2.tail[2]);
 				
-				expect(state.isValid(true)).toBe(true);
+				expect(state.isValid({considerLookAhead:true})).toBe(true);
 			});
 			
 			it('should return true if the state has two reduce items but with different look-ahead', function()
@@ -595,7 +595,7 @@ define(['../../../src/data/sampleGrammars', '../../../src/data/state', '../../..
 				reduceItem1.lookAhead.push(sampleGrammars.selectedBs.S2.tail[2]);
 				reduceItem2.lookAhead.push(sampleGrammars.selectedBs.S2.tail[1]);
 				
-				expect(state.isValid(true)).toBe(true);
+				expect(state.isValid({considerLookAhead:true})).toBe(true);
 			});
 			
 			it('should return true if the state has two reduce rule and one shift rule but their look-ahead is different', function()
@@ -612,8 +612,10 @@ define(['../../../src/data/sampleGrammars', '../../../src/data/state', '../../..
 				
 				reduceItem1._id = null;
 				reduceItem2._id = null;
+				
 				reduceItem1.lookAhead.push(sampleGrammars.selectedBs.S2.tail[2]);
-				reduceItem2.lookAhead.push(sampleGrammars.selectedBs.S2.tail[1]);
+				reduceItem2.lookAhead.push(sampleGrammars.selectedBs.S2.tail[0]);
+				expect(state.isValid({considerLookAhead:true})).toBe(true);
 			});
 			
 			it('should return false if the state has two reduce rule with a non disjoin lookAhead set', function()
@@ -632,7 +634,7 @@ define(['../../../src/data/sampleGrammars', '../../../src/data/state', '../../..
 				reduceItem1.lookAhead.push(sampleGrammars.selectedBs.S2.tail[1]);
 				reduceItem2.lookAhead.push(sampleGrammars.selectedBs.S2.tail[1]);
 				
-				expect(state.isValid(true)).toBe(false);
+				expect(state.isValid({considerLookAhead: true})).toBe(false);
 			});
 			
 			it('should return false if the state has one reduce rule and one shift rule with the same symbol', function()
@@ -645,12 +647,12 @@ define(['../../../src/data/sampleGrammars', '../../../src/data/state', '../../..
 					
 				reduceItem.dotLocation = 1;
 				
-				expect(state.isValid(true)).toBe(true);
+				expect(state.isValid({considerLookAhead:true})).toBe(true);
 				
 				reduceItem._id = null;
 				reduceItem.lookAhead.push(shiftItem.getCurrentSymbol());
 				
-				expect(state.isValid(true)).toBe(false);
+				expect(state.isValid({considerLookAhead:true})).toBe(false);
 			});
 		});
 		

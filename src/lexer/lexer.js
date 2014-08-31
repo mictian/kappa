@@ -39,6 +39,7 @@ define(['../utils/str', '../utils/obj', '../data/grammar'], function(k)
         * @returns {Void} */
         lexer.prototype.setStream = function (stream)
         {
+        	this.stream = stream;
         	this.inputStream = (!this.notIgnoreSpaces && this.stream) ? k.utils.str.ltrim(this.stream) : this.stream;
         	if (!this.notIgnoreSpaces && this.inputStream === '')
         	{
@@ -48,7 +49,7 @@ define(['../utils/str', '../utils/obj', '../data/grammar'], function(k)
         
         /* @function Get a generic result in case of error, when the lexer cannnot match any terminal in the input
         * @returns {Object} An object representing the the mis of any match (error)  */
-        lexer.prototype.__getErrorResult = function()
+        lexer.prototype._getErrorResult = function()
         {
         	return {
 					length: -1,
@@ -91,7 +92,7 @@ define(['../utils/str', '../utils/obj', '../data/grammar'], function(k)
             	}
             	else
             	{
-            		result = this.__getErrorResult();
+            		result = this._getErrorResult();
             	}
             }
             else
@@ -108,7 +109,7 @@ define(['../utils/str', '../utils/obj', '../data/grammar'], function(k)
 							result = {
 								length: match.length,
 								string: match,
-								terminal: terminals[i]//.rule.tail[0]
+								terminal: terminals[i]
 							};
 						}
 					}
@@ -119,7 +120,7 @@ define(['../utils/str', '../utils/obj', '../data/grammar'], function(k)
 						result = {
 							length: body.length,
 							string: body,
-							terminal: terminals[i]//.rule.tail[0]
+							terminal: terminals[i]
 						};
 					}
 				}
@@ -127,7 +128,7 @@ define(['../utils/str', '../utils/obj', '../data/grammar'], function(k)
 				if (result.length === -1)
 				{
 					//if there is no valid match, we return the current input stream
-					result = this.__getErrorResult();
+					result = this._getErrorResult();
 				}
 				else
 				{

@@ -120,12 +120,12 @@ define(['../utils/obj', '../data/grammar', '../data/itemRule', '../data/automata
 				else
 				{
 					//Shift Items
-					var shiftTransitions = k.utils.obj.filter(state.getSupportedTransitionSymbols(), function (supportedTransition)
+					/*var shiftTransitions = k.utils.obj.filter(state.getSupportedTransitionSymbols(), function (supportedTransition)
 					{
 						return supportedTransition.symbol instanceof k.data.Terminal ||
 								(supportedTransition.symbol instanceof k.data.Symbol && supportedTransition.symbol.isSpecial && supportedTransition.symbol.name === k.data.specialSymbol.EOF);
-					});
-					k.utils.obj.each(shiftTransitions, function (shiftTransition)
+					});*/
+					k.utils.obj.each(state.getSupportedTransitionSymbols()/*shiftTransitions*/, function (shiftTransition)
 					{
 						table[state.getIdentity()][shiftTransition.symbol.name] = {
 							action: k.parser.tableAction.SHIFT
@@ -134,7 +134,7 @@ define(['../utils/obj', '../data/grammar', '../data/itemRule', '../data/automata
 					
 					//Reduce Items
 					var reduceItems = state.getRecudeItems();
-					//IMPORTANT: At this point the autoamta MUST be already validated, ensuring us that the lookAhead sets ARE DISJOINT
+					//IMPORTANT: At this point the automata MUST be already validated, ensuring us that the lookAhead sets ARE DISJOINT
 					k.utils.obj.each(reduceItems, function (reduceItemRule)
 					{
 						k.utils.obj.each(reduceItemRule.lookAhead, function (reduceSymbol)

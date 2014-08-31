@@ -1,4 +1,4 @@
-define(['../utils/obj', '../data/stackItem', '../data/astNode', '../lexer/lexer', './automataLALR1Generator'],  function (k)
+define(['../utils/obj', '../data/stackItem', '../data/astNode', '../lexer/lexer', './automataLALR1Generator', './conflictResolver'],  function (k)
 {
 	'use strict';
 
@@ -56,6 +56,11 @@ define(['../utils/obj', '../data/stackItem', '../data/astNode', '../lexer/lexer'
 					state: this.initialState
 				});
 			this.currentInput = lexer.getNext();
+			
+			if (this.currentInput.ERROR)
+			{
+				return false;
+			}
 			this.stack.push(initialStackItem);
 
 			return this._parse(lexer);
@@ -207,7 +212,7 @@ define(['../utils/obj', '../data/stackItem', '../data/astNode', '../lexer/lexer'
 				automataGenerator = new options.automataGenerator({
 					grammar: grammar
 				}),
-				automata = automataGenerator.generateAutomata(),
+				automata = automataGenerator.generateAutomata({conflictResolvers: k.parser.ConflictResolver.getDefaultResolvers()}),
 				gotoTable = automataGenerator.generateGOTOTable(automata),
 				actionTable = automataGenerator.generateACTIONTable(automata),
 				lexer = new k.lexer.Lexer({

@@ -20,12 +20,13 @@ define(['../utils/obj', '../utils/str', './node', './grammar'], function (k) {
          * @param {[Object]} options.transitions Array of object that initialy compone this node
          * @param {[Node]} options.nodes Array of Nodes instances (or just objects) that are children of this Node
          */
-        function astNode (options) {
-            
+        function astNode (options)
+        {
             _super.apply(this, arguments);
 
             k.utils.obj.defineProperty(this, 'rule');
             k.utils.obj.defineProperty(this, 'stringValue');
+            k.utils.obj.defineProperty(this, 'currentValue');
             k.utils.obj.defineProperty(this, 'symbol');
         }
 
@@ -40,8 +41,8 @@ define(['../utils/obj', '../utils/str', './node', './grammar'], function (k) {
                 var tabs = k.utils.str.tabs(options.deep);
                 ++options.deep;
                 
-                return tabs + this._toCurrentString() + '\n' + k.utils.obj.reduce(this.nodes, function (acc, node){
-                    return acc + (k.utils.obj.isString(node) ? k.utils.str.tabs(options.deep) + node + '\n' : node.toString(options));
+                return tabs + this._toCurrentString() + '\n' + k.utils.obj.reduce(this.nodes, function (acc, node) {
+                    return acc + (k.utils.obj.isString(node) ? k.utils.str.tabs(options.deep) + node + '\n' : node.toString({deep: options.deep}));
                 },'');
             } 
             
@@ -52,7 +53,7 @@ define(['../utils/obj', '../utils/str', './node', './grammar'], function (k) {
          * @returns {String} formatted string */
         astNode.prototype._toCurrentString = function ()
         {
-            return this.getIdentity() + (this.rule ? ': '+ this.rule.toString() : '');
+            return this.getIdentity() + (this.rule ? ': '+ this.rule.toString() + ' (' + this.currentValue + ')' : '');
         };
         
         return astNode;

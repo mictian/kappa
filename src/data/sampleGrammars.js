@@ -498,43 +498,106 @@ define(['./grammar'], function(k)
 	{
 		/*
 		LR(1)
-		1. S --> S '+' S
-		2. S --> S '-' S
-		3. S --> \d
+		1. E --> E '+' E
+		2. E --> E '-' E
+		3. E --> E '*' E
+		4. E --> E '/' E
+		5. E --> (E) 
+		. E --> \d
 		*/
 		var E_NT = new k.data.NonTerminal({name: 'E'}),
 			
-			plus_T = new k.data.Terminal({name:'plus_terminal', body: '+'}),
-			minus_T = new k.data.Terminal({name:'minus_terminal', body: '-'}),
-			number_T = new k.data.Terminal({name:'number_terminal', body: /\d/}),
+			plus_T = new k.data.Terminal({name:'plus_terminal', body: '+', assoc: k.data.associativity.LEFT}),
+			minus_T = new k.data.Terminal({name:'minus_terminal', body: '-', assoc: k.data.associativity.LEFT}),
+			multi_T = new k.data.Terminal({name:'multi_terminal', body: '*', assoc: k.data.associativity.LEFT}),
+			div_T = new k.data.Terminal({name:'div_terminal', body: '/', assoc: k.data.associativity.LEFT}),
+			oparen_T = new k.data.Terminal({name:'oparen_terminal', body: '('}),
+			cparen_T = new k.data.Terminal({name:'cparen_terminal', body: ')'}),
+			number_T = new k.data.Terminal({name:'number_terminal', body: /\d+/}),
 			
 			E1 = new k.data.Rule({
 				head: E_NT.name,
 				tail: [E_NT, plus_T, E_NT],
+				reduceFunc: function (expressionsParams)
+				{
+					return expressionsParams.values[0] + expressionsParams.values[2];
+				},
+				precendence: 10,
 				name: 'EPLUSRULE'
 			}),
 			
 			E2 = new k.data.Rule({
 				head: E_NT.name,
 				tail: [E_NT, minus_T, E_NT],
+				reduceFunc: function (expressionsParams)
+				{
+					return expressionsParams.values[0] - expressionsParams.values[2];
+				},
+				precendence: 10,
 				name: 'EMINUSRULE'
 			}),
 			
 			E3 = new k.data.Rule({
 				head: E_NT.name,
+				tail: [E_NT, multi_T, E_NT],
+				reduceFunc: function (expressionsParams)
+				{
+					return expressionsParams.values[0] * expressionsParams.values[2];
+				},
+				precendence: 20,
+				name: 'EMULTIRULE'
+			}),
+			
+			E4 = new k.data.Rule({
+				head: E_NT.name,
+				tail: [E_NT, div_T, E_NT],
+				reduceFunc: function (expressionsParams)
+				{
+					return expressionsParams.values[0] / expressionsParams.values[2];
+				},
+				precendence: 20,
+				name: 'EDIVRULE'
+			}),
+			
+			E5 = new k.data.Rule({
+				head: E_NT.name,
+				tail: [oparen_T, E_NT, cparen_T],
+				reduceFunc: function (expressionsParams)
+				{
+					return expressionsParams.values[1];
+				},
+				precendence: 30,
+				name: 'EPARENRULE'
+			}),
+			
+			EN = new k.data.Rule({
+				head: E_NT.name,
 				tail: [number_T],
+				reduceFunc: function (numberParam)
+				{
+					return parseInt(numberParam.values[0]);
+				},
 				name: 'ENUMBERRULE'
 			});
 			
 		return  {
 			g: new k.data.Grammar({
 				startSymbol: E1.head,
-				rules:[E1, E2, E3],
+				rules:[E1, E2, E3, E4, E5, EN],
 				name:'arithmetic'
 			}),
+			plus_T:plus_T,
+			minus_T:minus_T,
+			multi_T:multi_T,
+			div_T:div_T,
+			number_T:number_T,
+			
 			E1:E1,
 			E2:E2,
-			E3:E3
+			E3:E3,
+			E4:E4,
+			E5:E5,
+			EN:EN
 		};
 	})();
 	

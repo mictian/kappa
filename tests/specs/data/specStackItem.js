@@ -9,7 +9,7 @@ define(['../../../src/data/sampleGrammars', '../../../src/data/stackItem'], func
 		{
 			it('should require a state property', function ()
 			{
-				expect(function () { return new k.data.StackItem({})}).toThrow();
+				expect(function () { return new k.data.StackItem({});}).toThrow();
 			});
 			
 			it('should accept the params: currentValue, stringValue, symbol and AST', function ()

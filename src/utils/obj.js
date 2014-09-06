@@ -389,7 +389,7 @@ define(['../core'], function(k)
         * @param {Object} obj object to traverse
         * @param {Function} predicate function called per each item founded in obj to determine if the item is or no in the final result
         * @param {Object} context object used to call the iterator
-        * @returns {Array} List of item in object that pass thruly the pass in predicate
+        * @returns {Array} List of item in object that return thruly tp the passed in predicate
         */
 		var __filter = function(obj, predicate, context) {
 			var results = [];
@@ -726,6 +726,19 @@ define(['../core'], function(k)
 			var id = ++idCounter + '';
 			return prefix ? prefix + id : id;
 		};
+		
+		var  __last = function (array, n, guard) {
+			//TODO TEST THIS
+			if (array === null || array === undefined) 
+			{
+				return void 0;
+			}
+			if (n === null || n === undefined || guard) 
+			{
+				return array[array.length - 1];
+			}
+			return slice.call(array, Math.max(array.length - n, 0));
+		};
 
         return {
             inherit: __inherit,
@@ -761,7 +774,8 @@ define(['../core'], function(k)
             uniq: __uniq,
             sortedIndex: __sortedIndex,
             indexOf: __indexOf,
-            uniqueId: __uniqueId
+            uniqueId: __uniqueId,
+            last: __last
         };
     })();
 

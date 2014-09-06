@@ -87,18 +87,22 @@ define(['../../../src/data/sampleGrammars', '../../../src/parser/parser', , '../
 		        expect(result).toBeTruthy();
 			});
 			
-			it('should FOO!!', function()
+			xit('should FOO!!', function()
 			{
 				var	grammar = sampleGrammars.arithmetic.g,
 					automataGenerator = new k.parser.AutomataLALR1Generator({
 						grammar: grammar
 					}),
-					automata = automataGenerator.generateAutomata({notValidate:false, conflictResolvers: k.parser.ConflictResolver.getDefaultResolvers()}),
+					automata = automataGenerator.generateAutomata({
+						conflictResolvers: k.parser.ConflictResolver.getDefaultResolvers()
+					}),
 					gotoTable = automataGenerator.generateGOTOTable(automata),
-					actionTable = automataGenerator.generateACTIONTable(automata),
+					actionTable = automataGenerator.generateACTIONTable(automata, {
+						conflictResolvers: k.parser.ConflictResolver.getDefaultResolvers(),
+						ignoreErrors: false
+					}),
 					lexer = new k.lexer.Lexer({
-						grammar: grammar,
-						stream: undefined
+						grammar: grammar
 					}),
 					parser = new k.parser.Parser({
 						gotoTable: gotoTable,
@@ -107,9 +111,10 @@ define(['../../../src/data/sampleGrammars', '../../../src/parser/parser', , '../
 						initialState: automata.initialStateAccessor()
 					});
 		        
-		        debugger;
-		        // var result = p.parser.parse(p.lexer);
-		        // expect(result).toBeTruthy();
+		        
+		        lexer.setStream('(1+1)');
+		        // debugger;
+		        var result = parser.parse(lexer);
 			});
 		});
 	});

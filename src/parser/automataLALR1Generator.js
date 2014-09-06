@@ -102,7 +102,7 @@ define(['../utils/obj', '../data/grammar', '../data/itemRule', '../data/automata
 		/* @function Given an automata returnes its ACTION Table. 
 		* @param {Automata} automata Automatma used as a base of the calculation
 		* @returns {Function} Function that given the a state id and a lookAhead returns the action to take */
-		automataLALR1Generator.prototype.generateACTIONTable = function (automata)
+		automataLALR1Generator.prototype.generateACTIONTable = function (automata, options)
 		{
 			var table = {};
 			
@@ -119,23 +119,31 @@ define(['../utils/obj', '../data/grammar', '../data/itemRule', '../data/automata
 				} 
 				else
 				{
+					var defaultActionTableStateOptions = {
+						ignoreErrors: false,
+						considerLookAhead: true
+					};
+					options = k.utils.obj.extendInNew(defaultActionTableStateOptions, options || {});
+					
+					var stateItems = state.getShiftReduceItemRule(options);
+					
+					if (!stateItems)
+					{
+						throw new Error('Impossible to generate Action Table. The following state is invalid. State: ' + state.getIdentity());	
+					}
+					
+					
 					//Shift Items
-					/*var shiftTransitions = k.utils.obj.filter(state.getSupportedTransitionSymbols(), function (supportedTransition)
+					k.utils.obj.each(stateItems.shiftItems, function (shiftItem)
 					{
-						return supportedTransition.symbol instanceof k.data.Terminal ||
-								(supportedTransition.symbol instanceof k.data.Symbol && supportedTransition.symbol.isSpecial && supportedTransition.symbol.name === k.data.specialSymbol.EOF);
-					});*/
-					k.utils.obj.each(state.getSupportedTransitionSymbols()/*shiftTransitions*/, function (shiftTransition)
-					{
-						table[state.getIdentity()][shiftTransition.symbol.name] = {
+						table[state.getIdentity()][shiftItem.getCurrentSymbol().name] = {
 							action: k.parser.tableAction.SHIFT
 						};
 					});
 					
 					//Reduce Items
-					var reduceItems = state.getRecudeItems();
 					//IMPORTANT: At this point the automata MUST be already validated, ensuring us that the lookAhead sets ARE DISJOINT
-					k.utils.obj.each(reduceItems, function (reduceItemRule)
+					k.utils.obj.each(stateItems.reduceItems, function (reduceItemRule)
 					{
 						k.utils.obj.each(reduceItemRule.lookAhead, function (reduceSymbol)
 						{
@@ -152,7 +160,7 @@ define(['../utils/obj', '../data/grammar', '../data/itemRule', '../data/automata
 			return (function (hasLookAhead, actionTable) {
 				return function (currentStateId, look_ahead)
 				{
-					return (actionTable[currentStateId] && actionTable[currentStateId][look_ahead.name] ) || 
+					return (actionTable[currentStateId] && look_ahead && look_ahead.name && actionTable[currentStateId][look_ahead.name] ) || 
 						{
 							action: k.parser.tableAction.ERROR
 						};

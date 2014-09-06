@@ -72,7 +72,7 @@ define(['../../../src/data/sampleGrammars', '../../../src/data/itemRule'], funct
 
 		describe('clone', function()
 		{
-			it('should create a new rule without any change if nothing else is specified', function()
+			it('should create a new item rule without any change if nothing else is specified', function()
 			{
 				var options = {
 						dotLocation: 42,
@@ -135,6 +135,24 @@ define(['../../../src/data/sampleGrammars', '../../../src/data/itemRule'], funct
 				expect(clone.options.isFake).toBeUndefined();
 				expect(clone.hahah).toBeUndefined();
 				expect(clone.options.hahah).toBeUndefined();
+			});
+			
+			it('should create a new array of lookAhead symbols that point to the original symbols', function ()
+			{
+				var reduceItem1 = k.data.ItemRule.newFromRules([sampleGrammars.arithmetic.E1])[0];
+				
+				reduceItem1.lookAhead.push(sampleGrammars.arithmetic.plus_T);
+				reduceItem1.lookAhead.push(sampleGrammars.arithmetic.minus_T);
+				
+				var result = reduceItem1.clone();
+
+				expect(result.lookAhead).not.toBe(reduceItem1.lookAhead);
+				expect(result.lookAhead.length).toBe(reduceItem1.lookAhead.length);
+				expect(result.lookAhead.length).toBe(2);
+				
+				reduceItem1.lookAhead.splice(0, 1);
+				
+				expect(result.lookAhead.length).toBe(2);
 			});
 		});
 

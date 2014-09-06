@@ -1,5 +1,5 @@
 /* global expect: true, describe: true, it:  true, beforeEach: true */
-define(['../../../src/data/automata'], function(k)
+define(['../../../src/data/sampleGrammars', '../../../src/data/automata'], function(sampleGrammars, k)
 {
     'use strict';
 
@@ -56,7 +56,7 @@ define(['../../../src/data/automata'], function(k)
 
 		describe('getNextState', function()
 		{
-			it('should return null if we retrieve all automata\'s states', function()
+			it('should return falsy if we retrieve all automata\'s states', function()
 			{
 				var a = new k.data.Automata({
 					states: [{
@@ -73,17 +73,17 @@ define(['../../../src/data/automata'], function(k)
 				a.getNextState(); //get 3
 
 				var result = a.getNextState();
-				expect(result).toBe(null);
+				expect(result).toBeFalsy();
 			});
 
-			it('should return null if there is no state', function()
+			it('should return falsy if there is no state', function()
 			{
 				var a = new k.data.Automata({});
 
-				expect(a.getNextState()).toBe(null);
+				expect(a.getNextState()).toBeFalsy();
 			});
 
-			it('shoud return the first state onyl once', function()
+			it('should return the first state only once', function()
 			{
 				var state1 = {
 						getIdentity: function() {return 1; }
@@ -103,7 +103,81 @@ define(['../../../src/data/automata'], function(k)
 				expect(a.getNextState()).toBe(state3); //get 3
 
 				var result = a.getNextState();
-				expect(result).toBe(null);
+				expect(result).toBeFalsy();
+			});
+			
+			it('should return added states', function ()
+			{
+				var shiftItem2 = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S1])[0],
+					shiftItem1 = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.L1])[0],
+					reduceItem1 = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S2])[0],
+					reduceItem2 = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.L2])[0],
+					state1 = new k.data.State({
+						items: [shiftItem1, reduceItem1]
+					}),
+					state2 = new k.data.State({
+						items: [shiftItem2, reduceItem2]
+					}),
+					automata = new k.data.Automata({});
+					
+				reduceItem1.dotLocation = 3;
+				reduceItem2.dotLocation = 3;
+				
+				reduceItem1._id = null;
+				reduceItem2._id = null;
+				reduceItem1.lookAhead.push(shiftItem2.getCurrentSymbol());
+				reduceItem2.lookAhead.push(shiftItem2.getCurrentSymbol());
+				
+				expect(automata.getNextState()).toBeFalsy();
+				
+				automata.addState(state1);
+				expect(automata.getNextState()).toBe(state1);
+				
+				automata.addState(state2);
+				expect(automata.getNextState()).toBe(state2);
+			});
+			
+			it('should add as unprocessed state when adding an already present state but with different lookAhead (editing existing state) (USING LOOKAHEAD of course)', function ()
+			{
+				var shiftItem1 = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.L2])[0],
+					reduceItem1 = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S2])[0],
+					state1 = new k.data.State({
+						items: [shiftItem1, reduceItem1]
+					}),
+					//We clone the reduce items, so when adding extra symbols in tis lookAhead, this new symbols will be only in hte cloned item rule and not in the original one
+					clonedReduceItem = reduceItem1.clone(),
+					state2 = new k.data.State({
+						items: [shiftItem1, clonedReduceItem]
+					}),
+					automata = new k.data.Automata({
+						hasLookAhead: true
+					});
+					
+				//This cause that the itemrule identity change, se we need to update the state register items
+				reduceItem1.dotLocation = 3;
+				reduceItem1._id = null;
+				reduceItem1.lookAhead.push(shiftItem1.getCurrentSymbol());
+				
+				clonedReduceItem.dotLocation = 3;
+				clonedReduceItem._id = null;
+				clonedReduceItem.lookAhead.push(shiftItem1.getCurrentSymbol());
+				
+				state1._registerItems = {};
+				state1._registerItemRules();
+				
+				state2._registerItems = {};
+				state2._registerItemRules();
+				
+				expect(automata.getNextState()).toBeFalsy();
+				
+				automata.addState(state1);
+				expect(automata.getNextState()).toBe(state1);
+				expect(automata.getNextState()).toBeFalsy();
+				
+				clonedReduceItem.lookAhead.push(shiftItem1.rule.tail[1]);
+				
+				automata.addState(state2);
+				expect(automata.getNextState()).toEqual(state1);
 			});
 		});
 		
@@ -284,7 +358,7 @@ define(['../../../src/data/automata'], function(k)
 				});
 
 				expect(a.getNextState().getIdentity()).toBe(1);
-				expect(a.getNextState()).toBe(null);
+				expect(a.getNextState()).toBeFalsy();
 			});
 		});
     });

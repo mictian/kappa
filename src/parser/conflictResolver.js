@@ -1,6 +1,8 @@
-define(['../utils/obj'], function(k)
+define(['../utils/obj', './automataLRGeneratorBase'], function(k)
 {
     'use strict';
+    
+    //TODO TEST ALL THIS CLASS!!
     
     /* Enum that describe valid types of conflict resolvers
 	* @readonly
@@ -21,9 +23,10 @@ define(['../utils/obj'], function(k)
 		*
 		* @constructor
 		* @param {String} options.name Uique name of the resolver.
-		* @param {conflictResolverType} options.type Indicate the kind of conflict that the current resolver can handle.
-		* @param {Integer} options.order Numeric values used to sort the resolver and in this way take precendence at the moment of resolve a problem. Resolvers will be sorted from lowest values to highest
-		* @param {Function} options.resolveFnc function evalutad at the time of resolve a conflict
+		* @param {conflictResolverType} options.type Indicate the kind of conflict that the current resolver can handle. Default: STATE_SHIFTREDUCE
+		* @param {Integer} options.order Numeric values used to sort the resolver and in this way take precendence at the moment of resolve a problem.
+		    Resolvers will be sorted from lowest values to highest. Default: 9999
+		* @param {Function} options.resolveFnc function evalutad at the time of resolve a conflict. Default: Just return false
 		*/
         var conflictResolver = function (options)
         {
@@ -35,6 +38,7 @@ define(['../utils/obj'], function(k)
 			k.utils.obj.defineProperty(this, 'resolveFnc');
 			
 			this.type = this.type || conflictResolverType.STATE_SHIFTREDUCE;
+			this.order = this.order || 9999;
         };
         
         /* @function Resolve a conflict
@@ -61,18 +65,57 @@ define(['../utils/obj'], function(k)
                         name: 'precedence_resolver',
                         type: conflictResolverType.STATE_SHIFTREDUCE,
                         order: 10,
-                        resolveFnc: function (automata, state, itemRule1, itemRule2)
+                        resolveFnc: function (automata, state, shiftItemRule, reduceItemRule)
                         {
-                            debugger;
+                            if (!k.utils.obj.isNumber(shiftItemRule.rule.precendence) && !k.utils.obj.isNumber(reduceItemRule.rule.precendence))
+                            {
+                                //If neither of the rules define precedence, we can resolve the conflict
+                                return false;
+                            }
+                            
+                            shiftItemRule.rule.precendence =  k.utils.obj.isNumber(shiftItemRule.rule.precendence) ? shiftItemRule.rule.precendence : 0;
+                            reduceItemRule.rule.precendence =  k.utils.obj.isNumber(reduceItemRule.rule.precendence) ? reduceItemRule.rule.precendence : 0;
+                            
+                            if (shiftItemRule.rule.precendence > reduceItemRule.rule.precendence)
+                            {
+                                return {
+                                    itemRule: shiftItemRule,
+                                    action: k.parser.tableAction.SHIFT
+                                };
+                            }
+                            else if (shiftItemRule.rule.precendence < reduceItemRule.rule.precendence)
+                            {
+                                return {
+                                    itemRule: reduceItemRule,
+                                    action: k.parser.tableAction.REDUCE
+                                };    
+                            }
+                            return false; // both rules have the same precendence
                         }
                     }),
                     new ConflictResolver({
                         name: 'associativity_resolver',
                         type: conflictResolverType.STATE_SHIFTREDUCE,
                         order: 20,
-                        resolveFnc: function (automata, state, itemRule1, itemRule2)
+                        resolveFnc: function (automata, state, shiftItemRule, reduceItemRule)
                         {
-                            debugger;
+                            var shiftSymbol = shiftItemRule.getCurrentSymbol();
+                            if (shiftSymbol.assoc === k.data.associativity.RIGHT)
+                            {
+                                return {
+                                    action: k.parser.tableAction.SHIFT,
+                                    itemRule: shiftItemRule
+                                };
+                            }
+                            else if (shiftSymbol.assoc === k.data.associativity.LEFT)
+                            {
+                                return {
+                                    action: k.parser.tableAction.REDUCE,
+                                    itemRule: reduceItemRule
+                                };
+                            }
+                            
+                            return false;
                         }
                     })
                 ];

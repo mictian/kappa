@@ -45,9 +45,9 @@ module.exports = function(grunt) {
 				'eqeqeq': true,
 				'freeze': true,
 				'immed': true,
-				'latedef':true,
+				'latedef': true,
 				'newcap': true,
-				'globals':  {
+				'globals': {
                     'define': true,
                     'require': true
 				}

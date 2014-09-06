@@ -172,7 +172,8 @@ define(['../utils/obj', '../data/stackItem', '../data/astNode', '../lexer/lexer'
 				nodes: subASTNodes,
 				rule: rule,
 				symbol: rule.head,
-				stringValue: lastItem.stringValue 
+				stringValue: lastItem.stringValue,
+				currentValue: lastItem.currentValue
 			});
 			lastItem.AST = newASTNode;
 
@@ -214,7 +215,10 @@ define(['../utils/obj', '../data/stackItem', '../data/astNode', '../lexer/lexer'
 				}),
 				automata = automataGenerator.generateAutomata({conflictResolvers: k.parser.ConflictResolver.getDefaultResolvers()}),
 				gotoTable = automataGenerator.generateGOTOTable(automata),
-				actionTable = automataGenerator.generateACTIONTable(automata),
+				actionTable = automataGenerator.generateACTIONTable(automata, {
+					conflictResolvers: k.parser.ConflictResolver.getDefaultResolvers(),
+					ignoreErrors: false
+				}),
 				lexer = new k.lexer.Lexer({
 					grammar: grammar,
 					stream: options.strInput

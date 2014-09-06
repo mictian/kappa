@@ -10,6 +10,15 @@ define(['../utils/obj'],  function (k)
         EMPTY: 'EMPTY',
         EOF : 'EOF'
     };
+    
+    /* Enum Terminals Associativity
+	* @readonly
+	* @enum {String}
+	*/
+    var associativity = {
+        LEFT: 'LEFT',
+        RIGHT: 'RIGHT'
+    };
 
     /* Symbol
     * @class
@@ -119,6 +128,7 @@ define(['../utils/obj'],  function (k)
 
             k.utils.obj.defineProperty(this, 'body');
             k.utils.obj.defineProperty(this, 'isTerminal');
+            k.utils.obj.defineProperty(this, 'assoc');
 
             this.isSpecial = false;
             this.isTerminal = true;
@@ -147,6 +157,7 @@ define(['../utils/obj'],  function (k)
         * @param {[Terminal|NonTerminal]} options.tail Array of terminals and nonTerminals that represent the tail of the rule. If is not present an empty tail will be created.
         * @param {Function} options.reduceFunc A function to be executed when reducint this rule
         * @param {String} options.name Identification of the rule instance
+        * @param {Number} options.precendence Optional number that indicate the precedence of the current rule
         */
         var rule = function (options)
         {
@@ -162,6 +173,7 @@ define(['../utils/obj'],  function (k)
             k.utils.obj.defineProperty(this, 'tail');
             k.utils.obj.defineProperty(this, 'reduceFunc');
             k.utils.obj.defineProperty(this, 'name');
+            k.utils.obj.defineProperty(this, 'precendence');
 
             k.utils.obj.defineProperty(this, 'index');
             k.utils.obj.defineProperty(this, 'isProductive'); //Determine if the rule be active part of the grammar. This is calculate by the grammar itself
@@ -652,7 +664,8 @@ define(['../utils/obj'],  function (k)
         Terminal: Terminal,
         Rule: Rule,
         Grammar: Grammar,
-        specialSymbol: specialSymbol
+        specialSymbol: specialSymbol,
+        associativity: associativity
     });
 
     return k;

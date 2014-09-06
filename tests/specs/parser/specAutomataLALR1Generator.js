@@ -294,10 +294,11 @@ define(['../../../src/parser/automataLALR1Generator', '../../../src/data/sampleG
 					'5(0)':['EOF','CPAREN'],
 					'6(0)':['NUMBER','OPAREN']
 				});
+				
 				validateState(states, '2(1)5(2)7(0)8(0)', 4,
 				{
 					'2(1)':['CPAREN','DIFF'],
-					'5(2)':['EOF'],
+					'5(2)':['EOF', 'CPAREN'],
 					'8(0)':['NUMBER', 'OPAREN'],
 					'7(0)':['EOF']
 				});
@@ -309,12 +310,12 @@ define(['../../../src/parser/automataLALR1Generator', '../../../src/data/sampleG
 				});
 				validateState(states, '5(3)7(1)', 2,
 				{
-					'5(3)':['EOF'],
+					'5(3)':['EOF', 'CPAREN'],
 					'7(1)':['EOF']
 				});
 				validateState(states, '2(3)', 1,
 				{
-					'2(3)': ['EOF', 'DIFF']
+					'2(3)': ['EOF', 'DIFF', 'CPAREN']
 				});
 				validateState(states, '3(1)', 1,
 				{
@@ -406,11 +407,11 @@ define(['../../../src/parser/automataLALR1Generator', '../../../src/data/sampleG
 					});
 				validateState(states, '2(2)', 1,
 				{
-					'2(2)': ['d_terminal']
+					'2(2)': ['d_terminal', 'b_terminal']
 				});
 				validateState(states, '2(3)', 1,
 				{
-					'2(3)':['d_terminal']
+					'2(3)':['d_terminal', 'b_terminal']
 				});
 				validateState(states, '0(1)', 1,
 				{
@@ -491,15 +492,15 @@ define(['../../../src/parser/automataLALR1Generator', '../../../src/data/sampleG
 				validateState(states, '2(1)5(2)', 2,
 				{
 					'2(1)': ['CPAREN', 'DIFF'],
-					'5(2)': ['EOF']
+					'5(2)': ['EOF', 'CPAREN']
 				});
 				validateState(states, '2(3)', 1,
 				{
-					'2(3)': ['EOF', 'DIFF']
+					'2(3)': ['EOF', 'DIFF', 'CPAREN']
 				});
 				validateState(states, '5(3)', 1,
 				{
-					'5(3)': ['EOF']
+					'5(3)': ['EOF', 'CPAREN']
 				});
 				validateState(states, 'AcceptanceState', 1,
 				{
@@ -605,8 +606,9 @@ define(['../../../src/parser/automataLALR1Generator', '../../../src/data/sampleG
 				expect(actionTable('2(3)', {name:'DIFF'}).rule.name).toEqual(sampleGrammars.numDiffCondenced.E1.name);
 				expect(actionTable('2(3)', {name:'EOF'}).action).toEqual(k.parser.tableAction.REDUCE);
 				expect(actionTable('2(3)', {name:'EOF'}).rule.name).toEqual(sampleGrammars.numDiffCondenced.E1.name);
+				expect(actionTable('2(3)', {name:'CPAREN'}).action).toEqual(k.parser.tableAction.REDUCE);
+				expect(actionTable('2(3)', {name:'CPAREN'}).rule.name).toEqual(sampleGrammars.numDiffCondenced.E1.name);
 				
-				expect(actionTable('2(3)', {name:'CPAREN'}).action).toEqual(k.parser.tableAction.ERROR);
 				expect(actionTable('2(3)', {name:'OPAREN'}).action).toEqual(k.parser.tableAction.ERROR);
 				expect(actionTable('2(3)', {name:'NUMBER'}).action).toEqual(k.parser.tableAction.ERROR);
 				
@@ -634,10 +636,11 @@ define(['../../../src/parser/automataLALR1Generator', '../../../src/data/sampleG
 				
 				expect(actionTable('5(3)', {name:'EOF'}).action).toEqual(k.parser.tableAction.REDUCE);
 				expect(actionTable('5(3)', {name:'EOF'}).rule.name).toEqual(sampleGrammars.numDiffCondenced.T2.name);
+				expect(actionTable('5(3)', {name:'CPAREN'}).action).toEqual(k.parser.tableAction.REDUCE);
+				expect(actionTable('5(3)', {name:'CPAREN'}).rule.name).toEqual(sampleGrammars.numDiffCondenced.T2.name);
 				
 				expect(actionTable('5(3)', {name:'NUM'}).action).toEqual(k.parser.tableAction.ERROR);
 				expect(actionTable('5(3)', {name:'OPAREN'}).action).toEqual(k.parser.tableAction.ERROR);
-				expect(actionTable('5(3)', {name:'CPAREN'}).action).toEqual(k.parser.tableAction.ERROR);
 				expect(actionTable('5(3)', {name:'DIFF'}).action).toEqual(k.parser.tableAction.ERROR);
 				
 				

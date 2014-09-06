@@ -1,4 +1,4 @@
-define(['../utils/obj', './node', './grammar'], function(k) {
+define(['../utils/obj', './node', './grammar', '../parser/conflictResolver'], function(k) {
     
     'use strict';
 
@@ -36,11 +36,18 @@ define(['../utils/obj', './node', './grammar'], function(k) {
             this._index = 0;
             this._registerItems = {};
 
+            this._registerItemRules();
+        }
+        
+        /* @function REgister the list of item rules of the current stateso they are assesible by its id
+         * @returns {Void} */
+        state.prototype._registerItemRules = function ()
+        {
             k.utils.obj.each(this._items, function (itemRule)
             {
                 this._registerItems[itemRule.getIdentity()] = itemRule;
-        }, this);
-        }
+            }, this);
+        };
         
         state.constants = {
             AcceptanceStateName: 'AcceptanceState'
@@ -212,9 +219,13 @@ define(['../utils/obj', './node', './grammar'], function(k) {
          * @param {[ConflictResolver]} options.conflictResolvers List of conflict resolvers used to resolve possible conflict at the current state.
          * @returns {Boolean} true if the state is valid (invalid), false otherwise (inconsistent) */
         state.prototype.isValid = function(options) {
-            
+            //NOTE: Important! When usign this method for LR(0) without taking into account lookAhead, the current implementation DOES NOT USE RESOLVERS IN THIS CASE! it just return false if invalid
             options = k.utils.obj.isObject(options) ? options : {};
-            var reduceItems = this.getRecudeItems();
+            options.conflictResolvers = options.conflictResolvers || [];
+            
+            var reduceItems = this.getRecudeItems(),
+                self = this,
+                isTheConflictResolvableWithResolvers = false;
             
             if (!options.considerLookAhead || !reduceItems.length)
             {
@@ -229,7 +240,12 @@ define(['../utils/obj', './node', './grammar'], function(k) {
             //Check for SHIFT/REDUCE Conflicts
             if (shiftItems.length && reduceItems.length)
             {
-                //For each shift item rule validate that the shift symbol is not in any lookAhead symbol of any reduce rule
+                var shiftReduceResolvers = k.utils.obj.sortBy(k.utils.obj.filter(options.conflictResolvers, function (resolver)
+                {
+                    return resolver.type === k.parser.conflictResolverType.STATE_SHIFTREDUCE;
+                }), 'order');
+                
+                //Generla Idea: For each shift item rule validate that the shift symbol is not in any lookAhead symbol of any reduce rule
                 
                 //For each shift item
                 var isAnyShiftReduceConflict = k.utils.obj.any(shiftItems, function (shiftItem)
@@ -241,7 +257,19 @@ define(['../utils/obj', './node', './grammar'], function(k) {
                     return k.utils.obj.find(reduceItems, function (reduceItem)
                     {
                         //if the shift symbol is in any reduce item rule's lookAhead set.
-                        return k.utils.obj.find(reduceItem.lookAhead, function (lookAheadSymbol) { return lookAheadSymbol.name === shiftSymbol.name});
+                        
+                        var isShiftSymbolInReduceLookAhead = k.utils.obj.find(reduceItem.lookAhead, function (lookAheadSymbol) { return lookAheadSymbol.name === shiftSymbol.name;});
+                        if (isShiftSymbolInReduceLookAhead)
+                        {
+                            isTheConflictResolvableWithResolvers = k.utils.obj.find(shiftReduceResolvers, function (resolver)
+                            {
+                                return resolver.resolve(options.automata, self, shiftItem, reduceItem);
+                            });
+                            
+                            return !isTheConflictResolvableWithResolvers;
+                        }
+                        
+                        return false;
                     });
                 });
                 
@@ -250,26 +278,224 @@ define(['../utils/obj', './node', './grammar'], function(k) {
                     return false;
                 }
             }
+            
             //Check for REDUCE/REDUCE Conflicts
             if (reduceItems.length > 1)
             {
-                var listOfLookAheadSymbols = k.utils.obj.reduce(reduceItems, function (acc, reduceItem)
+                var reduceReduceResolvers = k.utils.obj.sortBy(k.utils.obj.filter(options.conflictResolvers, function (resolver)
                     {
-                        k.utils.obj.each(reduceItem.lookAhead, function (lookAheadSymbol) {acc.push(lookAheadSymbol.name);});
-                        return acc;
-                    }, []),
-                    lookAheadLength = listOfLookAheadSymbols.length;
+                        return resolver.type === k.parser.conflictResolverType.STATE_REDUCEREDUCE;
+                    }), 'order');
+                    
+                //General Idea: For each reduce rule, validate that its look Ahead set is disjoin with the rest of the reduce rule
+                    
+                //for each reduce rule
+                var isAnyReduceReduceConflict = k.utils.obj.any(reduceItems, function (reduceItemSelected)
+                {
+                    //compare it with each of the other reduce rules
+                    return k.utils.obj.find(reduceItems, function (reduceItemInspected)
+                    {
+                        if (reduceItemInspected.getIdentity() === reduceItemSelected.getIdentity())
+                        {
+                            return false;
+                        }
+                        
+                        //and for each look ahead symbol of the first reduce rule, validate the it is not present in any other look Ahead
+                        var isLookAheadSymbolInOtherLookAheadSet = k.utils.obj.find(reduceItemSelected.lookAhead, function (lookAheadSelected)
+                        {
+                            return k.utils.obj.find(reduceItemInspected.lookAhead, function (lookAheadSymbol) { return lookAheadSymbol.name === lookAheadSelected.name;});
+                        });
+                        
+                        if (isLookAheadSymbolInOtherLookAheadSet)
+                        {
+                            isTheConflictResolvableWithResolvers = k.utils.obj.find(reduceReduceResolvers, function (resolver)
+                            {
+                                return resolver.resolve(options.automata, self, reduceItemSelected, reduceItemInspected);
+                            });
+                            
+                            return !isTheConflictResolvableWithResolvers;
+                        }
+                        
+                        return false;
+                    });
+                    
+                });
                 
-                listOfLookAheadSymbols = k.utils.obj.uniq(listOfLookAheadSymbols);
-                
-                //Some lookAhead symbols are duplicated. It is required that all lookAhead symbol sets are DISJOIN!
-                if (listOfLookAheadSymbols.length !== lookAheadLength)
+                if (isAnyReduceReduceConflict)
                 {
                     return false;
                 }
             }
             
             return true;
+        };
+        
+        /* @function Generates the list of shift and reduce items that take part iin the current state. Validating at the same time that none of these items are in conflict
+            or that the conflicts are solvable.
+         * @param {Boolean} options.considerLookAhead Indicate if the state should take into account look ahead to validate. If not the state will validate and generate the result as in a LR(0). Default: false
+         * @param {Automata} options.automata Optional automata instance used to pass to the conflict resolver in case there are conflict and resolvers.
+         * @param {[ConflictResolver]} options.conflictResolvers List of conflict resolvers used to resolve possible conflict at the current state.
+         * @param {Boolean} options.ignoreErrors Indicate if when facing an error (a conflict that can not be solve by any resolver) continue the execution. Default: false
+         * @returns {Object} An object containg two properties (arrays) shiftItems and reduceItems */
+        state.prototype.getShiftReduceItemRule = function(options) {
+            //NOTE: Important! When using this method for LR(0) without taking into account lookAhead, the current implementation DOES NOT USE RESOLVERS IN THIS CASE! it just return false if invalid
+            //NOTE: Important! When using this method for LR(0) without taking into account lookAhead, the current implementation DOES NOT HONOR the ignoreErrors PROPERTY!
+            options = k.utils.obj.isObject(options) ? options : {};
+            options.conflictResolvers = options.conflictResolvers || [];
+            
+            var reduceItems = this.getRecudeItems(),
+                shiftItems = k.utils.obj.filter(this._items, function (item)
+                {
+                    return !item.isReduce();
+                }),
+                self = this,
+                ignoreErrors = !!options.ignoreErrors,
+                result = {shiftItems:[], reduceItems:[]},
+                isTheConflictResolvableWithResolvers = false;
+            
+            if (!options.considerLookAhead)
+            {
+                if (!reduceItems.length)
+                {
+                    result.shiftItems = shiftItems || [];
+                }
+                else if (!shiftItems.length && reduceItems.length === 1)
+                {
+                    result.reduceItems = reduceItems;
+                }
+                else
+                {
+                    return false;
+                }
+                
+                return result;
+            }
+            
+            //We clone the reduce item, becuase when there is a Shift/Reduce conflic and the solution is shift, we need to remove the shift symbol from the lookAhead set of the reduce item!
+            //Otherwise when createion the Action table the reduce item end it up overriding the shift actions! (see automataLALRGenerator)
+            reduceItems = k.utils.obj.map(reduceItems, function (reduceItem)
+            {
+                return reduceItem.clone(); 
+            });
+            
+            //Process all SHIFT items & Check for SHIFT/REDUCE Conflicts
+            if (shiftItems.length)
+            {
+                var shiftReduceResolvers = k.utils.obj.sortBy(k.utils.obj.filter(options.conflictResolvers, function (resolver)
+                {
+                    return resolver.type === k.parser.conflictResolverType.STATE_SHIFTREDUCE;
+                }), 'order');
+                
+                //Generla Idea: For each shift item rule validate that the shift symbol is not in any lookAhead symbol of any reduce rule
+                
+                //For each shift item
+                var isAnyShiftReduceConflict = k.utils.obj.any(shiftItems, function (shiftItem)
+                {
+                    //get the shift symbol
+                    var shiftSymbol = shiftItem.getCurrentSymbol();
+                    
+                    //find among all reduce items
+                    var isShiftItemInConflict = k.utils.obj.find(reduceItems, function (reduceItem)
+                    {
+                        //if the shift symbol is in any reduce item rule's lookAhead set.
+                        //NOTE: Here we obtain the lookAhead Symbol that is in conflict, if any. 
+                        var isShiftSymbolInReduceLookAhead = k.utils.obj.find(reduceItem.lookAhead, function (lookAheadSymbol) { return lookAheadSymbol.name === shiftSymbol.name;});
+                        
+                        //if there is a possible shift/reduce conflict try to solve it by usign the resolvers list
+                        if (isShiftSymbolInReduceLookAhead)
+                        {
+                            var conflictSolutionFound;
+                            isTheConflictResolvableWithResolvers = k.utils.obj.find(shiftReduceResolvers, function (resolver)
+                            {
+                                conflictSolutionFound = resolver.resolve(options.automata, self, shiftItem, reduceItem);
+                                return conflictSolutionFound;
+                            });
+                            
+                            //If the conflict is resolvable, and the action to be taken is SHIFT, we remove the Shift symbol from the reduce item lookAhead, so when creating the Action table
+                            //that symbol wont take part of the table.
+                            if (isTheConflictResolvableWithResolvers && conflictSolutionFound.action === k.parser.tableAction.SHIFT)
+                            {
+                                var symbolIndexToRemove = k.utils.obj.indexOf(reduceItem.lookAhead, isShiftSymbolInReduceLookAhead);
+                                reduceItem.lookAhead.splice(symbolIndexToRemove,1);
+                            }
+                            
+                            return !isTheConflictResolvableWithResolvers;
+                        }
+                        
+                        return false;
+                    });
+                    
+                    if (!isShiftItemInConflict || ignoreErrors)
+                    {
+                        result.shiftItems.push(shiftItem);
+                        return false;
+                    } 
+                    
+                    return true;
+                    
+                });
+                
+                if (isAnyShiftReduceConflict)
+                {
+                    return false;
+                }
+            }
+            
+            //Process all REDUCE items & Check for REDUCE/REDUCE Conflicts
+            if (reduceItems.length)
+            {
+                var reduceReduceResolvers = k.utils.obj.sortBy(k.utils.obj.filter(options.conflictResolvers, function (resolver)
+                    {
+                        return resolver.type === k.parser.conflictResolverType.STATE_REDUCEREDUCE;
+                    }), 'order');
+                    
+                //General Idea: For each reduce rule, validate that its look Ahead set is disjoin with the rest of the reduce rule
+                    
+                //for each reduce rule
+                var isAnyReduceReduceConflict = k.utils.obj.any(reduceItems, function (reduceItemSelected)
+                {
+                    //compare it with each of the other reduce rules
+                    var isReduceItemInConflict = k.utils.obj.find(reduceItems, function (reduceItemInspected)
+                    {
+                        if (reduceItemInspected.getIdentity() === reduceItemSelected.getIdentity())
+                        {
+                            return false;
+                        }
+                        
+                        //and for each look ahead symbol of the first reduce rule, validate the it is not present in any other look Ahead
+                        var isLookAheadSymbolInOtherLookAheadSet = k.utils.obj.find(reduceItemSelected.lookAhead, function (lookAheadSelected)
+                        {
+                            return k.utils.obj.find(reduceItemInspected.lookAhead, function (lookAheadSymbol) { return lookAheadSymbol.name === lookAheadSelected.name;});
+                        });
+                        
+                        if (isLookAheadSymbolInOtherLookAheadSet)
+                        {
+                            isTheConflictResolvableWithResolvers = k.utils.obj.find(reduceReduceResolvers, function (resolver)
+                            {
+                                return resolver.resolve(options.automata, self, reduceItemSelected, reduceItemInspected);
+                            });
+                            
+                            return !isTheConflictResolvableWithResolvers;
+                        }
+                        
+                        return false;
+                    });
+                    
+                    if (!isReduceItemInConflict || ignoreErrors)
+                    {
+                        result.reduceItems.push(reduceItemSelected);
+                        return false; 
+                    }
+                    return true;
+                });
+                
+                if (isAnyReduceReduceConflict)
+                {
+                    return false;
+                }
+            }
+            
+            return result;
         };
 
         return state;

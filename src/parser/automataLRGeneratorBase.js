@@ -92,7 +92,7 @@ define(['../utils/obj', '../data/grammar', '../data/itemRule', '../data/automata
 			
 			var automata = this._generateAutomata();
 			
-			if (!options.notValidate && !automata.isValid(defaultAutomataGenerationOptions))
+			if (!options.notValidate && !automata.isValid(options))
 			{
 				return false;
 			}
@@ -207,9 +207,11 @@ define(['../utils/obj', '../data/grammar', '../data/itemRule', '../data/automata
 		
 		/* @function Given an automata returnes its ACTION Table. 
 		* The intend of this method is to be overwriten by each son class
-		* @param {Automata} automata Automatma used as a base of the calculation
+		* @param {Automata} automata Automatma used as a base of the calculation.
+		* @param {Boolean} options.ignoreErrors Indicate that when a state is in an error that cannot be resolver, continue the execution anyway.
+		* @param {Boolean} options.conflictResolvers List of resolver in case of conflic in any state.
 		* @returns {Function} Function that given the a state id and a lookAhead returns the action to take */
-		automataLRGeneratorBase.prototype.generateACTIONTable = function (automata)
+		automataLRGeneratorBase.prototype.generateACTIONTable = function (automata, options)
 		{};
 
 		return automataLRGeneratorBase;

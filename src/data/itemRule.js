@@ -86,7 +86,8 @@ define(['../utils/obj', './grammar'], function(k)
 			var result = k.utils.obj.extendInNew(this.options, extendedOptions || {});
 			
 			this.rule = result.rule = ruleAux;
-			this.lookAhead = result.lookAhead = lookAheadAux;
+			this.lookAhead = lookAheadAux;
+			result.lookAhead = [].concat(lookAheadAux);
 
 			return result;
 		};

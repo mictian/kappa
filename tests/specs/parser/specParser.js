@@ -87,7 +87,14 @@ define(['../../../src/data/sampleGrammars', '../../../src/parser/parser', , '../
 		        expect(result).toBeTruthy();
 			});
 			
-			xit('should FOO!!', function()
+			function getResult (lexer, parser, input)
+			{
+				lexer.setStream(input);
+		        var result = parser.parse(lexer);
+		        return result ? result.currentValue : result;
+			}
+			
+			it('should resturn the expected arithmetic result for an arithmetic grammar', function()
 			{
 				var	grammar = sampleGrammars.arithmetic.g,
 					automataGenerator = new k.parser.AutomataLALR1Generator({
@@ -113,8 +120,19 @@ define(['../../../src/data/sampleGrammars', '../../../src/parser/parser', , '../
 		        
 		        
 		        lexer.setStream('(1+1)');
-		        // debugger;
 		        var result = parser.parse(lexer);
+		        expect(result.currentValue).toBe(2);
+		        
+		        
+		        expect(getResult(lexer, parser, '1+1')).toBe(2);
+		        expect(getResult(lexer, parser, '1+2*2')).toBe(5);
+		        expect(getResult(lexer, parser, '(1+2)*2')).toBe(6);
+		        expect(getResult(lexer, parser, '(1+2)*2/2')).toBe(3);
+		        expect(getResult(lexer, parser, '(1+2)*(2/2)')).toBe(3);
+		        expect(getResult(lexer, parser, '(((((((((((((((((((((((((((((((((1235)))))))))))))))))))))))))))))))))')).toBe(1235);
+		        expect(getResult(lexer, parser, '(((((((((((((((((((((((((((((((((1235)))))))))))))))))))))))))))))))))+1')).toBe(1236);
+		        expect(getResult(lexer, parser, '2*3*4*6')).toBe(144);
+		        expect(getResult(lexer, parser, '1+(110/110)')).toBe(2);
 			});
 		});
 	});
@@ -178,7 +196,7 @@ define(['../../../src/data/sampleGrammars', '../../../src/parser/parser', , '../
 				expect(token).toBeDefined();
 				expect(token.length).toBe(1);
 				expect(token.string).toEqual('a');
-				expect(token.terminal.name).toEqual('A_LET')
+				expect(token.terminal.name).toEqual('A_LET');
 				
 				expect(r.lexer.getNext).toThrow();
 			});

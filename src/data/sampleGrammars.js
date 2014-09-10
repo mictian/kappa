@@ -1,13 +1,9 @@
 /* global expect: true, describe: true, it:  true, beforeEach: true */
-define(['./grammar'], function(k)
-{
-	'use strict';
-
+k.data.sampleGrammars = {
 	/*
 	001. Very simple grammar to represent number divisions
 	*/
-	var numDivs = (function()
-	{
+	numDivs: (function() {
 		/*
 		LR(1)
 		0. S --> E
@@ -58,13 +54,12 @@ define(['./grammar'], function(k)
 			Q: Q,
 			F: F
 		};
-	})();
+	})(),
 
 	/*
 	002. Very simple list of ids (letters) divides by spaces between '(' and ')'
 	*/
-	var idsList = (function()
-	{
+	idsList: (function() {
 		/*
 		LR(1)
 		1. S --> OPAREN EXPS CPAREN
@@ -122,13 +117,12 @@ define(['./grammar'], function(k)
 			OPAREN: OPAREN,
 			CPAREN: CPAREN
 		};
-	})();
+	})(),
 	
 	/*
 	003. Very simple grammar to represent number divisions with epsilon rule
 	*/
-	var numDivsEmpty = (function()
-	{
+	numDivsEmpty: (function() {
 		/*
 		LR(1)
 		0. S --> E
@@ -187,13 +181,12 @@ define(['./grammar'], function(k)
 			Q2: Q2,
 			F: F
 		};
-	})();
+	})(),
 	
 	/*
 	004. Very simple grammar for difference of numbers
 	*/
-	var numDiff = (function()
-	{
+	numDiff: (function() {
 		/*
 		LR(k>1)
 		1. S --> E
@@ -268,13 +261,12 @@ define(['./grammar'], function(k)
 			CPAREN: CPAREN,
 			R:R
 		};
-	})();
+	})(),
 	
 	/*
 	005. Very simple grammar for a*b (b, ab, aab, aaaaaaab)
 	*/
-	var aPlusb = (function()
-	{
+	aPlusb: (function() {
 		/*
 		LR(0)
 		1. A --> 'a' A
@@ -301,13 +293,12 @@ define(['./grammar'], function(k)
 			A1: A1,
 			A2: A2
 		};
-	})();
+	})(),
 	
 	/*
 	006. Very simple grammar for a*
 	*/
-	var aPlusEMPTY = (function ()
-	{
+	aPlusEMPTY: (function () {
 		/*
 		LR(1)
 		1. S --> 'a' S
@@ -334,13 +325,12 @@ define(['./grammar'], function(k)
 			S1: S1,
 			S2: S2
 		};
-	})();
+	})(),
 
 	/*
 	007. Condenced version of the grammar numDiff (same language)
 	*/
-	var numDiffCondenced = (function()
-	{
+	numDiffCondenced: (function() {
 		/*
 		LR(1)
 		1. S --> E
@@ -391,13 +381,12 @@ define(['./grammar'], function(k)
 			T1: T1,
 			T2: T2
 		};
-	})();
+	})(),
 	
 	/*
 	008. Simple a^(n+1)b^(n) Grammar
 	*/
-	var aPowN1b = (function ()
-	{
+	aPowN1b: (function () {
 		/*
 		LR(1)
 		1. S --> AD
@@ -440,13 +429,12 @@ define(['./grammar'], function(k)
 			A2:A2,
 			D:D
 		};
-	})();
+	})(),
 	
 	/*
 	009. Simple a^(n+1)b^(n) Grammar
 	*/
-	var selectedBs = (function ()
-	{
+	selectedBs: (function () {
 		/*
 		LR(0)
 		1. S --> 'b'
@@ -489,13 +477,12 @@ define(['./grammar'], function(k)
 			L1:L1,
 			L2:L2
 		};
-	})();
+	})(),
 	
 	/*
 	010. Grammar for simple arithmetic expressions
 	*/
-	var arithmetic = (function ()
-	{
+	arithmetic: (function () {
 		/*
 		LR(1)
 		1. E --> E '+' E
@@ -599,18 +586,5 @@ define(['./grammar'], function(k)
 			E5:E5,
 			EN:EN
 		};
-	})();
-	
-	return {
-		numDivs: numDivs,
-		idsList: idsList,
-		numDivsEmpty: numDivsEmpty,
-		numDiff: numDiff,
-		aPlusb: aPlusb,
-		aPlusEMPTY: aPlusEMPTY,
-		numDiffCondenced: numDiffCondenced,
-		aPowN1b: aPowN1b,
-		selectedBs:selectedBs,
-		arithmetic: arithmetic
-	};
-});
+	})()
+};

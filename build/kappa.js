@@ -10,10 +10,8 @@
 		global.kappa = init(/* global.dep, ... */); // Assumes base is loaded.
 	}
 })(this, function __init__() {
-// Import synonyms. ////////////////////////////////////////////////////////////
 
-// Library layout. /////////////////////////////////////////////////////////////
-	var k = {
+	var k = { // Library layout. ///////////////////////////////////////////////
 		__name__: 'kappa',
 		__init__: __init__,
 		__dependencies__: { /* 'dep': dep, ... */ },
@@ -25,14 +23,6 @@
 		parser: {},
 	};
 
-/*TODO main.js code:
-	var automataGenerator = new k.AutomataLR0Generator({
-        grammar: sampleGrammars.numDivs.g
-    });
-
-    var a = automataGenerator.generateAutomata();
-*/
-	
 // Continued by all sources concatenated and __epilogue__.js at the end.
 
 k.utils.obj = (function(){

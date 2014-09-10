@@ -12,13 +12,13 @@ Temporary HTML meant only to test the concatenated version of Kappa.
 <body>
 	<p>Open the console</p>
 	<script type="text/javascript">
-var automataGenerator = new kappa.parser.AutomataLR0Generator({
-        grammar: kappa.data.sampleGrammars.numDivs.g
-});
-console.log(automataGenerator);
-
-var automata = automataGenerator.generateAutomata();
-console.log(automata);
+	var automataGenerator = new kappa.parser.AutomataLALR1Generator({
+	        grammar: kappa.data.sampleGrammars.numDivs.g
+	});
+	console.log(automataGenerator);
+	
+	var automata = automataGenerator.generateAutomata();
+	console.log(automata);
 	</script>
 </body>
 </html>

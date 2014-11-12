@@ -20,6 +20,8 @@ var associativity = k.data.associativity = {
 * @class
 * @classdesc This class represent any simbol in the entire system */
 var Symbol = k.data.Symbol = (function () {
+	'use strict';
+	
 	/*
 	* Creates an instance of a Symbol (This class represent non Terminals, Terminals and Special symbols)
 	*
@@ -57,6 +59,8 @@ var Symbol = k.data.Symbol = (function () {
 * @class
 * @classdesc Use this class to create new instance of non Termianls */
 var NonTerminal = k.data.NonTerminal = (function(_super) {
+	'use strict';
+	
 	/* jshint latedef:false */
 	k.utils.obj.inherit(nonTerminal, _super);
 
@@ -100,6 +104,8 @@ var NonTerminal = k.data.NonTerminal = (function(_super) {
 * @class
 * @classdesc Use this class to repsent Termianls (like 'a', 'B', 'Hola', etc.) */
 var Terminal = k.data.Terminal = (function(_super) {
+	'use strict';
+	
 	/* jshint latedef:false */
 	k.utils.obj.inherit(terminal, _super);
 
@@ -141,6 +147,8 @@ var Terminal = k.data.Terminal = (function(_super) {
 * @class
 * @classdesc Use this class to create new instance of non Termianls */
 var Rule = k.data.Rule = (function() {
+	'use strict';
+	
 	/*
 	* Initialize a new Grammatical Rule
 	*
@@ -209,6 +217,8 @@ var Rule = k.data.Rule = (function() {
 * @class
 * @classdesc This class is used to represent grammars */
 var Grammar = k.data.Grammar = (function () {
+	'use strict';
+	
 	var defaultOptions = {
 		name: ''
 	};

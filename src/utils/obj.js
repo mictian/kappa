@@ -1,4 +1,7 @@
-k.utils.obj = (function(){
+
+k.utils.obj = (function ()
+{
+	'use strict';
 	/*
 	* @func Util function used to apply "Inheritance"
 	*

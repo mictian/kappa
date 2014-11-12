@@ -13,6 +13,7 @@ var tableAction = k.parser.tableAction = {
 * @class
 * @classdesc This is the base class for all LR automatas generator. The idea is simplify the autamata creation process */
 k.parser.AutomataLRGeneratorBase = (function() {
+	'use strict';
 	/*
 	* Initialize a new Automaton Generator
 	*
@@ -91,7 +92,7 @@ k.parser.AutomataLRGeneratorBase = (function() {
 		{
 			return false;
 		}
-		
+		//really
 		return automata;
 	};
 	

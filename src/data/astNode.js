@@ -2,6 +2,8 @@
  * @class
  * @classdesc This class reprensent an AST NODE, a sub-type of a generic Node */
 k.data.ASTNode = (function(_super) {
+	'use strict';
+	
 	/* jshint latedef:false */
 	k.utils.obj.inherit(astNode, _super);
 	

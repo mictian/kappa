@@ -5,6 +5,8 @@
 * @class
 * @classdesc This class scan an input stream and convert it to an token input */
 k.lexer.Lexer = (function() {
+	'use strict';
+	
 	var defaultOptions = {
 		notIgnoreSpaces : false
 	};

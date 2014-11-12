@@ -2,7 +2,7 @@
 * @class
 * @classdesc Parser engine reponsible for parse an entire string */
 var Parser = k.parser.Parser = (function() {
-
+	'use strict';
 	/*
 	* Creates an instance of a Parser
 	*
@@ -184,6 +184,7 @@ var Parser = k.parser.Parser = (function() {
 * @class
 * @classdesc Util class to simplify the process of creating a parser */
 var parserCreator = k.parser.parserCreator = (function () {
+	'use strict';
 	/*
 	* Creates an instance of a Parser  Creator. Generally this is not necessary, owing to this class has all its method statics
 	*

@@ -2,6 +2,7 @@
 * @class
 * @classdesc This class is reponsible for given a grammar create a new LR(0) automata */
 k.parser.AutomataLR0Generator = (function(_super) {
+	'use strict';
 	/* jshint latedef:false */
 	k.utils.obj.inherit(automataLR0Generator, _super);
 	

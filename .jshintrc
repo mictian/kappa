@@ -1,0 +1,17 @@
+{
+	"-W040":true,
+	"quotmark": "single",
+	"undef":true,
+	"strict": true,
+	"curly":  true,
+	"eqeqeq": true,
+	"freeze": true,
+	"immed": true,
+	"latedef": true,
+	"newcap": true,
+	"globals": {
+	        "kappa": true,
+	        "it":true,
+	        "k":true
+	}
+}

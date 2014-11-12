@@ -3,6 +3,8 @@
 * @classdesc This class represent an Item. A rule being processed. Generally a dot is used to represent which part have already been
 processed. Ex. S ==> aB*AB */
 var ItemRule = k.data.ItemRule = (function() {
+	'use strict';
+	
 	var defaultCloneOptions = {
 		dotLocationIncrement: 0
 	};

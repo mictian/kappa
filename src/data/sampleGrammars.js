@@ -4,6 +4,7 @@ k.data.sampleGrammars = {
 	001. Very simple grammar to represent number divisions
 	*/
 	numDivs: (function() {
+		'use strict';
 		/*
 		LR(1)
 		0. S --> E
@@ -60,6 +61,7 @@ k.data.sampleGrammars = {
 	002. Very simple list of ids (letters) divides by spaces between '(' and ')'
 	*/
 	idsList: (function() {
+		'use strict';
 		/*
 		LR(1)
 		1. S --> OPAREN EXPS CPAREN
@@ -123,6 +125,7 @@ k.data.sampleGrammars = {
 	003. Very simple grammar to represent number divisions with epsilon rule
 	*/
 	numDivsEmpty: (function() {
+		'use strict';
 		/*
 		LR(1)
 		0. S --> E
@@ -187,6 +190,7 @@ k.data.sampleGrammars = {
 	004. Very simple grammar for difference of numbers
 	*/
 	numDiff: (function() {
+		'use strict';
 		/*
 		LR(k>1)
 		1. S --> E
@@ -267,6 +271,7 @@ k.data.sampleGrammars = {
 	005. Very simple grammar for a*b (b, ab, aab, aaaaaaab)
 	*/
 	aPlusb: (function() {
+		'use strict';
 		/*
 		LR(0)
 		1. A --> 'a' A
@@ -299,6 +304,7 @@ k.data.sampleGrammars = {
 	006. Very simple grammar for a*
 	*/
 	aPlusEMPTY: (function () {
+		'use strict';
 		/*
 		LR(1)
 		1. S --> 'a' S
@@ -331,6 +337,7 @@ k.data.sampleGrammars = {
 	007. Condenced version of the grammar numDiff (same language)
 	*/
 	numDiffCondenced: (function() {
+		'use strict';
 		/*
 		LR(1)
 		1. S --> E
@@ -387,6 +394,7 @@ k.data.sampleGrammars = {
 	008. Simple a^(n+1)b^(n) Grammar
 	*/
 	aPowN1b: (function () {
+		'use strict';
 		/*
 		LR(1)
 		1. S --> AD
@@ -435,6 +443,7 @@ k.data.sampleGrammars = {
 	009. Simple a^(n+1)b^(n) Grammar
 	*/
 	selectedBs: (function () {
+		'use strict';
 		/*
 		LR(0)
 		1. S --> 'b'
@@ -483,6 +492,7 @@ k.data.sampleGrammars = {
 	010. Grammar for simple arithmetic expressions
 	*/
 	arithmetic: (function () {
+		'use strict';
 		/*
 		LR(1)
 		1. E --> E '+' E

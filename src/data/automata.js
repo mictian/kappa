@@ -2,6 +2,7 @@
 * @class
 * @classdesc This class reprensent an automata, whith all its state and transitions */
 k.data.Automata = (function() {
+	'use strict';
 	/*
 	* Automata Constructor
 	*

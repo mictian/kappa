@@ -13,6 +13,7 @@ var conflictResolverType = k.parser.conflictResolverType = {
 * @class
 * @classdesc This class is responsible for resolver conflicts at state level, for example Shift/Reduce conflicts */
 var ConflictResolver = k.parser.ConflictResolver = (function () {
+	'use strict';
 	/*
 	* Initialize a new Conflict Resolver
 	*

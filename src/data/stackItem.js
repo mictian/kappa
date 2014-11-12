@@ -2,7 +2,7 @@
 * @class
 * @classdesc Each instance of this class will be used by the parse to represent a state into the stack */
 k.data.StackItem = (function() {
-	
+	'use strict';
 	/*
 	* Creates an instance of a Parser 
 	*

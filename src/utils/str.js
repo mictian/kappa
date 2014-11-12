@@ -1,4 +1,7 @@
-k.utils.str = (function() {
+k.utils.str = (function()
+{
+	'use strict';
+	
 	/*
 	* @func Util function used to determine if a string starts with anotherone
 	*

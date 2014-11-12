@@ -2,6 +2,8 @@
  * @class
  * @classdesc This class reprensent a generic Node class */
 k.data.Node = (function () {
+	'use strict';
+	
 	/*
 	 * Constructor Generic Node for any kind of graph
 	 *

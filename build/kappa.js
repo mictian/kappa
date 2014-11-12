@@ -25,7 +25,9 @@
 
 // Continued by all sources concatenated and __epilogue__.js at the end.
 
-k.utils.obj = (function(){
+k.utils.obj = (function ()
+{
+	'use strict';
 	/*
 	* @func Util function used to apply "Inheritance"
 	*
@@ -796,8 +798,10 @@ k.utils.obj = (function(){
 	};
 })();
 
-
-k.utils.str = (function() {
+k.utils.str = (function()
+{
+	'use strict';
+	
 	/*
 	* @func Util function used to determine if a string starts with anotherone
 	*
@@ -875,11 +879,12 @@ k.utils.str = (function() {
 
 })();
 
-
 /* Node
  * @class
  * @classdesc This class reprensent a generic Node class */
 k.data.Node = (function () {
+	'use strict';
+	
 	/*
 	 * Constructor Generic Node for any kind of graph
 	 *
@@ -951,7 +956,6 @@ k.data.Node = (function () {
 	return node;
 })();
 
-
 /* Enum for any special Symbol
 * @readonly
 * @enum {String}
@@ -974,6 +978,8 @@ var associativity = k.data.associativity = {
 * @class
 * @classdesc This class represent any simbol in the entire system */
 var Symbol = k.data.Symbol = (function () {
+	'use strict';
+	
 	/*
 	* Creates an instance of a Symbol (This class represent non Terminals, Terminals and Special symbols)
 	*
@@ -1011,6 +1017,8 @@ var Symbol = k.data.Symbol = (function () {
 * @class
 * @classdesc Use this class to create new instance of non Termianls */
 var NonTerminal = k.data.NonTerminal = (function(_super) {
+	'use strict';
+	
 	/* jshint latedef:false */
 	k.utils.obj.inherit(nonTerminal, _super);
 
@@ -1054,6 +1062,8 @@ var NonTerminal = k.data.NonTerminal = (function(_super) {
 * @class
 * @classdesc Use this class to repsent Termianls (like 'a', 'B', 'Hola', etc.) */
 var Terminal = k.data.Terminal = (function(_super) {
+	'use strict';
+	
 	/* jshint latedef:false */
 	k.utils.obj.inherit(terminal, _super);
 
@@ -1095,6 +1105,8 @@ var Terminal = k.data.Terminal = (function(_super) {
 * @class
 * @classdesc Use this class to create new instance of non Termianls */
 var Rule = k.data.Rule = (function() {
+	'use strict';
+	
 	/*
 	* Initialize a new Grammatical Rule
 	*
@@ -1163,6 +1175,8 @@ var Rule = k.data.Rule = (function() {
 * @class
 * @classdesc This class is used to represent grammars */
 var Grammar = k.data.Grammar = (function () {
+	'use strict';
+	
 	var defaultOptions = {
 		name: ''
 	};
@@ -1602,11 +1616,12 @@ var Grammar = k.data.Grammar = (function () {
 
 	return grammar;
 })();
-
 /* ASTNode
  * @class
  * @classdesc This class reprensent an AST NODE, a sub-type of a generic Node */
 k.data.ASTNode = (function(_super) {
+	'use strict';
+	
 	/* jshint latedef:false */
 	k.utils.obj.inherit(astNode, _super);
 	
@@ -1658,12 +1673,13 @@ k.data.ASTNode = (function(_super) {
 	
 	return astNode;
 })(k.data.Node);
-
 /* Item Rule
 * @class
 * @classdesc This class represent an Item. A rule being processed. Generally a dot is used to represent which part have already been
 processed. Ex. S ==> aB*AB */
 var ItemRule = k.data.ItemRule = (function() {
+	'use strict';
+	
 	var defaultCloneOptions = {
 		dotLocationIncrement: 0
 	};
@@ -1813,13 +1829,13 @@ var ItemRule = k.data.ItemRule = (function() {
 	return itemRule;
 })();
 
-
 /* global expect: true, describe: true, it:  true, beforeEach: true */
 k.data.sampleGrammars = {
 	/*
 	001. Very simple grammar to represent number divisions
 	*/
 	numDivs: (function() {
+		'use strict';
 		/*
 		LR(1)
 		0. S --> E
@@ -1876,6 +1892,7 @@ k.data.sampleGrammars = {
 	002. Very simple list of ids (letters) divides by spaces between '(' and ')'
 	*/
 	idsList: (function() {
+		'use strict';
 		/*
 		LR(1)
 		1. S --> OPAREN EXPS CPAREN
@@ -1939,6 +1956,7 @@ k.data.sampleGrammars = {
 	003. Very simple grammar to represent number divisions with epsilon rule
 	*/
 	numDivsEmpty: (function() {
+		'use strict';
 		/*
 		LR(1)
 		0. S --> E
@@ -2003,6 +2021,7 @@ k.data.sampleGrammars = {
 	004. Very simple grammar for difference of numbers
 	*/
 	numDiff: (function() {
+		'use strict';
 		/*
 		LR(k>1)
 		1. S --> E
@@ -2083,6 +2102,7 @@ k.data.sampleGrammars = {
 	005. Very simple grammar for a*b (b, ab, aab, aaaaaaab)
 	*/
 	aPlusb: (function() {
+		'use strict';
 		/*
 		LR(0)
 		1. A --> 'a' A
@@ -2115,6 +2135,7 @@ k.data.sampleGrammars = {
 	006. Very simple grammar for a*
 	*/
 	aPlusEMPTY: (function () {
+		'use strict';
 		/*
 		LR(1)
 		1. S --> 'a' S
@@ -2147,6 +2168,7 @@ k.data.sampleGrammars = {
 	007. Condenced version of the grammar numDiff (same language)
 	*/
 	numDiffCondenced: (function() {
+		'use strict';
 		/*
 		LR(1)
 		1. S --> E
@@ -2203,6 +2225,7 @@ k.data.sampleGrammars = {
 	008. Simple a^(n+1)b^(n) Grammar
 	*/
 	aPowN1b: (function () {
+		'use strict';
 		/*
 		LR(1)
 		1. S --> AD
@@ -2251,6 +2274,7 @@ k.data.sampleGrammars = {
 	009. Simple a^(n+1)b^(n) Grammar
 	*/
 	selectedBs: (function () {
+		'use strict';
 		/*
 		LR(0)
 		1. S --> 'b'
@@ -2299,6 +2323,7 @@ k.data.sampleGrammars = {
 	010. Grammar for simple arithmetic expressions
 	*/
 	arithmetic: (function () {
+		'use strict';
 		/*
 		LR(1)
 		1. E --> E '+' E
@@ -2404,12 +2429,11 @@ k.data.sampleGrammars = {
 		};
 	})()
 };
-
 /* StackItem
 * @class
 * @classdesc Each instance of this class will be used by the parse to represent a state into the stack */
 k.data.StackItem = (function() {
-	
+	'use strict';
 	/*
 	* Creates an instance of a Parser 
 	*
@@ -2437,12 +2461,12 @@ k.data.StackItem = (function() {
 	return stackItem;
 })();
 
-
 /* State
  * @class
  * @classdesc This class reprensent an automata state, a sub-type of a generic Node */
 k.data.State = (function(_super)
 {
+	'use strict';
 	/* jshint latedef:false */
 	k.utils.obj.inherit(state, _super);
 	
@@ -2806,141 +2830,15 @@ k.data.State = (function(_super)
 			
 			return result;
 		}
-		
-		//We clone the reduce item, becuase when there is a Shift/Reduce conflic and the solution is shift, we need to remove the shift symbol from the lookAhead set of the reduce item!
-		//Otherwise when createion the Action table the reduce item end it up overriding the shift actions! (see automataLALRGenerator)
-		reduceItems = k.utils.obj.map(reduceItems, function (reduceItem)
-		{
-			return reduceItem.clone(); 
-		});
-		
-		//Process all SHIFT items & Check for SHIFT/REDUCE Conflicts
-		if (shiftItems.length)
-		{
-			var shiftReduceResolvers = k.utils.obj.sortBy(k.utils.obj.filter(options.conflictResolvers, function (resolver)
-			{
-				return resolver.type === k.parser.conflictResolverType.STATE_SHIFTREDUCE;
-			}), 'order');
-			
-			//Generla Idea: For each shift item rule validate that the shift symbol is not in any lookAhead symbol of any reduce rule
-			
-			//For each shift item
-			var isAnyShiftReduceConflict = k.utils.obj.any(shiftItems, function (shiftItem)
-			{
-				//get the shift symbol
-				var shiftSymbol = shiftItem.getCurrentSymbol();
-				
-				//find among all reduce items
-				var isShiftItemInConflict = k.utils.obj.find(reduceItems, function (reduceItem)
-				{
-					//if the shift symbol is in any reduce item rule's lookAhead set.
-					//NOTE: Here we obtain the lookAhead Symbol that is in conflict, if any. 
-					var isShiftSymbolInReduceLookAhead = k.utils.obj.find(reduceItem.lookAhead, function (lookAheadSymbol) { return lookAheadSymbol.name === shiftSymbol.name;});
-					
-					//if there is a possible shift/reduce conflict try to solve it by usign the resolvers list
-					if (isShiftSymbolInReduceLookAhead)
-					{
-						var conflictSolutionFound;
-						isTheConflictResolvableWithResolvers = k.utils.obj.find(shiftReduceResolvers, function (resolver)
-						{
-							conflictSolutionFound = resolver.resolve(options.automata, self, shiftItem, reduceItem);
-							return conflictSolutionFound;
-						});
-						
-						//If the conflict is resolvable, and the action to be taken is SHIFT, we remove the Shift symbol from the reduce item lookAhead, so when creating the Action table
-						//that symbol wont take part of the table.
-						if (isTheConflictResolvableWithResolvers && conflictSolutionFound.action === k.parser.tableAction.SHIFT)
-						{
-							var symbolIndexToRemove = k.utils.obj.indexOf(reduceItem.lookAhead, isShiftSymbolInReduceLookAhead);
-							reduceItem.lookAhead.splice(symbolIndexToRemove,1);
-						}
-						
-						return !isTheConflictResolvableWithResolvers;
-					}
-					
-					return false;
-				});
-				
-				if (!isShiftItemInConflict || ignoreErrors)
-				{
-					result.shiftItems.push(shiftItem);
-					return false;
-				} 
-				
-				return true;
-				
-			});
-			
-			if (isAnyShiftReduceConflict)
-			{
-				return false;
-			}
-		}
-		
-		//Process all REDUCE items & Check for REDUCE/REDUCE Conflicts
-		if (reduceItems.length)
-		{
-			var reduceReduceResolvers = k.utils.obj.sortBy(k.utils.obj.filter(options.conflictResolvers, function (resolver)
-				{
-					return resolver.type === k.parser.conflictResolverType.STATE_REDUCEREDUCE;
-				}), 'order');
-				
-			//General Idea: For each reduce rule, validate that its look Ahead set is disjoin with the rest of the reduce rule
-				
-			//for each reduce rule
-			var isAnyReduceReduceConflict = k.utils.obj.any(reduceItems, function (reduceItemSelected)
-			{
-				//compare it with each of the other reduce rules
-				var isReduceItemInConflict = k.utils.obj.find(reduceItems, function (reduceItemInspected)
-				{
-					if (reduceItemInspected.getIdentity() === reduceItemSelected.getIdentity())
-					{
-						return false;
-					}
-					
-					//and for each look ahead symbol of the first reduce rule, validate the it is not present in any other look Ahead
-					var isLookAheadSymbolInOtherLookAheadSet = k.utils.obj.find(reduceItemSelected.lookAhead, function (lookAheadSelected)
-					{
-						return k.utils.obj.find(reduceItemInspected.lookAhead, function (lookAheadSymbol) { return lookAheadSymbol.name === lookAheadSelected.name;});
-					});
-					
-					if (isLookAheadSymbolInOtherLookAheadSet)
-					{
-						isTheConflictResolvableWithResolvers = k.utils.obj.find(reduceReduceResolvers, function (resolver)
-						{
-							return resolver.resolve(options.automata, self, reduceItemSelected, reduceItemInspected);
-						});
-						
-						return !isTheConflictResolvableWithResolvers;
-					}
-					
-					return false;
-				});
-				
-				if (!isReduceItemInConflict || ignoreErrors)
-				{
-					result.reduceItems.push(reduceItemSelected);
-					return false; 
-				}
-				return true;
-			});
-			
-			if (isAnyReduceReduceConflict)
-			{
-				return false;
-			}
-		}
-		
-		return result;
 	};
 
 	return state;
 })(k.data.Node);
-
 /* Automata
 * @class
 * @classdesc This class reprensent an automata, whith all its state and transitions */
 k.data.Automata = (function() {
+	'use strict';
 	/*
 	* Automata Constructor
 	*
@@ -3069,7 +2967,6 @@ k.data.Automata = (function() {
 	return automata;
 })();
 
-
 /*global toString: true*/
 //TODO: Implement a REAL lexer. This one is just a temporal one!
 
@@ -3077,6 +2974,8 @@ k.data.Automata = (function() {
 * @class
 * @classdesc This class scan an input stream and convert it to an token input */
 k.lexer.Lexer = (function() {
+	'use strict';
+	
 	var defaultOptions = {
 		notIgnoreSpaces : false
 	};
@@ -3221,7 +3120,6 @@ k.lexer.Lexer = (function() {
 	return lexer;
 })();
 
-
 /*Enum for valid action in an action table
 * @readonly
 * @enum {String}
@@ -3237,6 +3135,7 @@ var tableAction = k.parser.tableAction = {
 * @class
 * @classdesc This is the base class for all LR automatas generator. The idea is simplify the autamata creation process */
 k.parser.AutomataLRGeneratorBase = (function() {
+	'use strict';
 	/*
 	* Initialize a new Automaton Generator
 	*
@@ -3315,7 +3214,7 @@ k.parser.AutomataLRGeneratorBase = (function() {
 		{
 			return false;
 		}
-		
+		//really
 		return automata;
 	};
 	
@@ -3436,11 +3335,11 @@ k.parser.AutomataLRGeneratorBase = (function() {
 	return automataLRGeneratorBase;
 })();
 
-
 /* Automata Generator
 * @class
 * @classdesc This class is reponsible for given a grammar create a new LR(0) automata */
 k.parser.AutomataLR0Generator = (function(_super) {
+	'use strict';
 	/* jshint latedef:false */
 	k.utils.obj.inherit(automataLR0Generator, _super);
 	
@@ -3535,12 +3434,12 @@ k.parser.AutomataLR0Generator = (function(_super) {
 	return automataLR0Generator;
 })(k.parser.AutomataLRGeneratorBase);
 
-
 /* Automata Generator
 * @class
 * @classdesc This class is reponsible for given a grammar create a new LR(0) automata */
 k.parser.AutomataLALR1Generator = (function(_super)
 {
+	'use strict';
 	/* jshint latedef:false */
 	k.utils.obj.inherit(automataLALR1Generator, _super);
 	
@@ -3659,7 +3558,8 @@ k.parser.AutomataLALR1Generator = (function(_super)
 				};
 				options = k.utils.obj.extendInNew(defaultActionTableStateOptions, options || {});
 				
-				var stateItems = state.getShiftReduceItemRule(options);
+				// var stateItems = state.getShiftReduceItemRule(options);
+				var stateItems = this.getShiftReduceItemRuleFromState(state, options);
 				
 				if (!stateItems)
 				{
@@ -3688,7 +3588,7 @@ k.parser.AutomataLALR1Generator = (function(_super)
 					});	
 				});
 			}
-		});
+		}, this);
 		
 		
 		return (function (hasLookAhead, actionTable) {
@@ -3702,10 +3602,158 @@ k.parser.AutomataLALR1Generator = (function(_super)
 			};
 		})(automata.hasLookAhead, table);
 	};
+	
+	/* @function Generates the list of shift and reduce items that take part from the passed in state. Validating at the same time that none of these items are in conflict
+		or that the conflicts are solvable.
+	 * @param {State} state State to extract form each of the reduce/shift item rules
+	 * @param {Boolean} options.considerLookAhead Indicate if the state should take into account look ahead to validate. If not the state will validate and generate the result as in a LR(0). Default: false
+	 * @param {Automata} options.automata Optional automata instance used to pass to the conflict resolver in case there are conflict and resolvers.
+	 * @param {[ConflictResolver]} options.conflictResolvers List of conflict resolvers used to resolve possible conflict at the current state.
+	 * @param {Boolean} options.ignoreErrors Indicate if when facing an error (a conflict that can not be solve by any resolver) continue the execution. Default: false
+	 * @returns {Object} An object containg two properties (arrays) shiftItems and reduceItems */
+	automataLALR1Generator.prototype.getShiftReduceItemRuleFromState = function (state, options)
+	{
+		options = k.utils.obj.isObject(options) ? options : {};
+		options.conflictResolvers = options.conflictResolvers || [];
+		
+		var reduceItems = state.getRecudeItems(),
+			shiftItems = k.utils.obj.filter(state.getOriginalItems(), function (item)
+			{
+				return !item.isReduce();
+			}),
+			ignoreErrors = !!options.ignoreErrors,
+			result = {shiftItems:[], reduceItems:[]},
+			isTheConflictResolvableWithResolvers = false;
+			
+		//We clone the reduce item, becuase when there is a Shift/Reduce conflic and the solution is shift, we need to remove the shift symbol from the lookAhead set of the reduce item!
+		//Otherwise when createion the Action table the reduce item end it up overriding the shift actions! (see automataLALRGenerator)
+		reduceItems = k.utils.obj.map(reduceItems, function (reduceItem)
+		{
+			return reduceItem.clone(); 
+		});
+		
+		//Process all SHIFT items & Check for SHIFT/REDUCE Conflicts
+		if (shiftItems.length)
+		{
+			var shiftReduceResolvers = k.utils.obj.sortBy(k.utils.obj.filter(options.conflictResolvers, function (resolver)
+			{
+				return resolver.type === k.parser.conflictResolverType.STATE_SHIFTREDUCE;
+			}), 'order');
+			
+			//Generla Idea: For each shift item rule validate that the shift symbol is not in any lookAhead symbol of any reduce rule
+			
+			//For each shift item
+			var isAnyShiftReduceConflict = k.utils.obj.any(shiftItems, function (shiftItem)
+			{
+				//get the shift symbol
+				var shiftSymbol = shiftItem.getCurrentSymbol();
+				
+				//find among all reduce items
+				var isShiftItemInConflict = k.utils.obj.find(reduceItems, function (reduceItem)
+				{
+					//if the shift symbol is in any reduce item rule's lookAhead set.
+					//NOTE: Here we obtain the lookAhead Symbol that is in conflict, if any. 
+					var isShiftSymbolInReduceLookAhead = k.utils.obj.find(reduceItem.lookAhead, function (lookAheadSymbol) { return lookAheadSymbol.name === shiftSymbol.name;});
+					
+					//if there is a possible shift/reduce conflict try to solve it by usign the resolvers list
+					if (isShiftSymbolInReduceLookAhead)
+					{
+						var conflictSolutionFound;
+						isTheConflictResolvableWithResolvers = k.utils.obj.find(shiftReduceResolvers, function (resolver)
+						{
+							conflictSolutionFound = resolver.resolve(options.automata, state, shiftItem, reduceItem);
+							return conflictSolutionFound;
+						});
+						
+						//If the conflict is resolvable, and the action to be taken is SHIFT, we remove the Shift symbol from the reduce item lookAhead, so when creating the Action table
+						//that symbol wont take part of the table.
+						if (isTheConflictResolvableWithResolvers && conflictSolutionFound.action === k.parser.tableAction.SHIFT)
+						{
+							var symbolIndexToRemove = k.utils.obj.indexOf(reduceItem.lookAhead, isShiftSymbolInReduceLookAhead);
+							reduceItem.lookAhead.splice(symbolIndexToRemove,1);
+						}
+						
+						return !isTheConflictResolvableWithResolvers;
+					}
+					
+					return false;
+				});
+				
+				if (!isShiftItemInConflict || ignoreErrors)
+				{
+					result.shiftItems.push(shiftItem);
+					return false;
+				} 
+				
+				return true;
+				
+			});
+			
+			if (isAnyShiftReduceConflict)
+			{
+				return false;
+			}
+		}
+		
+		//Process all REDUCE items & Check for REDUCE/REDUCE Conflicts
+		if (reduceItems.length)
+		{
+			var reduceReduceResolvers = k.utils.obj.sortBy(k.utils.obj.filter(options.conflictResolvers, function (resolver)
+				{
+					return resolver.type === k.parser.conflictResolverType.STATE_REDUCEREDUCE;
+				}), 'order');
+				
+			//General Idea: For each reduce rule, validate that its look Ahead set is disjoin with the rest of the reduce rule
+				
+			//for each reduce rule
+			var isAnyReduceReduceConflict = k.utils.obj.any(reduceItems, function (reduceItemSelected)
+			{
+				//compare it with each of the other reduce rules
+				var isReduceItemInConflict = k.utils.obj.find(reduceItems, function (reduceItemInspected)
+				{
+					if (reduceItemInspected.getIdentity() === reduceItemSelected.getIdentity())
+					{
+						return false;
+					}
+					
+					//and for each look ahead symbol of the first reduce rule, validate the it is not present in any other look Ahead
+					var isLookAheadSymbolInOtherLookAheadSet = k.utils.obj.find(reduceItemSelected.lookAhead, function (lookAheadSelected)
+					{
+						return k.utils.obj.find(reduceItemInspected.lookAhead, function (lookAheadSymbol) { return lookAheadSymbol.name === lookAheadSelected.name;});
+					});
+					
+					if (isLookAheadSymbolInOtherLookAheadSet)
+					{
+						isTheConflictResolvableWithResolvers = k.utils.obj.find(reduceReduceResolvers, function (resolver)
+						{
+							return resolver.resolve(options.automata, state, reduceItemSelected, reduceItemInspected);
+						});
+						
+						return !isTheConflictResolvableWithResolvers;
+					}
+					
+					return false;
+				});
+				
+				if (!isReduceItemInConflict || ignoreErrors)
+				{
+					result.reduceItems.push(reduceItemSelected);
+					return false; 
+				}
+				return true;
+			});
+			
+			if (isAnyReduceReduceConflict)
+			{
+				return false;
+			}
+		}
+		
+		return result;
+	};
 
 	return automataLALR1Generator;
 })(k.parser.AutomataLRGeneratorBase);
-
 
 //TODO TEST ALL THIS CLASS!!
 
@@ -3722,6 +3770,7 @@ var conflictResolverType = k.parser.conflictResolverType = {
 * @class
 * @classdesc This class is responsible for resolver conflicts at state level, for example Shift/Reduce conflicts */
 var ConflictResolver = k.parser.ConflictResolver = (function () {
+	'use strict';
 	/*
 	* Initialize a new Conflict Resolver
 	*
@@ -3828,12 +3877,11 @@ var ConflictResolver = k.parser.ConflictResolver = (function () {
 	return conflictResolver;
 })();
 
-
 /* Parser
 * @class
 * @classdesc Parser engine reponsible for parse an entire string */
 var Parser = k.parser.Parser = (function() {
-
+	'use strict';
 	/*
 	* Creates an instance of a Parser
 	*
@@ -4015,6 +4063,7 @@ var Parser = k.parser.Parser = (function() {
 * @class
 * @classdesc Util class to simplify the process of creating a parser */
 var parserCreator = k.parser.parserCreator = (function () {
+	'use strict';
 	/*
 	* Creates an instance of a Parser  Creator. Generally this is not necessary, owing to this class has all its method statics
 	*
@@ -4065,9 +4114,7 @@ var parserCreator = k.parser.parserCreator = (function () {
 	return creator;
 })();
 
-
 // See __prologue__.js
 	return k;
 });
-
 //# sourceMappingURL=kappa.js.map

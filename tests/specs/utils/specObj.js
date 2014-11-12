@@ -1,10 +1,8 @@
 /* global expect: true, describe: true, it:  true, beforeEach: true, jasmine: true, spyOn:true */
-define(['../../../src/utils/obj'], function(k)
-{
-	'use strict';
+'use strict';
 
-	describe('Object Utils', function()
-	{
+describe('Object Utils', function()
+{
 		describe('inherit', function()
 		{
 			var Human,
@@ -1408,4 +1406,3 @@ define(['../../../src/utils/obj'], function(k)
 			});
 		});
 	});
-});

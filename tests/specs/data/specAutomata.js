@@ -103,7 +103,7 @@ describe('automata', function()
 			var result = a.getNextState();
 			expect(result).toBeFalsy();
 		});
-		
+
 		it('should return added states', function ()
 		{
 			var shiftItem2 = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S1])[0],
@@ -117,24 +117,24 @@ describe('automata', function()
 					items: [shiftItem2, reduceItem2]
 				}),
 				automata = new k.data.Automata({});
-				
+
 			reduceItem1.dotLocation = 3;
 			reduceItem2.dotLocation = 3;
-			
+
 			reduceItem1._id = null;
 			reduceItem2._id = null;
 			reduceItem1.lookAhead.push(shiftItem2.getCurrentSymbol());
 			reduceItem2.lookAhead.push(shiftItem2.getCurrentSymbol());
-			
+
 			expect(automata.getNextState()).toBeFalsy();
-			
+
 			automata.addState(state1);
 			expect(automata.getNextState()).toBe(state1);
-			
+
 			automata.addState(state2);
 			expect(automata.getNextState()).toBe(state2);
 		});
-		
+
 		it('should add as unprocessed state when adding an already present state but with different lookAhead (editing existing state) (USING LOOKAHEAD of course)', function ()
 		{
 			var shiftItem1 = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.L2])[0],
@@ -150,155 +150,35 @@ describe('automata', function()
 				automata = new k.data.Automata({
 					hasLookAhead: true
 				});
-				
+
 			//This cause that the itemrule identity change, se we need to update the state register items
 			reduceItem1.dotLocation = 3;
 			reduceItem1._id = null;
 			reduceItem1.lookAhead.push(shiftItem1.getCurrentSymbol());
-			
+
 			clonedReduceItem.dotLocation = 3;
 			clonedReduceItem._id = null;
 			clonedReduceItem.lookAhead.push(shiftItem1.getCurrentSymbol());
-			
+
 			state1._registerItems = {};
 			state1._registerItemRules();
-			
+
 			state2._registerItems = {};
 			state2._registerItemRules();
-			
+
 			expect(automata.getNextState()).toBeFalsy();
-			
+
 			automata.addState(state1);
 			expect(automata.getNextState()).toBe(state1);
 			expect(automata.getNextState()).toBeFalsy();
-			
+
 			clonedReduceItem.lookAhead.push(shiftItem1.rule.tail[1]);
-			
+
 			automata.addState(state2);
 			expect(automata.getNextState()).toEqual(state1);
 		});
 	});
-	
-	describe('isValid', function()
-	{
-	    it('should return false if there is one invalid state', function()
-		{
-			var a = new k.data.Automata({
-				states: [
-					{
-						getIdentity: function() {
-							return '1';
-						},
-						isValid: function ()
-						{
-							return false;
-						}
-					},
-					{
-						getIdentity: function() {
-							return '2';
-						},
-						isValid: function ()
-						{
-							return true;
-						}
-					},
-					{
-						getIdentity: function() {
-							return '3';
-						},
-						isValid: function ()
-						{
-							return true;
-						}
-					}
-				]
-			});
 
-			expect(a.isValid()).toBe(false);
-		});
-		
-		it('should return false if all states are invalid', function ()
-		{
-			var a = new k.data.Automata({
-				states: [
-					{
-						getIdentity: function() {
-							return '1';
-						},
-						isValid: function ()
-						{
-							return false;
-						}
-					},
-					{
-						getIdentity: function() {
-							return '2';
-						},
-						isValid: function ()
-						{
-							return false;
-						}
-					},
-					{
-						getIdentity: function() {
-							return '3';
-						},
-						isValid: function ()
-						{
-							return false;
-						}
-					}
-				]
-			});
-
-			expect(a.isValid()).toBe(false);
-		});
-		
-		it('should return TRUE if the automata has no states', function ()
-		{
-			var a = new k.data.Automata({});
-			expect(a.isValid()).toBe(true);
-		});
-		
-		it('should return true if all states are valid', function()
-		{
-		    var a = new k.data.Automata({
-				states: [
-					{
-						getIdentity: function() {
-							return '1';
-						},
-						isValid: function ()
-						{
-							return true;
-						}
-					},
-					{
-						getIdentity: function() {
-							return '2';
-						},
-						isValid: function ()
-						{
-							return true;
-						}
-					},
-					{
-						getIdentity: function() {
-							return '3';
-						},
-						isValid: function ()
-						{
-							return true;
-						}
-					}
-				]
-			});
-
-			expect(a.isValid()).toBe(true);
-		});
-	});
-	
 	describe('initialStateAccessor', function()
 	{
 	    it('should set the initial state if it is passed', function()
@@ -307,18 +187,18 @@ describe('automata', function()
 	        	expectedResult = {
 					mock:true
 				};
-				
+
 			a.initialStateAccessor(expectedResult);
 			expect(a.initialStateAccessor()).toBe(expectedResult);
 	    });
-	    
+
 	    it('should return the initial state if nothing is passed', function()
 	    {
 	        var expectedResult = {
 					mock:true
 				},
 				a = new k.data.Automata({initialState: expectedResult});
-	        	
+
 			expect(a.initialStateAccessor()).toBe(expectedResult);
 	    });
 	});

@@ -11,7 +11,7 @@ describe('Automata LR(0) Generator', function ()
 			    return (item.rule.name === ruleName);
 			});
 		}
-		
+
 		it('should duplicate a rule if the dot location differs', function ()
 		{
 			var ag = new k.parser.AutomataLR0Generator({
@@ -21,20 +21,20 @@ describe('Automata LR(0) Generator', function ()
 				items = k.data.ItemRule.newFromRules([sampleGrammars.aPlusb.A1]),
 				state,
 				itemsState;
-				
+
 			// Convert A --> *'a'A into A --> 'a'*A
 			items[0].dotLocation++;
-			
+
 			initialState = new k.data.State({
 				items: items
 			});
-				
+
 			state = ag.expandItem(initialState);
-			
+
 			itemsState = state.getItems();
-				
+
 			expect(itemsState.length).toBe(3);
-			
+
 			var groupedItems = k.utils.obj.groupBy(itemsState, function (itemRule)
 			{
 				return itemRule.rule.name;
@@ -64,7 +64,7 @@ describe('Automata LR(0) Generator', function ()
 			var itemOparen = getItemByRuleName(itemsState, 'OPARENRULE'); //This name is defined in the rule inside the sampleGrammar file
 			expect(itemOparen).toBeDefined();
 			expect(itemOparen.rule).toBe(sampleGrammars.idsList.OPAREN);
-			
+
 			var itemAugment = getItemByRuleName(itemsState, 'AUGMENTRULE'); //This name is defined in all the grammars
 			expect(itemAugment).toBeDefined();
 		});
@@ -170,7 +170,7 @@ describe('Automata LR(0) Generator', function ()
 				return state.getIdentity() === id;
 			});
 		}
-		
+
 		function validateState(states, stateId, expectedItemsLength, lookAhead)
 		{
 			var state = findStateById(states, stateId);
@@ -181,14 +181,14 @@ describe('Automata LR(0) Generator', function ()
 			{
 				 var itemRule = state.getOriginalItemById(itemRuleId);
 				 expect(lookAhead[itemRuleId].length).toBe(itemRule.lookAhead.length);
-				 
+
 				k.utils.obj.each(lookAhead[itemRuleId], function (expectedLookAhead)
 				{
 				 	var lookAheadFound = !!k.utils.obj.find(itemRule.lookAhead, function (symbol)
 					{
 						return symbol.name === expectedLookAhead;
 					});
-					
+
 					expect(lookAheadFound).toBe(true);
 				});
 			});
@@ -201,12 +201,12 @@ describe('Automata LR(0) Generator', function ()
 				}),
 				result = ag.generateAutomata({notValidate:true}),
 				states = result.states;
-				
+
 			expect(result.hasLookAhead).toBe(false);
 
 			expect(result).toBeInstanceOf(k.data.Automata);
 			expect(states.length).toBe(9);
-			
+
 			validateState(states, '0(0)1(0)2(0)3(0)5(0)', 5);
 			validateState(states, '1(1)2(1)4(0)', 3);
 			validateState(states, '2(2)5(0)', 2);
@@ -217,7 +217,7 @@ describe('Automata LR(0) Generator', function ()
 			validateState(states, '0(1)', 1);
 			validateState(states, 'AcceptanceState', 1);
 		});
-		
+
 		it('should return the correct automata for the simple grammar NUM DIFF', function ()
 		{
 			var ag = new k.parser.AutomataLR0Generator({
@@ -225,12 +225,12 @@ describe('Automata LR(0) Generator', function ()
 				}),
 				result = ag.generateAutomata({notValidate:true}),
 				states = result.states;
-				
+
 			expect(result.hasLookAhead).toBe(false);
 
 			expect(result).toBeInstanceOf(k.data.Automata);
 			expect(states.length).toBe(12);
-			
+
 			validateState(states, '0(0)1(0)2(0)3(0)4(0)5(0)6(0)', 7);
 			validateState(states, '2(0)3(0)4(0)5(1)5(0)6(1)6(0)', 7);
 			validateState(states, '2(2)4(0)5(0)6(0)', 4);
@@ -244,7 +244,7 @@ describe('Automata LR(0) Generator', function ()
 			validateState(states, '0(1)', 1);
 			validateState(states, 'AcceptanceState', 1);
 		});
-		
+
 		it('should return the correct automata for the simple grammar A+B', function ()
 		{
 			var ag = new k.parser.AutomataLR0Generator({
@@ -252,12 +252,12 @@ describe('Automata LR(0) Generator', function ()
 				}),
 				result = ag.generateAutomata({notValidate:true}),
 				states = result.states;
-				
+
 			expect(result.hasLookAhead).toBe(false);
 
 			expect(result).toBeInstanceOf(k.data.Automata);
 			expect(states.length).toBe(6);
-			
+
 			validateState(states, '0(0)1(0)2(0)', 3);
 			validateState(states, '1(1)1(0)2(0)', 3);
 			validateState(states, '2(1)', 1);
@@ -265,7 +265,7 @@ describe('Automata LR(0) Generator', function ()
 			validateState(states, '1(2)', 1);
 			validateState(states, 'AcceptanceState',1);
 		});
-		
+
 		it('should return the correct automata for the simple grammar a^(n+1)b^(n)', function ()
 		{
 			var ag = new k.parser.AutomataLR0Generator({
@@ -273,12 +273,12 @@ describe('Automata LR(0) Generator', function ()
 				}),
 				result = ag.generateAutomata({notValidate:true}),
 				states = result.states;
-				
+
 			expect(result.hasLookAhead).toBe(false);
 
 			expect(result).toBeInstanceOf(k.data.Automata);
 			expect(states.length).toBe(9);
-			
+
 			validateState(states, '0(0)1(0)2(0)3(0)', 4);
 			validateState(states, '2(1)2(0)3(1)3(0)', 4);
 			validateState(states, '2(2)', 1);
@@ -287,10 +287,10 @@ describe('Automata LR(0) Generator', function ()
 			validateState(states, '4(1)', 1);
 			validateState(states, '1(2)', 1);
 			validateState(states, '1(1)4(0)', 2);
-			
+
 			validateState(states, 'AcceptanceState', 1);
 		});
-		
+
 		it('should return the correct automata for the simple grammar Condenced num Diff', function ()
 		{
 			var ag = new k.parser.AutomataLR0Generator({
@@ -298,12 +298,12 @@ describe('Automata LR(0) Generator', function ()
 				}),
 				result = ag.generateAutomata({notValidate:true}),
 				states = result.states;
-			
+
 			expect(result.hasLookAhead).toBe(false);
 
 			expect(result).toBeInstanceOf(k.data.Automata);
 			expect(states.length).toBe(11);
-			
+
 			validateState(states, '0(0)1(0)2(0)3(0)4(0)5(0)', 6);
 			validateState(states, '0(1)', 1);
 			validateState(states, '1(1)2(1)', 2);
@@ -317,7 +317,7 @@ describe('Automata LR(0) Generator', function ()
 			validateState(states, 'AcceptanceState', 1);
 		});
 	});
-	
+
 	describe('generateACTIONTable', function ()
 	{
 		it('should return the expected action function for the simple LR0 grammar a+b', function ()
@@ -327,24 +327,24 @@ describe('Automata LR(0) Generator', function ()
 				}),
 				automata = ag.generateAutomata({notValidate:true}),
 				actionTable = ag.generateACTIONTable(automata);
-			
+
 			expect(actionTable).toEqual(jasmine.any(Function));
-			
+
 			expect(actionTable('0(1)').action).toEqual(k.parser.tableAction.SHIFT);
-			
+
 			expect(actionTable('1(1)1(0)2(0)').action).toEqual(k.parser.tableAction.SHIFT);
-			
+
 			expect(actionTable('0(0)1(0)2(0)').action).toEqual(k.parser.tableAction.SHIFT);
-			
+
 			expect(actionTable('2(1)').action).toEqual(k.parser.tableAction.REDUCE);
 			expect(actionTable('2(1)').rule.name).toEqual(sampleGrammars.aPlusb.A2.name);
-			
+
 			expect(actionTable('1(2)').action).toEqual(k.parser.tableAction.REDUCE);
 			expect(actionTable('1(2)').rule.name).toEqual(sampleGrammars.aPlusb.A1.name);
-			
+
 			expect(actionTable('AcceptanceState').action).toEqual(k.parser.tableAction.ACCEPT);
 		});
-		
+
 		it('should return the expected action function for the simple LR0 grammar selectedBs', function ()
 		{
 			var ag = new k.parser.AutomataLR0Generator({
@@ -352,39 +352,150 @@ describe('Automata LR(0) Generator', function ()
 				}),
 				automata = ag.generateAutomata(),
 				actionTable = ag.generateACTIONTable(automata);
-			
+
 			expect(actionTable).toEqual(jasmine.any(Function));
-			
+
 			expect(actionTable('0(0)1(0)2(0)').action).toEqual(k.parser.tableAction.SHIFT);
-			
+
 			expect(actionTable('0(1)').action).toEqual(k.parser.tableAction.SHIFT);
-			
+
 			expect(actionTable('1(0)2(0)4(2)').action).toEqual(k.parser.tableAction.SHIFT);
-			
+
 			expect(actionTable('1(0)2(1)2(0)3(0)4(0)').action).toEqual(k.parser.tableAction.SHIFT);
-			
+
 			expect(actionTable('1(1)').action).toEqual(k.parser.tableAction.REDUCE);
 			expect(actionTable('1(1)').rule.name).toEqual(sampleGrammars.selectedBs.S1.name);
-			
+
 			expect(actionTable('2(2)4(1)').action).toEqual(k.parser.tableAction.SHIFT);
-			
+
 			expect(actionTable('2(3)').action).toEqual(k.parser.tableAction.REDUCE);
 			expect(actionTable('2(3)').rule.name).toEqual(sampleGrammars.selectedBs.S2.name);
-			
+
 			expect(actionTable('3(1)').action).toEqual(k.parser.tableAction.REDUCE);
 			expect(actionTable('3(1)').rule.name).toEqual(sampleGrammars.selectedBs.L1.name);
-			
+
 			expect(actionTable('4(3)').action).toEqual(k.parser.tableAction.REDUCE);
 			expect(actionTable('4(3)').rule.name).toEqual(sampleGrammars.selectedBs.L2.name);
-			
+
 			expect(actionTable('AcceptanceState').action).toEqual(k.parser.tableAction.ACCEPT);
-			
+
 			expect(actionTable('0(1)1(0)2(0)').action).toEqual(k.parser.tableAction.ERROR);
 			expect(actionTable('0(4)').action).toEqual(k.parser.tableAction.ERROR);
 			expect(actionTable('1(2)2(0)').action).toEqual(k.parser.tableAction.ERROR);
 			expect(actionTable('5(0)').action).toEqual(k.parser.tableAction.ERROR);
 			expect(actionTable('2(0)4(4)').action).toEqual(k.parser.tableAction.ERROR);
 		});
-		
+
+	});
+
+	describe('isStateValid', function ()
+	{
+		it('should return true if the state does not have any reduce item', function()
+		{
+			var ag = new k.parser.AutomataLR0Generator({
+					grammar: sampleGrammars.aPlusb.g
+				}),
+				item1 = new k.data.ItemRule(
+				{
+					rule: {
+						index: 1,
+						tail:[]
+					}
+				}),
+				item2 = new k.data.ItemRule(
+				{
+					rule: {
+						index: 5,
+						tail:[]
+					}
+				}),
+				s = new k.data.State({
+					items: [item1, item2]
+				});
+
+			spyOn(item1, 'isReduce').and.returnValue(false);
+			spyOn(item2, 'isReduce').and.returnValue(false);
+
+			expect(ag.isStateValid(s)).toBe(true);
+		});
+
+		it('should return true if the state has just one reduce item without lookAhead', function()
+		{
+			var ag = new k.parser.AutomataLR0Generator({
+					grammar: sampleGrammars.aPlusb.g
+				}),
+				item1 = new k.data.ItemRule(
+				{
+					rule: {
+						index: 1,
+						tail:[]
+					}
+				}),
+				s = new k.data.State({
+					items: [item1]
+				});
+
+			spyOn(item1, 'isReduce').and.returnValue(true);
+
+			expect(ag.isStateValid(s)).toBe(true);
+		});
+
+		it('should return false if it has two reduce items without look-ahead', function()
+		{
+			var ag = new k.parser.AutomataLR0Generator({
+					grammar: sampleGrammars.aPlusb.g
+				}),
+				item1 = new k.data.ItemRule(
+				{
+					rule: {
+						index: 1,
+						tail:[]
+					}
+				}),
+				item2 = new k.data.ItemRule(
+				{
+					rule: {
+						index: 5,
+						tail:[]
+					}
+				}),
+				s = new k.data.State({
+					items: [item1, item2]
+				});
+
+			spyOn(item1, 'isReduce').and.returnValue(true);
+			spyOn(item2, 'isReduce').and.returnValue(true);
+
+			expect(ag.isStateValid(s)).toBe(false);
+		});
+
+		it('should return false if it has one reduce item and one shift item without look-ahead', function()
+		{
+			var ag = new k.parser.AutomataLR0Generator({
+					grammar: sampleGrammars.aPlusb.g
+				}),
+				item1 = new k.data.ItemRule(
+				{
+					rule: {
+						index: 1,
+						tail:[]
+					}
+				}),
+				item2 = new k.data.ItemRule(
+				{
+					rule: {
+						index: 5,
+						tail:[]
+					}
+				}),
+				s = new k.data.State({
+					items: [item1, item2]
+				});
+
+			spyOn(item1, 'isReduce').and.returnValue(false);
+			spyOn(item2, 'isReduce').and.returnValue(true);
+
+			expect(ag.isStateValid(s)).toBe(false);
+		});
 	});
 });

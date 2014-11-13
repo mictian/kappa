@@ -2469,7 +2469,7 @@ k.data.State = (function(_super)
 	'use strict';
 	/* jshint latedef:false */
 	k.utils.obj.inherit(state, _super);
-	
+
 	/*
 	 * Constructor Automata State
 	 *
@@ -2479,18 +2479,18 @@ k.data.State = (function(_super)
 	 * @param {[Node]} options.nodes Array of State instances that are children of this State
 	 */
 	function state (options) {
-		
+
 		_super.apply(this, arguments);
 
 		k.utils.obj.defineProperty(this, 'isAcceptanceState'); // This is set by the automata generator
-		
+
 		k.utils.obj.defineProperty(this, '_items');
 		k.utils.obj.defineProperty(this, '_registerItems');
 		k.utils.obj.defineProperty(this, '_index');
 		k.utils.obj.defineProperty(this, '_condencedView');
 
 		this.isAcceptanceState = false;
-		
+
 		this._items = options.items || [];
 		options.items = null;
 		this._index = 0;
@@ -2498,7 +2498,7 @@ k.data.State = (function(_super)
 
 		this._registerItemRules();
 	}
-	
+
 	/* @function REgister the list of item rules of the current stateso they are assesible by its id
 	 * @returns {Void} */
 	state.prototype._registerItemRules = function ()
@@ -2508,7 +2508,7 @@ k.data.State = (function(_super)
 			this._registerItems[itemRule.getIdentity()] = itemRule;
 		}, this);
 	};
-	
+
 	state.constants = {
 		AcceptanceStateName: 'AcceptanceState'
 	};
@@ -2549,14 +2549,14 @@ k.data.State = (function(_super)
 		var strResult = 'ID: ' + this.getIdentity() + '\n' +
 						this._items.join('\n') +
 						'\nTRANSITIONS:\n';
-						
+
 		k.utils.obj.each(this.transitions, function (transition)
 		{
 			strResult += '*--' + transition.symbol + '-->' + transition.state.getIdentity() + '\n';
 		});
 		return strResult;
 	};
-	
+
 	/* @function Returns the condenced (one line) string that reprenset the current 'state' of the current state
 	 * @returns {String} State Representation in one line  */
 	state.prototype.getCondencedString = function() {
@@ -2566,7 +2566,7 @@ k.data.State = (function(_super)
 		}
 		return this._condencedView;
 	};
-	
+
 	/* @function Internal method to generate a condenced (one line) string that reprenset the current 'state' of the current state
 	 * @returns {String} State Representation in one line  */
 	state.prototype._generateCondencedString = function() {
@@ -2579,20 +2579,20 @@ k.data.State = (function(_super)
 				return item.rule.index;
 			}).join('-');
 	};
-	
+
 	/* @function Generates an ID that identify this state from any other state
 	 * @returns {String} Generated ID  */
 	state.prototype._generateIdentity = function() {
-		
+
 		if (this.isAcceptanceState)
 		{
 			return state.constants.AcceptanceStateName;
 		}
 		else if (!this._items.length)
 		{
-			return _super.prototype._generateIdentity.apply(this, arguments);    
+			return _super.prototype._generateIdentity.apply(this, arguments);
 		}
-	
+
 		return k.utils.obj.reduce(
 			k.utils.obj.sortBy(this._items, function(item)
 			{
@@ -2610,14 +2610,14 @@ k.data.State = (function(_super)
 			return item.clone();
 		});
 	};
-	
+
 	/* @function Returns an orignal item rule based on its id.
 		This method is intended to be use as READ-ONLY, editing the returned items will affect the state and the rest of the automata at with this state belongs to.
 	 * @returns {[ItemRule]} Array of current item rules  */
 	state.prototype.getOriginalItems = function() {
 		return this._items;
 	};
-	
+
 	/* @function Returns an orignal item rule based on its id.
 		This method is intended to be use as READ-ONLY, editing the returned items will affect the state and the rest of the automata at with this state belongs to.
 	 * @returns {ItemRule} Item rule corresponding to the id passed in if present or null otherwise  */
@@ -2664,172 +2664,13 @@ k.data.State = (function(_super)
 			state: state
 		};
 	};
-	
+
 	/* @function Returns the list of item rules contained in the current state that are reduce item rules.
 	 * @returns {[ItemRule]} Recude Item Rules  */
 	state.prototype.getRecudeItems = function () {
 		return k.utils.obj.filter(this._items, function (item) {
 			return item.isReduce();
-		});   
-	};
-	
-	/* @function Determine if the current state is valid or not.
-	 * @param {Boolean} options.considerLookAhead Indicate if the state should take into account look ahead to validate. Default: false
-	 * @param {Automata} options.automata Optional automata instance used to pass to the conflict resolver in case there are conflict and resolvers.
-	 * @param {[ConflictResolver]} options.conflictResolvers List of conflict resolvers used to resolve possible conflict at the current state.
-	 * @returns {Boolean} true if the state is valid (invalid), false otherwise (inconsistent) */
-	state.prototype.isValid = function(options) {
-		//NOTE: Important! When usign this method for LR(0) without taking into account lookAhead, the current implementation DOES NOT USE RESOLVERS IN THIS CASE! it just return false if invalid
-		options = k.utils.obj.isObject(options) ? options : {};
-		options.conflictResolvers = options.conflictResolvers || [];
-		
-		var reduceItems = this.getRecudeItems(),
-			self = this,
-			isTheConflictResolvableWithResolvers = false;
-		
-		if (!options.considerLookAhead || !reduceItems.length)
-		{
-			return !(reduceItems.length !== this._items.length && reduceItems.length > 0 || reduceItems.length > 1);
-		}
-		
-		var shiftItems = k.utils.obj.filter(this._items, function (item)
-			{
-				return !item.isReduce();
-			});
-		
-		//Check for SHIFT/REDUCE Conflicts
-		if (shiftItems.length && reduceItems.length)
-		{
-			var shiftReduceResolvers = k.utils.obj.sortBy(k.utils.obj.filter(options.conflictResolvers, function (resolver)
-			{
-				return resolver.type === k.parser.conflictResolverType.STATE_SHIFTREDUCE;
-			}), 'order');
-			
-			//Generla Idea: For each shift item rule validate that the shift symbol is not in any lookAhead symbol of any reduce rule
-			
-			//For each shift item
-			var isAnyShiftReduceConflict = k.utils.obj.any(shiftItems, function (shiftItem)
-			{
-				//get the shift symbol
-				var shiftSymbol = shiftItem.getCurrentSymbol();
-				
-				//find among all reduce items
-				return k.utils.obj.find(reduceItems, function (reduceItem)
-				{
-					//if the shift symbol is in any reduce item rule's lookAhead set.
-					
-					var isShiftSymbolInReduceLookAhead = k.utils.obj.find(reduceItem.lookAhead, function (lookAheadSymbol) { return lookAheadSymbol.name === shiftSymbol.name;});
-					if (isShiftSymbolInReduceLookAhead)
-					{
-						isTheConflictResolvableWithResolvers = k.utils.obj.find(shiftReduceResolvers, function (resolver)
-						{
-							return resolver.resolve(options.automata, self, shiftItem, reduceItem);
-						});
-						
-						return !isTheConflictResolvableWithResolvers;
-					}
-					
-					return false;
-				});
-			});
-			
-			if (isAnyShiftReduceConflict)
-			{
-				return false;
-			}
-		}
-		
-		//Check for REDUCE/REDUCE Conflicts
-		if (reduceItems.length > 1)
-		{
-			var reduceReduceResolvers = k.utils.obj.sortBy(k.utils.obj.filter(options.conflictResolvers, function (resolver)
-				{
-					return resolver.type === k.parser.conflictResolverType.STATE_REDUCEREDUCE;
-				}), 'order');
-				
-			//General Idea: For each reduce rule, validate that its look Ahead set is disjoin with the rest of the reduce rule
-				
-			//for each reduce rule
-			var isAnyReduceReduceConflict = k.utils.obj.any(reduceItems, function (reduceItemSelected)
-			{
-				//compare it with each of the other reduce rules
-				return k.utils.obj.find(reduceItems, function (reduceItemInspected)
-				{
-					if (reduceItemInspected.getIdentity() === reduceItemSelected.getIdentity())
-					{
-						return false;
-					}
-					
-					//and for each look ahead symbol of the first reduce rule, validate the it is not present in any other look Ahead
-					var isLookAheadSymbolInOtherLookAheadSet = k.utils.obj.find(reduceItemSelected.lookAhead, function (lookAheadSelected)
-					{
-						return k.utils.obj.find(reduceItemInspected.lookAhead, function (lookAheadSymbol) { return lookAheadSymbol.name === lookAheadSelected.name;});
-					});
-					
-					if (isLookAheadSymbolInOtherLookAheadSet)
-					{
-						isTheConflictResolvableWithResolvers = k.utils.obj.find(reduceReduceResolvers, function (resolver)
-						{
-							return resolver.resolve(options.automata, self, reduceItemSelected, reduceItemInspected);
-						});
-						
-						return !isTheConflictResolvableWithResolvers;
-					}
-					
-					return false;
-				});
-				
-			});
-			
-			if (isAnyReduceReduceConflict)
-			{
-				return false;
-			}
-		}
-		
-		return true;
-	};
-	
-	/* @function Generates the list of shift and reduce items that take part iin the current state. Validating at the same time that none of these items are in conflict
-		or that the conflicts are solvable.
-	 * @param {Boolean} options.considerLookAhead Indicate if the state should take into account look ahead to validate. If not the state will validate and generate the result as in a LR(0). Default: false
-	 * @param {Automata} options.automata Optional automata instance used to pass to the conflict resolver in case there are conflict and resolvers.
-	 * @param {[ConflictResolver]} options.conflictResolvers List of conflict resolvers used to resolve possible conflict at the current state.
-	 * @param {Boolean} options.ignoreErrors Indicate if when facing an error (a conflict that can not be solve by any resolver) continue the execution. Default: false
-	 * @returns {Object} An object containg two properties (arrays) shiftItems and reduceItems */
-	state.prototype.getShiftReduceItemRule = function(options) {
-		//NOTE: Important! When using this method for LR(0) without taking into account lookAhead, the current implementation DOES NOT USE RESOLVERS IN THIS CASE! it just return false if invalid
-		//NOTE: Important! When using this method for LR(0) without taking into account lookAhead, the current implementation DOES NOT HONOR the ignoreErrors PROPERTY!
-		options = k.utils.obj.isObject(options) ? options : {};
-		options.conflictResolvers = options.conflictResolvers || [];
-		
-		var reduceItems = this.getRecudeItems(),
-			shiftItems = k.utils.obj.filter(this._items, function (item)
-			{
-				return !item.isReduce();
-			}),
-			self = this,
-			ignoreErrors = !!options.ignoreErrors,
-			result = {shiftItems:[], reduceItems:[]},
-			isTheConflictResolvableWithResolvers = false;
-		
-		if (!options.considerLookAhead)
-		{
-			if (!reduceItems.length)
-			{
-				result.shiftItems = shiftItems || [];
-			}
-			else if (!shiftItems.length && reduceItems.length === 1)
-			{
-				result.reduceItems = reduceItems;
-			}
-			else
-			{
-				return false;
-			}
-			
-			return result;
-		}
+		});
 	};
 
 	return state;
@@ -2855,8 +2696,8 @@ k.data.Automata = (function() {
 		k.utils.obj.defineProperty(this, 'initialState');
 		//Determines if the current autamata has or not lookAhead. This is set by the automata Generator
 		k.utils.obj.defineProperty(this, 'hasLookAhead');
-		
-		
+
+
 		k.utils.obj.defineProperty(this, '_index');
 		k.utils.obj.defineProperty(this, '_unprocessedStates');
 		k.utils.obj.defineProperty(this, '_registerStates');
@@ -2865,7 +2706,7 @@ k.data.Automata = (function() {
 		this._unprocessedStates = [];
 		this._index = 0; //Index used to traversal the states of the current instance
 		this._registerStates = k.utils.obj.groupBy(this.states, function (state) {return state.getIdentity();});
-		
+
 		if (this.states.length)
 		{
 			this._unprocessedStates = [].concat(this.states);
@@ -2886,27 +2727,7 @@ k.data.Automata = (function() {
 		return this._unprocessedStates.splice(0,1)[0];
 		//this._index < this.states.length ? this.states[this._index++] : null;
 	};
-	
-	/* @function Function used to check if an automamta is valid.
-	* Commonly used to check if an automata is an LR(0) valid one.
-	* @param {Boolean} options.considerLookAhead Indicate if the validation process should take into account lookAhead values in the rule items. This values is passed in to each state.
-	* @param {[ConflictResovler]} options.conflictResolvers List of conflict resolvers used by the states in conflict.
-	* @returns {Boolean} true in case th automata is valid, false otherwise */
-	automata.prototype.isValid = function(options)
-	{
-		var defaultValidationOptions = {
-			considerLookAhead: this.hasLookAhead
-		};
-		
-		options = k.utils.obj.extendInNew(defaultValidationOptions, options || {});
-		options.automata = this;
-		
-		return !k.utils.obj.any(this.states, function (state)
-		{
-			return !state.isValid(options);
-		}, this);
-	};
-	
+
 	/* @function Set or get the initial state.
 	* @param {State} state If specified, set the initial state of the automata
 	* @returns {State} In case that none state is specifed returnes the initial state previously set */
@@ -2934,27 +2755,27 @@ k.data.Automata = (function() {
 			//When the states are the same in rules but its only difference is in its the look aheads, as a easy-to-implement a LALR(1) parser, we merge this look-aheads
 			var currentState = this._registerStates[newState.getIdentity()],
 				currentStateHasChange = false;
-				
+
 			k.utils.obj.each(currentState.getOriginalItems(), function (originalItemRule)
 			{
 				var newItemRule = newState.getOriginalItemById(originalItemRule.getIdentity()),
 					originalItemRuleLookAheadLength = originalItemRule.lookAhead.length;
-				
+
 				originalItemRule.lookAhead = k.utils.obj.uniq(originalItemRule.lookAhead.concat(newItemRule.lookAhead), function (item) { return item.name;});
-				
+
 				if (!currentStateHasChange && originalItemRuleLookAheadLength !== originalItemRule.lookAhead.length)
 				{
 					currentStateHasChange = true;
 				}
 			});
-			
+
 			if (currentStateHasChange)
 			{
 				var isCurrentStateAlreadyUnProcessed = k.utils.obj.find(this._unprocessedStates, function (unprocessedState)
 				{
 					return currentState.getIdentity() === unprocessedState.getIdentity();
 				});
-				
+
 				if (!isCurrentStateAlreadyUnProcessed)
 				{
 					this._unprocessedStates.push(currentState);
@@ -3145,7 +2966,7 @@ k.parser.AutomataLRGeneratorBase = (function() {
 	var automataLRGeneratorBase = function (options)
 	{
 		this.options = options;
-		
+
 		k.utils.obj.defineProperty(this, 'grammar');
 
 		if (!(this.grammar instanceof k.data.Grammar))
@@ -3176,7 +2997,7 @@ k.parser.AutomataLRGeneratorBase = (function() {
 
 		return currentState;
 	};
-	
+
 	/* @function Generate the options used to add item rules into the states when thy are being expanded
 	* @returns {Object} An object specifying the options used by the state.addItems method to include methods */
 	automataLRGeneratorBase.prototype._getExpansionItemNewItemsOptions = function ()
@@ -3185,9 +3006,8 @@ k.parser.AutomataLRGeneratorBase = (function() {
 			hasLookAhead: false
 		};
 	};
-	
-	/* @function When expanding an state, depending on the kind of automata that is being created (LR1/LALR1/LR0/etc), the way that is genrerated the list
-	* of new item rule to add to the current being processed state.
+
+	/* @function Generate the list of item rules that can be getted from a state when expanding it in the automata creation prcoess.
 	* This method is intended to be overwritten!.
 	* @param {ItemRule} currentItem The current item rule from which the new item rule are being generated.
 	* @param {Symbol} currentSymbol Is the symbol used to find new item rules.
@@ -3200,31 +3020,59 @@ k.parser.AutomataLRGeneratorBase = (function() {
 	* @param {Boolean} options.notValidate Indicate if the resulting automata should be validated for the current lookAhead or not. False by default (DO validate the automata).
 	* @param {[ConflicResolver]} options.conflictResolvers ORDERED List of conflicts resolvers used in case of conflicts in the state.
 	* @returns {Automata} The corresponding automata for the specified grammar */
-	automataLRGeneratorBase.prototype.generateAutomata = function(options)
+	automataLRGeneratorBase.prototype.generateAutomata = function (options)
 	{
 		var defaultAutomataGenerationOptions = {
 				notValidate: false,
 				conflictResolvers: []
 			};
+
 		options = k.utils.obj.extendInNew(defaultAutomataGenerationOptions, options || {});
-		
+
 		var automata = this._generateAutomata();
-		
-		if (!options.notValidate && !automata.isValid(options))
+
+		if (!options.notValidate && !this.isAutomataValid(automata, options))
 		{
 			return false;
 		}
-		//really
+
 		return automata;
 	};
-	
+
+	/* @function Validates an automata based on the current generator type (consider or not look-ahead)
+	* @param {Autamata} automata Automata instances to be validated
+	* @param {[ConflicResolver]} options.conflictResolvers ORDERED List of conflicts resolvers used in case of conflicts in the state.
+	* @returns {Boolean} true in case the automata is valid, false otherwise */
+	automataLRGeneratorBase.prototype.isAutomataValid = function (automata, options)
+	{
+		var defaultValidationOptions = {
+			automata: automata
+		};
+
+		options = k.utils.obj.extend(defaultValidationOptions, options || {});
+
+		return !k.utils.obj.any(automata.states, function (state)
+		{
+			return !this.isStateValid(state, options);
+		}, this);
+	};
+
+	/* @function Determine if the indicated state is valid or not.
+	* This method is intended to be overwritten!.
+	* @param {State} state State to validate
+	* @param {Boolean} options.considerLookAhead Indicate if the state should take into account look ahead to validate. Default: false
+	* @param {Automata} options.automata Optional automata instance used to pass to the conflict resolver in case there are conflict and resolvers.
+	* @returns {Boolean} true if the state is valid (invalid), false otherwise (inconsistent) */
+	automataLRGeneratorBase.prototype.isStateValid = function (state, options)
+	{
+	};
+
 	/* @function Generate the conflict resolvers list use to solve any possible conflict when validating the automata and when creating the Action table.
 	* @returns {Automata} The corresponding automata for the specified grammar */
 	automataLRGeneratorBase.prototype._getConflictResolvers = function ()
 	{
-		
 	};
-	
+
 	/* @function Actually Generate an automata
 	* @returns {Automata} The corresponding automata for the specified grammar */
 	automataLRGeneratorBase.prototype._generateAutomata = function()
@@ -3238,7 +3086,7 @@ k.parser.AutomataLRGeneratorBase = (function() {
 		this._expandAutomata(automata);
 		return automata;
 	};
-	
+
 	/* @function Generate the construction object used to initialize the new automata
 	* @param {State} initialState State that only contains the items rules from the start symbol of the grammar. This is the initial state before being expanded.
 	* @returns {Object} Object containing all the options used to create the new automata */
@@ -3248,7 +3096,7 @@ k.parser.AutomataLRGeneratorBase = (function() {
 				states: [this.expandItem(initialState)]
 			};
 	};
-	
+
 	/* @function Returns the initial list of item rules that will take part in the initial state of the automata. This can differ if the automata has or not lookahead
 	* @returns {[ItemRule]} The initial list of item rule. */
 	automataLRGeneratorBase.prototype._getInitialStateItemRules = function ()
@@ -3260,7 +3108,7 @@ k.parser.AutomataLRGeneratorBase = (function() {
 	automataLRGeneratorBase.prototype._expandAutomata = function(automata)
 	{
 		var currentState = automata.getNextState();
-		
+
 		while (currentState) {
 
 			//Get all valid symbol from which the current state can have transitions
@@ -3268,7 +3116,7 @@ k.parser.AutomataLRGeneratorBase = (function() {
 				addedState, //To control duplicated states
 				newItemRules = [];
 
-			// For each supported transicion from the current state, explore neighbours states 
+			// For each supported transicion from the current state, explore neighbours states
 			//Warning remove to create function inside this loop
 			/*jshint -W083 */
 			k.utils.obj.each(supportedTransitions, function (supportedTransition)
@@ -3287,13 +3135,13 @@ k.parser.AutomataLRGeneratorBase = (function() {
 				});
 
 				this.expandItem(newState, automata);
-				
-				// We determien if the new state is an acceptance state, if it has only the augmented rule in reduce state.    
+
+				// We determien if the new state is an acceptance state, if it has only the augmented rule in reduce state.
 				newState.isAcceptanceState = !!(newState.getOriginalItems().length === 1 && newState.getOriginalItems()[0].rule.name === k.data.Grammar.constants.AugmentedRuleName && newState.getOriginalItems()[0].dotLocation === 2);
 
 				// Add state controlling duplicated ones
 				addedState = automata.addState(newState);
-				
+
 				currentState.addTransition(supportedTransition.symbol, addedState);
 
 				newItemRules = [];
@@ -3302,7 +3150,7 @@ k.parser.AutomataLRGeneratorBase = (function() {
 			currentState = automata.getNextState();
 		}
 	};
-	
+
 	/* @function Given an automata returnes its GOTO Table. The table is represented by an object where each state is a property (row) and each possible symbol is a property of the previous object (column)
 	* Sample: table[<state>][<symbol>] = [undefined = error|<state id - string>]
 	* @param {Automata} automata Automatma used as a base of the calculation
@@ -3310,20 +3158,20 @@ k.parser.AutomataLRGeneratorBase = (function() {
 	automataLRGeneratorBase.prototype.generateGOTOTable = function(automata)
 	{
 		var table = {};
-		
+
 		k.utils.obj.each(automata.states, function (state)
 		{
 			table[state.getIdentity()] = {};
-			
+
 			k.utils.obj.each(state.transitions, function (transition) {
 				table[state.getIdentity()][transition.symbol.toString()] = transition.state;
 			});
 		});
-		
+
 		return table;
 	};
-	
-	/* @function Given an automata returnes its ACTION Table. 
+
+	/* @function Given an automata returnes its ACTION Table.
 	* The intend of this method is to be overwriten by each son class
 	* @param {Automata} automata Automatma used as a base of the calculation.
 	* @param {Boolean} options.ignoreErrors Indicate that when a state is in an error that cannot be resolver, continue the execution anyway.
@@ -3342,7 +3190,7 @@ k.parser.AutomataLR0Generator = (function(_super) {
 	'use strict';
 	/* jshint latedef:false */
 	k.utils.obj.inherit(automataLR0Generator, _super);
-	
+
 	/*
 	* Initialize a new Automaton Generator
 	*
@@ -3353,7 +3201,7 @@ k.parser.AutomataLR0Generator = (function(_super) {
 	{
 		_super.apply(this, arguments);
 	}
-	
+
 	/* @function Override super method to return the list of item rules that has as its head the current symbol, without taking into account the lookAhead
 	* @param {ItemRule} currentItem The current item rule from which the new item rule are being generated.
 	* @param {Symbol} currentSymbol Is the symbol used to find new item rules.
@@ -3362,7 +3210,7 @@ k.parser.AutomataLR0Generator = (function(_super) {
 	{
 		return k.data.ItemRule.newFromRules(this.grammar.getRulesFromNonTerminal(currentSymbol));
 	};
-	
+
 	/* @function Generate the construction object used to initialize the new automata. Override the super method to indicate that te automata should NOT use lookahead
 	* @param {State} initialState State that only contains the items rules from the start symbol of the grammar. This is the initial state before being expanded.
 	* @returns {Object} Object containing all the options used to create the new automata */
@@ -3370,10 +3218,10 @@ k.parser.AutomataLR0Generator = (function(_super) {
 	{
 		var result = _super.prototype._getNewAutomataOptions.apply(this, arguments);
 		result.hasLookAhead = false;
-		
+
 		return result;
 	};
-	
+
 	/* @function Override super method to return the list of item rules that has as its head the start symbol of the grammar
 	* @returns {[ItemRule]} The initial list of item rule. */
 	automataLR0Generator.prototype._getInitialStateItemRules = function ()
@@ -3383,18 +3231,18 @@ k.parser.AutomataLR0Generator = (function(_super) {
 					lookAhead: []
 				})];
 	};
-	
-	/* @function Given an automata returnes its ACTION Table. 
+
+	/* @function Given an automata returnes its ACTION Table.
 	* @param {Automata} automata Automatma used as a base of the calculation
 	* @returns {Function} Function that given the a state id and a lookAhead returns the action to take */
 	automataLR0Generator.prototype.generateACTIONTable = function (automata)
 	{
 		var table = {};
-		
+
 		k.utils.obj.each(automata.states, function(state)
 		{
 			var stateItems = state.getItems();
-			
+
 			// If it is a REDUCE state
 			if (stateItems.length === 1 && stateItems[0].dotLocation === (stateItems[0].rule.tail.length))
 			{
@@ -3405,7 +3253,7 @@ k.parser.AutomataLR0Generator = (function(_super) {
 						rule: stateItems[0].rule
 					};
 				}
-				else 
+				else
 				{
 					table[state.getIdentity()] = {
 						action: k.parser.tableAction.REDUCE,
@@ -3418,18 +3266,35 @@ k.parser.AutomataLR0Generator = (function(_super) {
 					action: k.parser.tableAction.SHIFT
 				};
 			}
-		});
-		
-		
-		return (function (hasLookAhead, actionTable) {
+		}); 
+
+
+		return (function (actionTable) {
 			return function (currentStateId, look_ahead)
 			{
 				return actionTable[currentStateId] || {
 					action: k.parser.tableAction.ERROR
 				};
 			};
-		})(automata.hasLookAhead, table);
+		})(table);
 	};
+
+	/* @function  Override super method to determine if the indicated state is valid or not.
+	* @param {State} state State to validate
+	* @param {Boolean} options.considerLookAhead Indicate if the state should take into account look ahead to validate. Default: false
+	* @param {Automata} options.automata Optional automata instance used to pass to the conflict resolver in case there are conflict and resolvers.
+	* @returns {Boolean} true if the state is valid (invalid), false otherwise (inconsistent) */
+	automataLR0Generator.prototype.isStateValid = function (state, options)
+	{
+		//NOTE: Important! When usign this method the current implementation DOES NOT USE RESOLVERS IN THIS CASE! it just return false if invalid
+		//TODO IMPLEMENT IT
+		options = k.utils.obj.isObject(options) ? options : {};
+		options.conflictResolvers = options.conflictResolvers || [];
+
+		var reduceItems = state.getRecudeItems();
+
+		return !(reduceItems.length !== state.getOriginalItems().length && reduceItems.length > 0 || reduceItems.length > 1);
+	}
 
 	return automataLR0Generator;
 })(k.parser.AutomataLRGeneratorBase);
@@ -3442,7 +3307,7 @@ k.parser.AutomataLALR1Generator = (function(_super)
 	'use strict';
 	/* jshint latedef:false */
 	k.utils.obj.inherit(automataLALR1Generator, _super);
-	
+
 	/*
 	* Initialize a new Automaton Generator
 	*
@@ -3453,7 +3318,7 @@ k.parser.AutomataLALR1Generator = (function(_super)
 	{
 		_super.apply(this, arguments);
 	}
-	
+
 	/* @function Override super method to return the list of item rules that has as its head the current symbol, TAKING into account the lookAhead
 	* @param {ItemRule} currentItem The current item rule from which the new item rule are being generated.
 	* @param {Symbol} currentSymbol Is the symbol used to find new item rules.
@@ -3463,7 +3328,7 @@ k.parser.AutomataLALR1Generator = (function(_super)
 		var lookAhead = this._getFirstSet(currentItem);
 		return k.data.ItemRule.newFromRules(this.grammar.getRulesFromNonTerminal(currentSymbol), lookAhead);
 	};
-	
+
 	/* @function Override super method to return the object require to indicate that new item rules added into a state should take into account the lookAhead
 	* @returns {Object} Object used by State.addItemRules indicating to DO use lookAhead to merge new items */
 	automataLALR1Generator.prototype._getExpansionItemNewItemsOptions = function ()
@@ -3472,7 +3337,7 @@ k.parser.AutomataLALR1Generator = (function(_super)
 			hasLookAhead: true
 		};
 	};
-	
+
 	/* @function Gets the array of look-ahead for the particular item rule taking into account the dot location fo the specified item rule.
 	* @param {ItemRule} itemRule Item rule to find FIRST Set
 	* @returns {[Terminals]} First set for specified look ahead */
@@ -3480,9 +3345,9 @@ k.parser.AutomataLALR1Generator = (function(_super)
 	{
 		var symbolsToTraverse = itemRule.rule.tail.slice(itemRule.dotLocation + 1),
 			requestedFirstSet = [];
-			
+
 		symbolsToTraverse = symbolsToTraverse.concat(itemRule.lookAhead);
-		
+
 		k.utils.obj.find(symbolsToTraverse, function (symbolTraversed)
 		{
 			if (symbolTraversed instanceof k.data.NonTerminal)
@@ -3501,16 +3366,16 @@ k.parser.AutomataLALR1Generator = (function(_super)
 				requestedFirstSet.push(symbolTraversed);
 				return true;
 			}
-			else 
+			else
 			{
 				throw new Error('Invalid Item Rule. Impossible calculate first set. Item Rule: ' + itemRule.toString());
 			}
-			
+
 		}, this);
-		
+
 		return requestedFirstSet;
 	};
-	
+
 	/* @function Generate the construction object used to initialize the new automata. Override the super method to indicate that te automata should DO use lookahead
 	* @param {State} initialState State that only contains the items rules from the start symbol of the grammar. This is the initial state before being expanded.
 	* @returns {Object} Object containing all the options used to create the new automata */
@@ -3518,10 +3383,10 @@ k.parser.AutomataLALR1Generator = (function(_super)
 	{
 		var result = _super.prototype._getNewAutomataOptions.apply(this, arguments);
 		result.hasLookAhead = true;
-		
+
 		return result;
 	};
-	
+
 	/* @function Override super method to return the list of item rules that has as its head the start symbol of the grammar, TAKING into account the lookAhead
 	* @returns {[ItemRule]} The initial list of item rule. */
 	automataLALR1Generator.prototype._getInitialStateItemRules = function ()
@@ -3531,25 +3396,25 @@ k.parser.AutomataLALR1Generator = (function(_super)
 					lookAhead: [new k.data.Symbol({name: k.data.specialSymbol.EOF, isSpecial: true})]
 				})];
 	};
-	
-	/* @function Given an automata returnes its ACTION Table. 
+
+	/* @function Given an automata returnes its ACTION Table.
 	* @param {Automata} automata Automatma used as a base of the calculation
 	* @returns {Function} Function that given the a state id and a lookAhead returns the action to take */
 	automataLALR1Generator.prototype.generateACTIONTable = function (automata, options)
 	{
 		var table = {};
-		
+
 		k.utils.obj.each(automata.states, function (state)
 		{
 			table[state.getIdentity()] = {};
-			
+
 			if (state.isAcceptanceState)
 			{
 				table[state.getIdentity()][k.data.specialSymbol.EOF] = {
 					action: k.parser.tableAction.ACCEPT,
 					rule: state.getOriginalItems()[0].rule //As we augment the grammar in the acceptance state is should be only one rule, the augmented rule, for that reason is the 0
 				};
-			} 
+			}
 			else
 			{
 				var defaultActionTableStateOptions = {
@@ -3557,16 +3422,16 @@ k.parser.AutomataLALR1Generator = (function(_super)
 					considerLookAhead: true
 				};
 				options = k.utils.obj.extendInNew(defaultActionTableStateOptions, options || {});
-				
+
 				// var stateItems = state.getShiftReduceItemRule(options);
 				var stateItems = this.getShiftReduceItemRuleFromState(state, options);
-				
+
 				if (!stateItems)
 				{
-					throw new Error('Impossible to generate Action Table. The following state is invalid. State: ' + state.getIdentity());	
+					throw new Error('Impossible to generate Action Table. The following state is invalid. State: ' + state.getIdentity());
 				}
-				
-				
+
+
 				//Shift Items
 				k.utils.obj.each(stateItems.shiftItems, function (shiftItem)
 				{
@@ -3574,7 +3439,7 @@ k.parser.AutomataLALR1Generator = (function(_super)
 						action: k.parser.tableAction.SHIFT
 					};
 				});
-				
+
 				//Reduce Items
 				//IMPORTANT: At this point the automata MUST be already validated, ensuring us that the lookAhead sets ARE DISJOINT
 				k.utils.obj.each(stateItems.reduceItems, function (reduceItemRule)
@@ -3585,24 +3450,136 @@ k.parser.AutomataLALR1Generator = (function(_super)
 							action: k.parser.tableAction.REDUCE,
 							rule: reduceItemRule.rule
 						};
-					});	
+					});
 				});
 			}
 		}, this);
-		
-		
-		return (function (hasLookAhead, actionTable) {
+
+
+		return (function (actionTable)
+		{
 			return function (currentStateId, look_ahead)
 			{
-				return (actionTable[currentStateId] && look_ahead && look_ahead.name && actionTable[currentStateId][look_ahead.name] ) || 
+				return (actionTable[currentStateId] && look_ahead && look_ahead.name && actionTable[currentStateId][look_ahead.name] ) ||
 					{
 						action: k.parser.tableAction.ERROR
 					};
-				
+
 			};
-		})(automata.hasLookAhead, table);
+		})(table);
 	};
-	
+
+	/* @function  Override super method to determine if the current state is valid or not.
+	 * @param {Boolean} options.considerLookAhead Indicate if the state should take into account look ahead to validate. Default: false
+	 * @param {Automata} options.automata Optional automata instance used to pass to the conflict resolver in case there are conflict and resolvers.
+	 * @param {[ConflictResolver]} options.conflictResolvers List of conflict resolvers used to resolve possible conflict at the current state.
+	 * @returns {Boolean} true if the state is valid (invalid), false otherwise (inconsistent) */
+	automataLALR1Generator.prototype.isStateValid = function (state, options)
+	{
+		options = k.utils.obj.isObject(options) ? options : {};
+		options.conflictResolvers = options.conflictResolvers || [];
+
+		var reduceItems = state.getRecudeItems(),
+			isTheConflictResolvableWithResolvers = false;
+
+		var shiftItems = k.utils.obj.filter(state.getOriginalItems(), function (item)
+			{
+				return !item.isReduce();
+			});
+
+		//Check for SHIFT/REDUCE Conflicts
+		if (shiftItems.length && reduceItems.length)
+		{
+			var shiftReduceResolvers = k.utils.obj.sortBy(k.utils.obj.filter(options.conflictResolvers, function (resolver)
+			{
+				return resolver.type === k.parser.conflictResolverType.STATE_SHIFTREDUCE;
+			}), 'order');
+
+			//Generla Idea: For each shift item rule validate that the shift symbol is not in any lookAhead symbol of any reduce rule
+
+			//For each shift item
+			var isAnyShiftReduceConflict = k.utils.obj.any(shiftItems, function (shiftItem)
+			{
+				//get the shift symbol
+				var shiftSymbol = shiftItem.getCurrentSymbol();
+
+				//find among all reduce items
+				return k.utils.obj.find(reduceItems, function (reduceItem)
+				{
+					//if the shift symbol is in any reduce item rule's lookAhead set.
+
+					var isShiftSymbolInReduceLookAhead = k.utils.obj.find(reduceItem.lookAhead, function (lookAheadSymbol) { return lookAheadSymbol.name === shiftSymbol.name;});
+					if (isShiftSymbolInReduceLookAhead)
+					{
+						isTheConflictResolvableWithResolvers = k.utils.obj.find(shiftReduceResolvers, function (resolver)
+						{
+							return resolver.resolve(options.automata, state, shiftItem, reduceItem);
+						});
+
+						return !isTheConflictResolvableWithResolvers;
+					}
+
+					return false;
+				});
+			});
+
+			if (isAnyShiftReduceConflict)
+			{
+				return false;
+			}
+		}
+
+		//Check for REDUCE/REDUCE Conflicts
+		if (reduceItems.length > 1)
+		{
+			var reduceReduceResolvers = k.utils.obj.sortBy(k.utils.obj.filter(options.conflictResolvers, function (resolver)
+				{
+					return resolver.type === k.parser.conflictResolverType.STATE_REDUCEREDUCE;
+				}), 'order');
+
+			//General Idea: For each reduce rule, validate that its look Ahead set is disjoin with the rest of the reduce rule
+
+			//for each reduce rule
+			var isAnyReduceReduceConflict = k.utils.obj.any(reduceItems, function (reduceItemSelected)
+			{
+				//compare it with each of the other reduce rules
+				return k.utils.obj.find(reduceItems, function (reduceItemInspected)
+				{
+					if (reduceItemInspected.getIdentity() === reduceItemSelected.getIdentity())
+					{
+						return false;
+					}
+
+					//and for each look ahead symbol of the first reduce rule, validate the it is not present in any other look Ahead
+					var isLookAheadSymbolInOtherLookAheadSet = k.utils.obj.find(reduceItemSelected.lookAhead, function (lookAheadSelected)
+					{
+						return k.utils.obj.find(reduceItemInspected.lookAhead, function (lookAheadSymbol) { return lookAheadSymbol.name === lookAheadSelected.name;});
+					});
+
+					if (isLookAheadSymbolInOtherLookAheadSet)
+					{
+						isTheConflictResolvableWithResolvers = k.utils.obj.find(reduceReduceResolvers, function (resolver)
+						{
+							return resolver.resolve(options.automata, state, reduceItemSelected, reduceItemInspected);
+						});
+
+						return !isTheConflictResolvableWithResolvers;
+					}
+
+					return false;
+				});
+
+			});
+
+			if (isAnyReduceReduceConflict)
+			{
+				return false;
+			}
+		}
+
+		return true;
+	};
+
 	/* @function Generates the list of shift and reduce items that take part from the passed in state. Validating at the same time that none of these items are in conflict
 		or that the conflicts are solvable.
 	 * @param {State} state State to extract form each of the reduce/shift item rules
@@ -3615,7 +3592,7 @@ k.parser.AutomataLALR1Generator = (function(_super)
 	{
 		options = k.utils.obj.isObject(options) ? options : {};
 		options.conflictResolvers = options.conflictResolvers || [];
-		
+
 		var reduceItems = state.getRecudeItems(),
 			shiftItems = k.utils.obj.filter(state.getOriginalItems(), function (item)
 			{
@@ -3624,14 +3601,14 @@ k.parser.AutomataLALR1Generator = (function(_super)
 			ignoreErrors = !!options.ignoreErrors,
 			result = {shiftItems:[], reduceItems:[]},
 			isTheConflictResolvableWithResolvers = false;
-			
+
 		//We clone the reduce item, becuase when there is a Shift/Reduce conflic and the solution is shift, we need to remove the shift symbol from the lookAhead set of the reduce item!
 		//Otherwise when createion the Action table the reduce item end it up overriding the shift actions! (see automataLALRGenerator)
 		reduceItems = k.utils.obj.map(reduceItems, function (reduceItem)
 		{
-			return reduceItem.clone(); 
+			return reduceItem.clone();
 		});
-		
+
 		//Process all SHIFT items & Check for SHIFT/REDUCE Conflicts
 		if (shiftItems.length)
 		{
@@ -3639,22 +3616,22 @@ k.parser.AutomataLALR1Generator = (function(_super)
 			{
 				return resolver.type === k.parser.conflictResolverType.STATE_SHIFTREDUCE;
 			}), 'order');
-			
+
 			//Generla Idea: For each shift item rule validate that the shift symbol is not in any lookAhead symbol of any reduce rule
-			
+
 			//For each shift item
 			var isAnyShiftReduceConflict = k.utils.obj.any(shiftItems, function (shiftItem)
 			{
 				//get the shift symbol
 				var shiftSymbol = shiftItem.getCurrentSymbol();
-				
+
 				//find among all reduce items
 				var isShiftItemInConflict = k.utils.obj.find(reduceItems, function (reduceItem)
 				{
 					//if the shift symbol is in any reduce item rule's lookAhead set.
-					//NOTE: Here we obtain the lookAhead Symbol that is in conflict, if any. 
+					//NOTE: Here we obtain the lookAhead Symbol that is in conflict, if any.
 					var isShiftSymbolInReduceLookAhead = k.utils.obj.find(reduceItem.lookAhead, function (lookAheadSymbol) { return lookAheadSymbol.name === shiftSymbol.name;});
-					
+
 					//if there is a possible shift/reduce conflict try to solve it by usign the resolvers list
 					if (isShiftSymbolInReduceLookAhead)
 					{
@@ -3664,7 +3641,7 @@ k.parser.AutomataLALR1Generator = (function(_super)
 							conflictSolutionFound = resolver.resolve(options.automata, state, shiftItem, reduceItem);
 							return conflictSolutionFound;
 						});
-						
+
 						//If the conflict is resolvable, and the action to be taken is SHIFT, we remove the Shift symbol from the reduce item lookAhead, so when creating the Action table
 						//that symbol wont take part of the table.
 						if (isTheConflictResolvableWithResolvers && conflictSolutionFound.action === k.parser.tableAction.SHIFT)
@@ -3672,29 +3649,29 @@ k.parser.AutomataLALR1Generator = (function(_super)
 							var symbolIndexToRemove = k.utils.obj.indexOf(reduceItem.lookAhead, isShiftSymbolInReduceLookAhead);
 							reduceItem.lookAhead.splice(symbolIndexToRemove,1);
 						}
-						
+
 						return !isTheConflictResolvableWithResolvers;
 					}
-					
+
 					return false;
 				});
-				
+
 				if (!isShiftItemInConflict || ignoreErrors)
 				{
 					result.shiftItems.push(shiftItem);
 					return false;
-				} 
-				
+				}
+
 				return true;
-				
+
 			});
-			
+
 			if (isAnyShiftReduceConflict)
 			{
 				return false;
 			}
 		}
-		
+
 		//Process all REDUCE items & Check for REDUCE/REDUCE Conflicts
 		if (reduceItems.length)
 		{
@@ -3702,9 +3679,9 @@ k.parser.AutomataLALR1Generator = (function(_super)
 				{
 					return resolver.type === k.parser.conflictResolverType.STATE_REDUCEREDUCE;
 				}), 'order');
-				
+
 			//General Idea: For each reduce rule, validate that its look Ahead set is disjoin with the rest of the reduce rule
-				
+
 			//for each reduce rule
 			var isAnyReduceReduceConflict = k.utils.obj.any(reduceItems, function (reduceItemSelected)
 			{
@@ -3715,40 +3692,40 @@ k.parser.AutomataLALR1Generator = (function(_super)
 					{
 						return false;
 					}
-					
+
 					//and for each look ahead symbol of the first reduce rule, validate the it is not present in any other look Ahead
 					var isLookAheadSymbolInOtherLookAheadSet = k.utils.obj.find(reduceItemSelected.lookAhead, function (lookAheadSelected)
 					{
 						return k.utils.obj.find(reduceItemInspected.lookAhead, function (lookAheadSymbol) { return lookAheadSymbol.name === lookAheadSelected.name;});
 					});
-					
+
 					if (isLookAheadSymbolInOtherLookAheadSet)
 					{
 						isTheConflictResolvableWithResolvers = k.utils.obj.find(reduceReduceResolvers, function (resolver)
 						{
 							return resolver.resolve(options.automata, state, reduceItemSelected, reduceItemInspected);
 						});
-						
+
 						return !isTheConflictResolvableWithResolvers;
 					}
-					
+
 					return false;
 				});
-				
+
 				if (!isReduceItemInConflict || ignoreErrors)
 				{
 					result.reduceItems.push(reduceItemSelected);
-					return false; 
+					return false;
 				}
 				return true;
 			});
-			
+
 			if (isAnyReduceReduceConflict)
 			{
 				return false;
 			}
 		}
-		
+
 		return result;
 	};
 

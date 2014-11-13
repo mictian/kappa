@@ -11,7 +11,7 @@ describe('Automata LALR(1) Generator', function ()
 			    return (item.rule.name === ruleName);
 			});
 		}
-		
+
 		it('should duplicate a rule if the dot location differs', function ()
 		{
 			var ag = new k.parser.AutomataLALR1Generator({
@@ -21,20 +21,20 @@ describe('Automata LALR(1) Generator', function ()
 				items = k.data.ItemRule.newFromRules([sampleGrammars.aPlusb.A1]),
 				state,
 				itemsState;
-				
+
 			// Convert A --> *'a'A into A --> 'a'*A
 			items[0].dotLocation++;
-			
+
 			initialState = new k.data.State({
 				items: items
 			});
-				
+
 			state = ag.expandItem(initialState);
-			
+
 			itemsState = state.getItems();
-				
+
 			expect(itemsState.length).toBe(3);
-			
+
 			var groupedItems = k.utils.obj.groupBy(itemsState, function (itemRule)
 			{
 				return itemRule.rule.name;
@@ -64,7 +64,7 @@ describe('Automata LALR(1) Generator', function ()
 			var itemOparen = getItemByRuleName(itemsState, 'OPARENRULE'); //This name is defined in the rule inside the sampleGrammar file
 			expect(itemOparen).toBeDefined();
 			expect(itemOparen.rule).toBe(sampleGrammars.idsList.OPAREN);
-			
+
 			var itemAugment = getItemByRuleName(itemsState, 'AUGMENTRULE'); //This name is defined in all the grammars
 			expect(itemAugment).toBeDefined();
 		});
@@ -170,7 +170,7 @@ describe('Automata LALR(1) Generator', function ()
 				return state.getIdentity() === id;
 			});
 		}
-		
+
 		function validateState(states, stateId, expectedItemsLength, lookAhead)
 		{
 			var state = findStateById(states, stateId);
@@ -181,14 +181,14 @@ describe('Automata LALR(1) Generator', function ()
 			{
 				 var itemRule = state.getOriginalItemById(itemRuleId);
 				 expect(lookAhead[itemRuleId].length).toBe(itemRule.lookAhead.length);
-				 
+
 				k.utils.obj.each(lookAhead[itemRuleId], function (expectedLookAhead)
 				{
 				 	var lookAheadFound = !!k.utils.obj.find(itemRule.lookAhead, function (symbol)
 					{
 						return symbol.name === expectedLookAhead;
 					});
-					
+
 					expect(lookAheadFound).toBe(true);
 				});
 			});
@@ -201,12 +201,12 @@ describe('Automata LALR(1) Generator', function ()
 				}),
 				result = ag.generateAutomata(),
 				states = result.states;
-				
+
 			expect(result.hasLookAhead).toBe(true);
 
 			expect(result).toBeInstanceOf(k.data.Automata);
 			expect(states.length).toBe(9);
-			
+
 			validateState(states, '0(0)1(0)2(0)3(0)5(0)', 5,
 			{
 				'0(0)':['EOF'],
@@ -251,7 +251,7 @@ describe('Automata LALR(1) Generator', function ()
 				'0(2)':['EOF']
 			});
 		});
-		
+
 		it('should return the correct automata for the simple grammar NUM DIFF', function ()
 		{
 			var ag = new k.parser.AutomataLALR1Generator({
@@ -259,12 +259,12 @@ describe('Automata LALR(1) Generator', function ()
 				}),
 				result = ag.generateAutomata({notValidate:true}),
 				states = result.states;
-				
+
 			expect(result.hasLookAhead).toBe(true);
 
 			expect(result).toBeInstanceOf(k.data.Automata);
 			expect(states.length).toBe(12);
-			
+
 			validateState(states, '0(0)1(0)2(0)3(0)4(0)5(0)6(0)', 7,
 			{
 				'0(0)':['EOF'],
@@ -292,7 +292,7 @@ describe('Automata LALR(1) Generator', function ()
 				'5(0)':['EOF','CPAREN'],
 				'6(0)':['NUMBER','OPAREN']
 			});
-			
+
 			validateState(states, '2(1)5(2)7(0)8(0)', 4,
 			{
 				'2(1)':['CPAREN','DIFF'],
@@ -336,7 +336,7 @@ describe('Automata LALR(1) Generator', function ()
 				'0(2)':['EOF']
 			});
 		});
-		
+
 		it('should return the correct automata for the simple grammar A+B', function ()
 		{
 			var ag = new k.parser.AutomataLALR1Generator({
@@ -347,7 +347,7 @@ describe('Automata LALR(1) Generator', function ()
 
 			expect(result).toBeInstanceOf(k.data.Automata);
 			expect(states.length).toBe(6);
-			
+
 			validateState(states, '0(0)1(0)2(0)', 3,
 			{
 				'0(0)':['EOF'],
@@ -377,7 +377,7 @@ describe('Automata LALR(1) Generator', function ()
 				'0(2)':['EOF']
 			});
 		});
-		
+
 		it('should return the correct automata for the simple grammar a^(n+1)b^(n)', function ()
 		{
 			var ag = new k.parser.AutomataLALR1Generator({
@@ -388,7 +388,7 @@ describe('Automata LALR(1) Generator', function ()
 
 			expect(result).toBeInstanceOf(k.data.Automata);
 			expect(states.length).toBe(9);
-			
+
 			validateState(states, '0(0)1(0)2(0)3(0)', 4,
 				{
 					'0(0)': ['EOF'],
@@ -428,13 +428,13 @@ describe('Automata LALR(1) Generator', function ()
 				'1(1)':['EOF'],
 				'4(0)':['EOF']
 			});
-			
+
 			validateState(states, 'AcceptanceState', 1,
 			{
 				'0(2)':['EOF']
 			});
 		});
-		
+
 		it('should return the correct automata for the simple grammar Condenced num Diff', function ()
 		{
 			var ag = new k.parser.AutomataLALR1Generator({
@@ -446,7 +446,7 @@ describe('Automata LALR(1) Generator', function ()
 
 			expect(result).toBeInstanceOf(k.data.Automata);
 			expect(states.length).toBe(11);
-			
+
 			validateState(states, '0(0)1(0)2(0)3(0)4(0)5(0)', 6,
 			{
 				'0(0)':['EOF'],
@@ -506,7 +506,7 @@ describe('Automata LALR(1) Generator', function ()
 			});
 		});
 	});
-	
+
 	describe('generateACTIONTable', function ()
 	{
 		it('should return the expected action function for the simple LR0 grammar a+b', function ()
@@ -516,31 +516,31 @@ describe('Automata LALR(1) Generator', function ()
 				}),
 				automata = ag.generateAutomata(),
 				actionTable = ag.generateACTIONTable(automata);
-			
+
 			expect(actionTable).toEqual(jasmine.any(Function));
-		
+
 			expect(actionTable('0(0)1(0)2(0)', {name:'A_LET'})).toEqual({action: k.parser.tableAction.SHIFT});
-			
+
 			expect(actionTable('0(0)1(0)2(0)', {name:''})).toEqual({action: k.parser.tableAction.ERROR});
 			expect(actionTable('0(0)1(0)2(0)', {name:'fake_value'})).toEqual({action: k.parser.tableAction.ERROR});
 			expect(actionTable('0(0)1(0)2(0)', {name:'_A_LET'})).toEqual({action: k.parser.tableAction.ERROR});
-			
+
 			expect(actionTable('1(1)1(0)2(0)', {name:'A_LET'})).toEqual({action: k.parser.tableAction.SHIFT});
 			expect(actionTable('1(1)1(0)2(0)', {name:'A_LET'})).toEqual({action: k.parser.tableAction.SHIFT});
-			
+
 			expect(actionTable('0(1)', {name:'EOF'})).toEqual({action: k.parser.tableAction.SHIFT});
-			
+
 			expect(actionTable('2(1)', {name:'EOF'}).action).toEqual(k.parser.tableAction.REDUCE);
 			expect(actionTable('2(1)', {name:'EOF'}).rule.name).toEqual(sampleGrammars.aPlusb.A2.name);
-			
+
 			expect(actionTable('2(1)', {name:'A_LET'}).action).toEqual(k.parser.tableAction.ERROR);
-			
+
 			expect(actionTable('1(2)', {name:'EOF'}).action).toEqual(k.parser.tableAction.REDUCE);
 			expect(actionTable('1(2)', {name:'EOF'}).rule.name).toEqual(sampleGrammars.aPlusb.A1.name);
-			
+
 			expect(actionTable('AcceptanceState', {name:'EOF'}).action).toEqual('ACCEPT');
 		});
-		
+
 		it('should return the expected action function (table) for the simple LR1 grammar num Diff Condenced', function ()
 		{
 			var ag = new k.parser.AutomataLALR1Generator({
@@ -548,112 +548,112 @@ describe('Automata LALR(1) Generator', function ()
 				}),
 				automata = ag.generateAutomata(),
 				actionTable = ag.generateACTIONTable(automata);
-			
+
 			expect(actionTable).toEqual(jasmine.any(Function));
-		
+
 			expect(actionTable('0(0)1(0)2(0)3(0)4(0)5(0)', {name:'NUMBER'}).action).toEqual(k.parser.tableAction.SHIFT);
 			expect(actionTable('0(0)1(0)2(0)3(0)4(0)5(0)', {name:'OPAREN'}).action).toEqual(k.parser.tableAction.SHIFT);
-			
+
 			expect(actionTable('0(0)1(0)2(0)3(0)4(0)5(0)', {name:'CPAREN'}).action).toEqual(k.parser.tableAction.ERROR);
 			expect(actionTable('0(0)1(0)2(0)3(0)4(0)5(0)', {name:'EOF'}).action).toEqual(k.parser.tableAction.ERROR);
 			expect(actionTable('0(0)1(0)2(0)3(0)4(0)5(0)', {name:'DIFF'}).action).toEqual(k.parser.tableAction.ERROR);
-			
-			
+
+
 			expect(actionTable('0(1)', {name:'EOF'}).action).toEqual(k.parser.tableAction.SHIFT);
-			
+
 			expect(actionTable('0(1)', {name:'CPAREN'}).action).toEqual( k.parser.tableAction.ERROR);
 			expect(actionTable('0(1)', {name:'OPAREN'}).action).toEqual( k.parser.tableAction.ERROR);
 			expect(actionTable('0(1)', {name:'DIFF'}).action).toEqual(k.parser.tableAction.ERROR);
 			expect(actionTable('0(1)', {name:'NUMBER'}).action).toEqual(k.parser.tableAction.ERROR);
-			
-			
+
+
 			expect(actionTable('1(1)2(1)', {name:'DIFF'}).action).toEqual(k.parser.tableAction.SHIFT);
 			expect(actionTable('1(1)2(1)', {name:'EOF'}).action).toEqual(k.parser.tableAction.REDUCE);
 			expect(actionTable('1(1)2(1)', {name:'EOF'}).rule.name).toEqual(sampleGrammars.numDiffCondenced.S.name);
-			
+
 			expect(actionTable('1(1)2(1)', {name:'OPAREN'}).action).toEqual(k.parser.tableAction.ERROR);
 			expect(actionTable('1(1)2(1)', {name:'CPAREN'}).action).toEqual(k.parser.tableAction.ERROR);
 			expect(actionTable('1(1)2(1)', {name:'NUMBER'}).action).toEqual(k.parser.tableAction.ERROR);
-			
-			
+
+
 			expect(actionTable('2(0)3(0)4(0)5(1)5(0)', {name:'NUMBER'}).action).toEqual(k.parser.tableAction.SHIFT);
 			expect(actionTable('2(0)3(0)4(0)5(1)5(0)', {name:'OPAREN'}).action).toEqual(k.parser.tableAction.SHIFT);
-			
+
 			expect(actionTable('2(0)3(0)4(0)5(1)5(0)', {name:'EOF'}).action).toEqual(k.parser.tableAction.ERROR);
 			expect(actionTable('2(0)3(0)4(0)5(1)5(0)', {name:'DIFF'}).action).toEqual(k.parser.tableAction.ERROR);
 			expect(actionTable('2(0)3(0)4(0)5(1)5(0)', {name:'CPAREN'}).action).toEqual(k.parser.tableAction.ERROR);
-			
-			
+
+
 			expect(actionTable('2(1)5(2)', {name:'CPAREN'}).action).toEqual(k.parser.tableAction.SHIFT);
 			expect(actionTable('2(1)5(2)', {name:'DIFF'}).action).toEqual(k.parser.tableAction.SHIFT);
-			
+
 			expect(actionTable('2(1)5(2)', {name:'EOF'}).action).toEqual(k.parser.tableAction.ERROR);
 			expect(actionTable('2(1)5(2)', {name:'OPAREN'}).action).toEqual(k.parser.tableAction.ERROR);
 			expect(actionTable('2(1)5(2)', {name:'NUMBER'}).action).toEqual(k.parser.tableAction.ERROR);
-			
-			
+
+
 			expect(actionTable('2(2)4(0)5(0)', {name:'NUMBER'}).action).toEqual(k.parser.tableAction.SHIFT);
 			expect(actionTable('2(2)4(0)5(0)', {name:'OPAREN'}).action).toEqual(k.parser.tableAction.SHIFT);
-			
+
 			expect(actionTable('2(2)4(0)5(0)', {name:'CPAREN'}).action).toEqual(k.parser.tableAction.ERROR);
 			expect(actionTable('2(2)4(0)5(0)', {name:'EOF'}).action).toEqual(k.parser.tableAction.ERROR);
 			expect(actionTable('2(2)4(0)5(0)', {name:'DIFF'}).action).toEqual(k.parser.tableAction.ERROR);
-			
-			
+
+
 			expect(actionTable('2(3)', {name:'DIFF'}).action).toEqual(k.parser.tableAction.REDUCE);
 			expect(actionTable('2(3)', {name:'DIFF'}).rule.name).toEqual(sampleGrammars.numDiffCondenced.E1.name);
 			expect(actionTable('2(3)', {name:'EOF'}).action).toEqual(k.parser.tableAction.REDUCE);
 			expect(actionTable('2(3)', {name:'EOF'}).rule.name).toEqual(sampleGrammars.numDiffCondenced.E1.name);
 			expect(actionTable('2(3)', {name:'CPAREN'}).action).toEqual(k.parser.tableAction.REDUCE);
 			expect(actionTable('2(3)', {name:'CPAREN'}).rule.name).toEqual(sampleGrammars.numDiffCondenced.E1.name);
-			
+
 			expect(actionTable('2(3)', {name:'OPAREN'}).action).toEqual(k.parser.tableAction.ERROR);
 			expect(actionTable('2(3)', {name:'NUMBER'}).action).toEqual(k.parser.tableAction.ERROR);
-			
-			
+
+
 			expect(actionTable('3(1)', {name:'CPAREN'}).action).toEqual(k.parser.tableAction.REDUCE);
 			expect(actionTable('3(1)', {name:'CPAREN'}).rule.name).toEqual(sampleGrammars.numDiffCondenced.E2.name);
 			expect(actionTable('3(1)', {name:'DIFF'}).action).toEqual(k.parser.tableAction.REDUCE);
 			expect(actionTable('3(1)', {name:'DIFF'}).rule.name).toEqual(sampleGrammars.numDiffCondenced.E2.name);
 			expect(actionTable('3(1)', {name:'EOF'}).action).toEqual(k.parser.tableAction.REDUCE);
 			expect(actionTable('3(1)', {name:'EOF'}).rule.name).toEqual(sampleGrammars.numDiffCondenced.E2.name);
-			
+
 			expect(actionTable('3(1)', {name:'NUMBER'}).action).toEqual(k.parser.tableAction.ERROR);
 			expect(actionTable('3(1)', {name:'OPAREN'}).action).toEqual(k.parser.tableAction.ERROR);
-			
-			
+
+
 			expect(actionTable('4(1)', {name:'CPAREN'}).action).toEqual(k.parser.tableAction.REDUCE);
 			expect(actionTable('4(1)', {name:'CPAREN'}).rule.name).toEqual(sampleGrammars.numDiffCondenced.T1.name);
 			expect(actionTable('4(1)', {name:'EOF'}).action).toEqual(k.parser.tableAction.REDUCE);
 			expect(actionTable('4(1)', {name:'EOF'}).rule.name).toEqual(sampleGrammars.numDiffCondenced.T1.name);
-			
+
 			expect(actionTable('4(1)', {name:'OPAREN'}).action).toEqual(k.parser.tableAction.ERROR);
 			expect(actionTable('4(1)', {name:'DIFF'}).action).toEqual(k.parser.tableAction.ERROR);
 			expect(actionTable('4(1)', {name:'NUM'}).action).toEqual(k.parser.tableAction.ERROR);
-			
-			
+
+
 			expect(actionTable('5(3)', {name:'EOF'}).action).toEqual(k.parser.tableAction.REDUCE);
 			expect(actionTable('5(3)', {name:'EOF'}).rule.name).toEqual(sampleGrammars.numDiffCondenced.T2.name);
 			expect(actionTable('5(3)', {name:'CPAREN'}).action).toEqual(k.parser.tableAction.REDUCE);
 			expect(actionTable('5(3)', {name:'CPAREN'}).rule.name).toEqual(sampleGrammars.numDiffCondenced.T2.name);
-			
+
 			expect(actionTable('5(3)', {name:'NUM'}).action).toEqual(k.parser.tableAction.ERROR);
 			expect(actionTable('5(3)', {name:'OPAREN'}).action).toEqual(k.parser.tableAction.ERROR);
 			expect(actionTable('5(3)', {name:'DIFF'}).action).toEqual(k.parser.tableAction.ERROR);
-			
-			
+
+
 			expect(actionTable(k.data.State.constants.AcceptanceStateName, {name:'EOF'}).action).toEqual(k.parser.tableAction.ACCEPT);
 			expect(actionTable(k.data.State.constants.AcceptanceStateName, {name:'EOF'}).rule.name).toEqual(k.data.Grammar.constants.AugmentedRuleName);
-			
+
 			expect(actionTable(k.data.State.constants.AcceptanceStateName, {name:'OPAREN'}).action).toEqual(k.parser.tableAction.ERROR);
 			expect(actionTable(k.data.State.constants.AcceptanceStateName, {name:'CPAREN'}).action).toEqual(k.parser.tableAction.ERROR);
 			expect(actionTable(k.data.State.constants.AcceptanceStateName, {name:'NUMBER'}).action).toEqual(k.parser.tableAction.ERROR);
 			expect(actionTable(k.data.State.constants.AcceptanceStateName, {name:'DIFF'}).action).toEqual(k.parser.tableAction.ERROR);
 		});
-		
+
 	});
-	
-	describe('getShiftReduceItemRule', function ()
+
+	describe('getShiftReduceItemRuleFromState', function ()
 	{
 		// //WITH look Ahead and without resolvers
 		it('should return false if there are two reduce items with the same lookAhead (without resolvers and NOT ignore errors)', function ()
@@ -666,23 +666,23 @@ describe('Automata LALR(1) Generator', function ()
 				state = new k.data.State({
 					items: [reduceItem1, reduceItem2]
 				});
-				
+
 			reduceItem1.dotLocation = 1;
 			reduceItem2.dotLocation = 3;
-			
+
 			reduceItem1._id = null;
 			reduceItem2._id = null;
 			reduceItem1.lookAhead.push(sampleGrammars.selectedBs.S2.tail[1]);
 			reduceItem2.lookAhead.push(sampleGrammars.selectedBs.S2.tail[1]);
-			
+
 			var result = ag.getShiftReduceItemRuleFromState(state,{
 				considerLookAhead: true,
 				conflictResolvers: []
 			});
-			
+
 			expect(result).toBe(false);
 		});
-		
+
 		it('should return false if there is a shift item in conflict with a reduce items (without resolvers and NOT ignore errors)', function ()
 		{
 			var ag = new k.parser.AutomataLALR1Generator({
@@ -693,18 +693,18 @@ describe('Automata LALR(1) Generator', function ()
 				state = new k.data.State({
 					items: [reduceItem, shiftItem]
 				});
-				
+
 			reduceItem.dotLocation = 1;
 			reduceItem.lookAhead.push(shiftItem.getCurrentSymbol());
-			
+
 			var result = ag.getShiftReduceItemRuleFromState(state,{
 				considerLookAhead: true,
 				conflictResolvers: []
 			});
-			
+
 			expect(result).toBe(false);
 		});
-		
+
 		it('should return an object with two reduce items if there are two reduce items with the same lookAhead (without resolvers and DO USING ignore errors)', function ()
 		{
 			var ag = new k.parser.AutomataLALR1Generator({
@@ -715,21 +715,21 @@ describe('Automata LALR(1) Generator', function ()
 				state = new k.data.State({
 					items: [reduceItem1, reduceItem2]
 				});
-				
+
 			reduceItem1.dotLocation = 1;
 			reduceItem2.dotLocation = 3;
-			
+
 			reduceItem1._id = null;
 			reduceItem2._id = null;
 			reduceItem1.lookAhead.push(sampleGrammars.selectedBs.S2.tail[2]);
 			reduceItem2.lookAhead.push(sampleGrammars.selectedBs.S2.tail[1]);
-			
+
 			var result = ag.getShiftReduceItemRuleFromState(state,{considerLookAhead:true});
-			
+
 			expect(result.shiftItems.length).toBe(0);
 			expect(result.reduceItems.length).toBe(2);
 		});
-		
+
 		it('should return an object with one shift item and one reduce items that are in conflict with using ignore errors (without resolvers)', function ()
 		{
 			var ag = new k.parser.AutomataLALR1Generator({
@@ -740,20 +740,20 @@ describe('Automata LALR(1) Generator', function ()
 				state = new k.data.State({
 					items: [reduceItem, shiftItem]
 				});
-				
+
 			reduceItem.dotLocation = 1;
 			reduceItem.lookAhead.push(shiftItem.getCurrentSymbol());
-			
+
 			var result = ag.getShiftReduceItemRuleFromState(state,{
 				considerLookAhead: true,
 				conflictResolvers: [],
 				ignoreErrors: true
 			});
-			
+
 			expect(result.shiftItems.length).toBe(1);
 			expect(result.reduceItems.length).toBe(1);
 		});
-		
+
 		it('should return an object with two reduce items if the state has two reduce items without conflict', function ()
 		{
 			var ag = new k.parser.AutomataLALR1Generator({
@@ -764,26 +764,26 @@ describe('Automata LALR(1) Generator', function ()
 				state = new k.data.State({
 					items: [reduceItem1, reduceItem2]
 				});
-				
+
 			reduceItem1.dotLocation = 1;
 			reduceItem2.dotLocation = 3;
-			
+
 			reduceItem1._id = null;
 			reduceItem2._id = null;
 			reduceItem1.lookAhead.push(sampleGrammars.selectedBs.S2.tail[1]);
 			reduceItem2.lookAhead.push(sampleGrammars.selectedBs.S2.tail[0]);
-			
+
 			var result = ag.getShiftReduceItemRuleFromState(state,{
 				considerLookAhead: true,
 				conflictResolvers: []
 			});
-			
+
 			expect(result.shiftItems.length).toBe(0);
 			expect(result.reduceItems.length).toBe(2);
 			expect(result.reduceItems[0].getIdentity()).toEqual(reduceItem1.getIdentity());
 			expect(result.reduceItems[1].getIdentity()).toEqual(reduceItem2.getIdentity());
 		});
-		
+
 		it('should return an object with two shift items if the state has two shift item', function ()
 		{
 			var ag = new k.parser.AutomataLALR1Generator({
@@ -794,18 +794,18 @@ describe('Automata LALR(1) Generator', function ()
 				state = new k.data.State({
 					items: [shiftItem1, shiftItem2]
 				});
-				
+
 			var result = ag.getShiftReduceItemRuleFromState(state,{
 				considerLookAhead: true,
 				conflictResolvers: []
 			});
-			
+
 			expect(result.shiftItems.length).toBe(2);
 			expect(result.shiftItems[0].getIdentity()).toEqual(shiftItem1.getIdentity());
 			expect(result.shiftItems[1].getIdentity()).toEqual(shiftItem2.getIdentity());
 			expect(result.reduceItems.length).toBe(0);
 		});
-		
+
 		it('should return an object with two shift items and two reduce items in the state has two reduce and two shift item without conflcts', function ()
 		{
 			var ag = new k.parser.AutomataLALR1Generator({
@@ -818,30 +818,30 @@ describe('Automata LALR(1) Generator', function ()
 				state = new k.data.State({
 					items: [shiftItem1, shiftItem2, reduceItem1, reduceItem2]
 				});
-				
+
 			reduceItem1.dotLocation = 3;
 			reduceItem2.dotLocation = 3;
-			
+
 			reduceItem1._id = null;
 			reduceItem2._id = null;
 			reduceItem1.lookAhead.push(sampleGrammars.selectedBs.S2.tail[2]);
 			reduceItem2.lookAhead.push(sampleGrammars.selectedBs.L2.tail[1]);
-			
+
 			var result = ag.getShiftReduceItemRuleFromState(state,{
 				considerLookAhead: true,
 				conflictResolvers: []
 			});
-			
+
 			expect(result.shiftItems.length).toBe(2);
 			expect(result.shiftItems[0].getIdentity()).toEqual(shiftItem1.getIdentity());
 			expect(result.shiftItems[1].getIdentity()).toEqual(shiftItem2.getIdentity());
-			
+
 			expect(result.reduceItems.length).toBe(2);
 			expect(result.reduceItems[0].getIdentity()).toEqual(reduceItem1.getIdentity());
 			expect(result.reduceItems[1].getIdentity()).toEqual(reduceItem2.getIdentity());
 		});
-		
-		
+
+
 		//WITH look Ahead and WITH resolvers
 		it('should return an object with two reduce item if there are two reduce items in a resolvable conflict', function ()
 		{
@@ -854,31 +854,31 @@ describe('Automata LALR(1) Generator', function ()
 				state = new k.data.State({
 					items: [reduceItem1, reduceItem2]
 				});
-				
+
 			reduceItem1.dotLocation = 1;
 			reduceItem2.dotLocation = 3;
-			
+
 			reduceItem1._id = null;
 			reduceItem2._id = null;
 			reduceItem1.lookAhead.push(sampleGrammars.selectedBs.S2.tail[1]);
 			reduceItem2.lookAhead.push(sampleGrammars.selectedBs.S2.tail[1]);
-			
+
 			spyOn(fakeConflictResolver, 'resolve').and.returnValue({
 				action: k.parser.tableAction.REDUCE,
 				itemRule: reduceItem1
 			});
-			
+
 			var result = ag.getShiftReduceItemRuleFromState(state,{
 				considerLookAhead: true,
 				conflictResolvers: [fakeConflictResolver]
 			});
-			
+
 			expect(result.shiftItems.length).toBe(0);
 			expect(result.reduceItems.length).toBe(2);
 			expect(result.reduceItems[0].getIdentity()).toBe(reduceItem1.getIdentity());
 			expect(result.reduceItems[1].getIdentity()).toBe(reduceItem2.getIdentity());
 		});
-		 
+
 		it('should retrun an object with a shift item and a reduce item if the state has a resolvable shift/reduce conflict', function ()
 		{
 			var ag = new k.parser.AutomataLALR1Generator({
@@ -890,27 +890,27 @@ describe('Automata LALR(1) Generator', function ()
 				state = new k.data.State({
 					items: [reduceItem, shiftItem]
 				});
-				
+
 			reduceItem.dotLocation = 1;
 			reduceItem._id = null;
 			reduceItem.lookAhead.push(shiftItem.getCurrentSymbol());
-			
+
 			spyOn(fakeConflictResolver, 'resolve').and.returnValue({
 				action: k.parser.tableAction.SHIFT,
 				itemRule: shiftItem
 			});
-			
+
 			var result = ag.getShiftReduceItemRuleFromState(state,{
 				considerLookAhead: true,
 				conflictResolvers: [fakeConflictResolver]
 			});
-			 
-			expect(result.shiftItems.length).toBe(1); 
-			expect(result.shiftItems[0].getIdentity()).toBe(shiftItem.getIdentity()); 
-			expect(result.reduceItems.length).toBe(1); 
-			expect(result.reduceItems[0].getIdentity()).toBe(reduceItem.getIdentity()); 
+
+			expect(result.shiftItems.length).toBe(1);
+			expect(result.shiftItems[0].getIdentity()).toBe(shiftItem.getIdentity());
+			expect(result.reduceItems.length).toBe(1);
+			expect(result.reduceItems[0].getIdentity()).toBe(reduceItem.getIdentity());
 		});
-		
+
 		it('should return an object with two shift items and two reduce items if the state has resolvable shift/reduce and reduce/reduce conflicts with resolvers', function ()
 		{
 			var ag = new k.parser.AutomataLALR1Generator({
@@ -925,39 +925,39 @@ describe('Automata LALR(1) Generator', function ()
 				state = new k.data.State({
 					items: [shiftItem1, shiftItem2, reduceItem1, reduceItem2]
 				});
-				
+
 			reduceItem1.dotLocation = 3;
 			reduceItem2.dotLocation = 3;
-			
+
 			reduceItem1._id = null;
 			reduceItem2._id = null;
 			reduceItem1.lookAhead.push(shiftItem2.getCurrentSymbol());
 			reduceItem2.lookAhead.push(shiftItem2.getCurrentSymbol());
-			
+
 			spyOn(fakeConflictResolverShiftReduce, 'resolve').and.returnValue({
 				action: k.parser.tableAction.SHIFT,
 				itemRule: shiftItem1
 			});
-			
+
 			spyOn(fakeConflictResolverRedcueReduce, 'resolve').and.returnValue({
 				action: k.parser.tableAction.REDUCE,
 				itemRule: reduceItem1
 			});
-			
+
 			var result = ag.getShiftReduceItemRuleFromState(state,{
 				considerLookAhead: true,
 				conflictResolvers: [fakeConflictResolverShiftReduce, fakeConflictResolverRedcueReduce]
 			});
-			
+
 			expect(result.shiftItems.length).toBe(2);
 			expect(result.shiftItems[0].getIdentity()).toEqual(shiftItem1.getIdentity());
 			expect(result.shiftItems[1].getIdentity()).toEqual(shiftItem2.getIdentity());
-			
+
 			expect(result.reduceItems.length).toBe(2);
 			expect(result.reduceItems[0].getIdentity()).toEqual(reduceItem1.getIdentity());
 			expect(result.reduceItems[1].getIdentity()).toEqual(reduceItem2.getIdentity());
 		});
-		
+
 		it('should return reduce items only with the VALID lookAhead symbols after applying all resovlers', function ()
 		{
 			var ag = new k.parser.AutomataLALR1Generator({
@@ -971,39 +971,425 @@ describe('Automata LALR(1) Generator', function ()
 				state = new k.data.State({
 					items: [reduceItem1, shiftItem1, shiftItem2, shiftItem3, shiftItem4]
 				});
-				
+
 			reduceItem1.dotLocation = 3;
 			reduceItem1._id = null;
-			
+
 			shiftItem1.dotLocation = 1;
 			shiftItem1._id = null;
-			
+
 			shiftItem2.dotLocation = 1;
 			shiftItem2._id = null;
-			
+
 			shiftItem3.dotLocation = 1;
 			shiftItem3._id = null;
-			
+
 			shiftItem4.dotLocation = 1;
 			shiftItem4._id = null;
-			
-			
-			reduceItem1.lookAhead = [new k.data.Symbol({name: k.data.specialSymbol.EOF, isSpecial: true}), sampleGrammars.arithmetic.plus_T, sampleGrammars.arithmetic.minus_T, 
+
+
+			reduceItem1.lookAhead = [new k.data.Symbol({name: k.data.specialSymbol.EOF, isSpecial: true}), sampleGrammars.arithmetic.plus_T, sampleGrammars.arithmetic.minus_T,
 				sampleGrammars.arithmetic.multi_T, sampleGrammars.arithmetic.div_T];
-			
+
 			var result = ag.getShiftReduceItemRuleFromState(state,{
 				considerLookAhead: true,
 				conflictResolvers: k.parser.ConflictResolver.getDefaultResolvers()
 			});
-			
+
 			expect(result.shiftItems.length).toBe(4);
-			
+
 			expect(result.reduceItems.length).toBe(1);
-			
+
 			expect(result.reduceItems[0].lookAhead.length).toBe(3);
 			expect(result.reduceItems[0].lookAhead[0].name).toEqual(k.data.specialSymbol.EOF);
 			expect(result.reduceItems[0].lookAhead[1].name).toEqual(sampleGrammars.arithmetic.plus_T.name);
 			expect(result.reduceItems[0].lookAhead[2].name).toEqual(sampleGrammars.arithmetic.minus_T.name);
 		});
 	});
+
+	describe('isStateValid', function ()
+	{
+		it('should return true if the state does not have any reduce item', function()
+		{
+			var ag = new k.parser.AutomataLALR1Generator({
+					grammar: sampleGrammars.aPlusb.g
+				}),
+				item1 = new k.data.ItemRule(
+				{
+					rule: {
+						index: 1,
+						tail:[]
+					}
+				}),
+				item2 = new k.data.ItemRule(
+				{
+					rule: {
+						index: 5,
+						tail:[]
+					}
+				}),
+				s = new k.data.State({
+					items: [item1, item2]
+				});
+
+			spyOn(item1, 'isReduce').and.returnValue(false);
+			spyOn(item2, 'isReduce').and.returnValue(false);
+
+			expect(ag.isStateValid(s)).toBe(true);
+		});
+
+		it('should return true if the state has just one reduce item without lookAhead', function()
+		{
+			var ag = new k.parser.AutomataLALR1Generator({
+					grammar: sampleGrammars.aPlusb.g
+				}),
+				item1 = new k.data.ItemRule(
+				{
+					rule: {
+						index: 1,
+						tail:[]
+					}
+				}),
+				s = new k.data.State({
+					items: [item1]
+				});
+
+			spyOn(item1, 'isReduce').and.returnValue(true);
+
+			expect(ag.isStateValid(s)).toBe(true);
+		});
+
+		it('should return true if the state has one reduce item and one shift item that does not share anything between them (using lookAhead)', function()
+		{
+			var ag = new k.parser.AutomataLALR1Generator({
+					grammar: sampleGrammars.aPlusb.g
+				}),
+				reduceItem = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S1])[0],
+				shiftItem = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S2])[0],
+				state = new k.data.State({
+					items: [reduceItem, shiftItem]
+				});
+
+			reduceItem.dotLocation = 1;
+
+			expect(ag.isStateValid(state, {considerLookAhead:true})).toBe(true);
+
+			reduceItem._id = null;
+			reduceItem.lookAhead.push(sampleGrammars.selectedBs.S2.tail[2]);
+
+			expect(ag.isStateValid(state, {considerLookAhead:true})).toBe(true);
+		});
+
+		it('should return true if the state has two reduce items but with different look-ahead', function()
+		{
+			var ag = new k.parser.AutomataLALR1Generator({
+					grammar: sampleGrammars.aPlusb.g
+				}),
+				reduceItem1 = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S1])[0],
+				reduceItem2 = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S2])[0],
+				state = new k.data.State({
+					items: [reduceItem1, reduceItem2]
+				});
+
+			reduceItem1.dotLocation = 1;
+			reduceItem2.dotLocation = 3;
+
+			reduceItem1._id = null;
+			reduceItem2._id = null;
+			reduceItem1.lookAhead.push(sampleGrammars.selectedBs.S2.tail[2]);
+			reduceItem2.lookAhead.push(sampleGrammars.selectedBs.S2.tail[1]);
+
+			expect(ag.isStateValid(state, {considerLookAhead:true})).toBe(true);
+		});
+
+		it('should return true if the state has two reduce rule and one shift rule but their look-ahead is different', function()
+		{
+			var ag = new k.parser.AutomataLALR1Generator({
+					grammar: sampleGrammars.aPlusb.g
+				}),
+				reduceItem1 = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S1])[0],
+				shiftItem = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.L2])[0],
+				reduceItem2 = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S2])[0],
+				state = new k.data.State({
+					items: [reduceItem1, reduceItem2, shiftItem]
+				});
+
+			reduceItem1.dotLocation = 1;
+			reduceItem2.dotLocation = 3;
+
+			reduceItem1._id = null;
+			reduceItem2._id = null;
+
+			reduceItem1.lookAhead.push(sampleGrammars.selectedBs.S2.tail[2]);
+			reduceItem2.lookAhead.push(sampleGrammars.selectedBs.S2.tail[0]);
+			expect(ag.isStateValid(state, {considerLookAhead:true})).toBe(true);
+		});
+
+		it('should return false if the state has two reduce rule with a non disjoin lookAhead set', function()
+		{
+			var ag = new k.parser.AutomataLALR1Generator({
+					grammar: sampleGrammars.aPlusb.g
+				}),
+				reduceItem1 = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S1])[0],
+				reduceItem2 = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S2])[0],
+				state = new k.data.State({
+					items: [reduceItem1, reduceItem2]
+				});
+
+			reduceItem1.dotLocation = 1;
+			reduceItem2.dotLocation = 3;
+
+			reduceItem1._id = null;
+			reduceItem2._id = null;
+			reduceItem1.lookAhead.push(sampleGrammars.selectedBs.S2.tail[1]);
+			reduceItem2.lookAhead.push(sampleGrammars.selectedBs.S2.tail[1]);
+
+			expect(ag.isStateValid(state, {considerLookAhead: true})).toBe(false);
+		});
+
+		it('should return false if the state has one reduce rule and one shift rule with the same symbol', function()
+		{
+			var ag = new k.parser.AutomataLALR1Generator({
+					grammar: sampleGrammars.aPlusb.g
+				}),
+				reduceItem = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S1])[0],
+				shiftItem = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S2])[0],
+				state = new k.data.State({
+					items: [reduceItem, shiftItem]
+				});
+
+			reduceItem.dotLocation = 1;
+
+			expect(ag.isStateValid(state, {considerLookAhead:true})).toBe(true);
+
+			reduceItem._id = null;
+			reduceItem.lookAhead.push(shiftItem.getCurrentSymbol());
+
+			expect(ag.isStateValid(state, {considerLookAhead:true})).toBe(false);
+		});
+
+		it('should ask for resolver of there is a Shift/Reduce conflict', function()
+		{
+			var ag = new k.parser.AutomataLALR1Generator({
+					grammar: sampleGrammars.aPlusb.g
+				}),
+				reduceItem = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S1])[0],
+				shiftItem = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S2])[0],
+				fakeConflictResolver = new k.parser.ConflictResolver({type: k.parser.conflictResolverType.STATE_SHIFTREDUCE, name: 'fake'}),
+				state = new k.data.State({
+					items: [reduceItem, shiftItem]
+				});
+
+			reduceItem.dotLocation = 1;
+			reduceItem._id = null;
+			reduceItem.lookAhead.push(shiftItem.getCurrentSymbol());
+
+			spyOn(fakeConflictResolver, 'resolve');
+
+			ag.isStateValid(state, {
+				considerLookAhead: true,
+				conflictResolvers: [fakeConflictResolver]
+			});
+
+			expect(fakeConflictResolver.resolve).toHaveBeenCalled();
+		});
+
+		it('should return false if there is a Shift/Reduce conflict and there is no resolvers', function()
+		{
+			var ag = new k.parser.AutomataLALR1Generator({
+					grammar: sampleGrammars.aPlusb.g
+				}),
+				reduceItem = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S1])[0],
+				shiftItem = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S2])[0],
+				state = new k.data.State({
+					items: [reduceItem, shiftItem]
+				});
+
+			reduceItem.dotLocation = 1;
+			reduceItem._id = null;
+			reduceItem.lookAhead.push(shiftItem.getCurrentSymbol());
+
+			var result = ag.isStateValid(state, {
+				considerLookAhead: true,
+				conflictResolvers: []
+			});
+
+			expect(result).toBe(false);
+		});
+
+		it('should return false if there is a Shift/Reduce conflict and the resolvers cannot resolve the issue', function()
+		{
+		    var ag = new k.parser.AutomataLALR1Generator({
+					grammar: sampleGrammars.aPlusb.g
+				}),
+				reduceItem = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S1])[0],
+				shiftItem = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S2])[0],
+				fakeConflictResolver = new k.parser.ConflictResolver({type: k.parser.conflictResolverType.STATE_SHIFTREDUCE, name: 'fake'}),
+				state = new k.data.State({
+					items: [reduceItem, shiftItem]
+				});
+
+			reduceItem.dotLocation = 1;
+			reduceItem._id = null;
+			reduceItem.lookAhead.push(shiftItem.getCurrentSymbol());
+
+			spyOn(fakeConflictResolver, 'resolve').and.returnValue(false);
+
+			var result = ag.isStateValid(state, {
+				considerLookAhead: true,
+				conflictResolvers: [fakeConflictResolver]
+			});
+
+			expect(result).toBe(false);
+		});
+
+		it('should return true if there is a Shift/Reduce that can be resolved by the resolvers', function()
+		{
+			var ag = new k.parser.AutomataLALR1Generator({
+					grammar: sampleGrammars.aPlusb.g
+				}),
+				reduceItem = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S1])[0],
+				shiftItem = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S2])[0],
+				fakeConflictResolver = new k.parser.ConflictResolver({type: k.parser.conflictResolverType.STATE_SHIFTREDUCE, name: 'fake'}),
+				state = new k.data.State({
+					items: [reduceItem, shiftItem]
+				});
+
+			reduceItem.dotLocation = 1;
+			reduceItem._id = null;
+			reduceItem.lookAhead.push(shiftItem.getCurrentSymbol());
+
+			spyOn(fakeConflictResolver, 'resolve').and.returnValue({
+				action: k.parser.tableAction.SHIFT,
+				itemRule: shiftItem
+			});
+
+			var result = ag.isStateValid(state, {
+				considerLookAhead: true,
+				conflictResolvers: [fakeConflictResolver]
+			});
+
+			expect(result).toBe(true);
+		});
+
+		it('should ask for resolver of there is a Reduce/Reduce conflict', function()
+		{
+			var ag = new k.parser.AutomataLALR1Generator({
+					grammar: sampleGrammars.aPlusb.g
+				}),
+				reduceItem1 = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S1])[0],
+				reduceItem2 = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S2])[0],
+				fakeConflictResolver = new k.parser.ConflictResolver({type: k.parser.conflictResolverType.STATE_REDUCEREDUCE, name: 'fake'}),
+				state = new k.data.State({
+					items: [reduceItem1, reduceItem2]
+				});
+
+			reduceItem1.dotLocation = 1;
+			reduceItem2.dotLocation = 3;
+
+			reduceItem1._id = null;
+			reduceItem2._id = null;
+			reduceItem1.lookAhead.push(sampleGrammars.selectedBs.S2.tail[1]);
+			reduceItem2.lookAhead.push(sampleGrammars.selectedBs.S2.tail[1]);
+
+			spyOn(fakeConflictResolver, 'resolve');
+
+			ag.isStateValid(state, {
+				considerLookAhead: true,
+				conflictResolvers: [fakeConflictResolver]
+			});
+
+			expect(fakeConflictResolver.resolve).toHaveBeenCalled();
+		});
+
+		it('should return false if there is a Reduce/Reduce conflict and there is no resolvers', function()
+		{
+		    var ag = new k.parser.AutomataLALR1Generator({
+					grammar: sampleGrammars.aPlusb.g
+				}),
+				reduceItem1 = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S1])[0],
+				reduceItem2 = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S2])[0],
+				state = new k.data.State({
+					items: [reduceItem1, reduceItem2]
+				});
+
+			reduceItem1.dotLocation = 1;
+			reduceItem2.dotLocation = 3;
+
+			reduceItem1._id = null;
+			reduceItem2._id = null;
+			reduceItem1.lookAhead.push(sampleGrammars.selectedBs.S2.tail[1]);
+			reduceItem2.lookAhead.push(sampleGrammars.selectedBs.S2.tail[1]);
+
+			var result = ag.isStateValid(state, {
+				considerLookAhead: true,
+				conflictResolvers: []
+			});
+
+			expect(result).toBe(false);
+		});
+
+		it('should return false if there is a Reduce/Reduce conflict and the resolvers cannot resolve the issue', function()
+		{
+		    var ag = new k.parser.AutomataLALR1Generator({
+					grammar: sampleGrammars.aPlusb.g
+				}),
+				reduceItem1 = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S1])[0],
+				reduceItem2 = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S2])[0],
+				fakeConflictResolver = new k.parser.ConflictResolver({type: k.parser.conflictResolverType.STATE_REDUCEREDUCE, name: 'fake'}),
+				state = new k.data.State({
+					items: [reduceItem1, reduceItem2]
+				});
+
+			reduceItem1.dotLocation = 1;
+			reduceItem2.dotLocation = 3;
+
+			reduceItem1._id = null;
+			reduceItem2._id = null;
+			reduceItem1.lookAhead.push(sampleGrammars.selectedBs.S2.tail[1]);
+			reduceItem2.lookAhead.push(sampleGrammars.selectedBs.S2.tail[1]);
+
+			spyOn(fakeConflictResolver, 'resolve').and.returnValue(false);
+
+			var result = ag.isStateValid(state, {
+				considerLookAhead: true,
+				conflictResolvers: [fakeConflictResolver]
+			});
+
+			expect(result).toBe(false);
+		});
+
+		it('should return true if there is a Reduce/Reduce that can be resolved by the resolvers', function()
+		{
+			var ag = new k.parser.AutomataLALR1Generator({
+					grammar: sampleGrammars.aPlusb.g
+				}),
+				reduceItem1 = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S1])[0],
+				reduceItem2 = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S2])[0],
+				fakeConflictResolver = new k.parser.ConflictResolver({type: k.parser.conflictResolverType.STATE_REDUCEREDUCE, name: 'fake'}),
+				state = new k.data.State({
+					items: [reduceItem1, reduceItem2]
+				});
+
+			reduceItem1.dotLocation = 1;
+			reduceItem2.dotLocation = 3;
+
+			reduceItem1._id = null;
+			reduceItem2._id = null;
+			reduceItem1.lookAhead.push(sampleGrammars.selectedBs.S2.tail[1]);
+			reduceItem2.lookAhead.push(sampleGrammars.selectedBs.S2.tail[1]);
+
+			spyOn(fakeConflictResolver, 'resolve').and.returnValue({
+				action: k.parser.tableAction.REDUCE,
+				itemRule: reduceItem1
+			});
+
+			var result = ag.isStateValid(state, {
+				considerLookAhead: true,
+				conflictResolvers: [fakeConflictResolver]
+			});
+
+			expect(result).toBe(true);
+		});
+	})
 });

@@ -142,7 +142,7 @@ k.utils.obj = (function ()
 	{
 		return Object.prototype.toString.call(n) === '[object Number]';
 	};
-	
+
 	/*
 	* @func Util function to determine if an object is or not a Function
 	* @param {Object} f object to check its type
@@ -152,7 +152,7 @@ k.utils.obj = (function ()
 	{
 		return Object.prototype.toString.call(f) === '[object Function]';
 	};
-	
+
 	/*
 	* @func Util function to determine if an object is or not Boolean
 	* @param {Object} b object to check its type
@@ -161,7 +161,7 @@ k.utils.obj = (function ()
 	var __isBoolean = function(b) {
 		return b === true || b === false || Object.prototype.toString.call(b) === '[object Boolean]';
 	};
-	
+
 	/*
 	* @func Util function to determine if an object is the JS Arguments array, which is of a particular type
 	* @param {Object} a object to check its type
@@ -171,13 +171,13 @@ k.utils.obj = (function ()
 	{
 		return Object.prototype.toString.call(a) === '[object Arguments]';
 	};
-	
+
 	if (!__isArguments(arguments)) {
 		__isArguments = function(a) {
 			return !!(a && __has(a, 'callee'));
 		};
 	}
-	
+
 	/*
 	* @func Util function to determine if an thing is or not a Object
 	* @param {Thing} n object to check its type
@@ -186,7 +186,7 @@ k.utils.obj = (function ()
 	var __isObject = function(obj) {
 		return obj === Object(obj) && !__isFunction(obj);
 	};
-	
+
 	/*
 	* @func Util function to determine if a thing is or not defined
 	* @param {Thing} obj object to check its state
@@ -195,7 +195,7 @@ k.utils.obj = (function ()
 	var __isUndefined = function(obj) {
 		return obj === void 0;
 	};
-	
+
 	/*
 	====================================================================================================================================
 	The next function are copied from underscorejs.org. These function are here because I want to be in control of all the code I manage.
@@ -326,8 +326,8 @@ k.utils.obj = (function ()
 		{
 			if (context)
 			{
-				iterator = __bind(iterator, context);	
-			} 
+				iterator = __bind(iterator, context);
+			}
 			return initial ? obj.reduce(iterator, memo) : obj.reduce(iterator);
 		}
 		__each(obj, function(value, index, list) {
@@ -343,10 +343,10 @@ k.utils.obj = (function ()
 		}
 		return memo;
 	};
-	
+
 	var Ctor = function(){};
-	
-	/* @func Bind a function to an object, meaning that whenever the function is called, the value of this will be the object. 
+
+	/* @func Bind a function to an object, meaning that whenever the function is called, the value of this will be the object.
 	* Optionally, pass arguments to the function to pre-fill them, also known as partial application
 	* @param {Function} func Function to wrap up
 	* @param {Object} context Object used as a context in the execution of func
@@ -377,7 +377,7 @@ k.utils.obj = (function ()
 		};
 		return bound;
 	};
-	
+
 	/* @func Iterate over the passed in first parameter and filter them based on the result of the predicate parameter
 	* @param {Object} obj object to traverse
 	* @param {Function} predicate function called per each item founded in obj to determine if the item is or no in the final result
@@ -392,7 +392,7 @@ k.utils.obj = (function ()
 		if (nativeFilter && obj.filter === nativeFilter) {
 			return obj.filter(predicate, context);
 		}
-		
+
 		__each(obj, function(value, index, list) {
 			if (predicate.call(context, value, index, list))
 			{
@@ -409,7 +409,7 @@ k.utils.obj = (function ()
 	var __identity = function(value) {
 		return value;
 	};
-	
+
 	/* @func Determine if at least one element in the object matches a truth test
 	* @param {Object} obj object to traverse
 	* @param {Function} predicate function called per each item founded in obj to determine if the item fullfil the requirements
@@ -419,13 +419,13 @@ k.utils.obj = (function ()
 	var __any = function(obj, predicate, context) {
 		predicate = predicate || __identity;
 		var result = false;
-		if (obj === null) { 
+		if (obj === null) {
 			return result;
 		}
 		if (nativeSome && obj.some === nativeSome) {
 			return obj.some(predicate, context);
 		}
-		
+
 		__each(obj, function(value, index, list) {
 			if (result || (result = predicate.call(context, value, index, list))) {
 				return breaker;
@@ -433,7 +433,7 @@ k.utils.obj = (function ()
 		});
 		return !!result;
 	};
-	
+
 	/* @func Convenience version of a common use case of map: fetching a property.
 	* @param {Object} obj Object to be traverse
 	* @param {String} key Name of the property to extract from eacj item in obje
@@ -442,7 +442,7 @@ k.utils.obj = (function ()
 	var __pluck = function(obj, key) {
 		return __map(obj, __property(key));
 	};
-	
+
 	/* @func Auxiliar and Internal function used to return an object's propert by settings using a closure the property name.
 	* Returns a function that will itself return the key property of any passed-in object
 	* @param {String} key Name of the property name to 'lock'
@@ -453,7 +453,7 @@ k.utils.obj = (function ()
 			return obj[key];
 		};
 	};
-	
+
 	/* @func An internal function to generate lookup iterators
 	* @param {Object} value Lookup
 	* @returns {Object} Object lookup
@@ -467,7 +467,7 @@ k.utils.obj = (function ()
 		}
 		return __property(value);
 	};
-	
+
 	/* @func Sort the object’s values by a criterion produced by an iterator.
 	* @param {Object} obj object to traverse
 	* @param {Function} iterator function called per each item founded in obj. Called with value, index, list
@@ -476,7 +476,7 @@ k.utils.obj = (function ()
 	*/
 	var __sortBy = function(obj, iterator, context) {
 		iterator = lookupIterator(iterator);
-		
+
 		return __pluck(__map(obj, function(value, index, list)
 		{
 			return {
@@ -488,17 +488,17 @@ k.utils.obj = (function ()
 			var a = left.criteria;
 			var b = right.criteria;
 			if (a !== b) {
-				if (a > b || a === void 0) { 
+				if (a > b || a === void 0) {
 					return 1;
 				}
-				if (a < b || b === void 0) { 
+				if (a < b || b === void 0) {
 					return -1;
 				}
 			}
 			return left.index - right.index;
 		}), 'value');
 	};
-	
+
 	/* @func Return the first value which passes a truth test
 	* @param {Object} obj object to traverse
 	* @param {Function} predicate function called per each item founded in obj
@@ -515,7 +515,7 @@ k.utils.obj = (function ()
 		});
 		return result;
 	};
-	
+
 	/* @func An internal function used for aggregate “group by” operations.
 	* @param {Array} obj object to traverse
 	* @param {Function} iterator function called per each item founded in obj
@@ -533,7 +533,7 @@ k.utils.obj = (function ()
 			return result;
 		};
 	};
-	
+
 	/* @func Determine whether all of the elements match a truth test.
 	* @param {Array} obj object to traverse
 	* @param {Function} predicate function called per each item founded in obj to determine if fulfill the requirements
@@ -550,14 +550,14 @@ k.utils.obj = (function ()
 			return obj.every(predicate, context);
 		}
 		__each(obj, function(value, index, list) {
-			if (!(result = result && predicate.call(context, value, index, list))) 
+			if (!(result = result && predicate.call(context, value, index, list)))
 			{
 				return breaker;
 			}
 		});
 		return !!result;
 	};
-	
+
 	/* @func Internal implementation of a recursive flatten function.
 	* @param {Array} input object to traverse
 	* @param {Boolean} shallow Indicate if the flattening should NOT be made recusrively (true: DO NOT make it recursively)
@@ -572,7 +572,7 @@ k.utils.obj = (function ()
 			if (__isArray(value) || __isArguments(value)) {
 				if (shallow) {
 					push.apply(output, value);
-				} else { 
+				} else {
 					flatten(value, shallow, output);
 				}
 			} else {
@@ -581,7 +581,7 @@ k.utils.obj = (function ()
 		});
 		return output;
 	};
-	
+
 	/* @func Flatten out an array, either recursively (by default), or just one level.
 	* @param {Array} array object to traverse
 	* @param {Boolean} shallow Indicate if the flattening should NOT be made recusrively (true: DO NOT make it recursively)
@@ -590,7 +590,7 @@ k.utils.obj = (function ()
 	var __flatten = function(array, shallow) {
 		return flatten(array, shallow, []);
 	};
-	
+
 	/* @func Determine if the array or object contains a given value (using ===).
 	* @param {Array} obj object to traverse
 	* @param {Object} target Object looked for
@@ -607,7 +607,7 @@ k.utils.obj = (function ()
 			return value === target;
 		});
 	};
-	
+
 	/* @func Produce a duplicate-free version of the array. If the array has already been sorted, you have the option of using a faster algorithm.
 	* @param {Array} array object to traverse
 	* @param {Boolean} isSorted indicate if the array is osrted or not
@@ -624,7 +624,7 @@ k.utils.obj = (function ()
 		var initial = iterator ? __map(array, iterator, context) : array,
 			results = [],
 			seen = [];
-		
+
 		__each(initial, function(value, index) {
 			if (isSorted ? (!index || seen[seen.length - 1] !== value) : !__contains(seen, value))
 			{
@@ -634,7 +634,7 @@ k.utils.obj = (function ()
 		});
 		return results;
 	};
-	
+
 	/* @func Groups the object’s values by a criterion. Pass either a string attribute to group by, or a function that returns the criterion
 	* @param {Array} obj object to traverse
 	* @param {Function} iterator function called per each item founded in obj
@@ -645,11 +645,11 @@ k.utils.obj = (function ()
 		if (__has(result, key))
 		{
 			result[key].push(value);
-		} else { 
+		} else {
 			result[key] = [value];
 		}
 	});
-	
+
 	/* @func Uses a binary search to determine the index at which the value should be inserted into the list in order to maintain the list's sorted order.
 	* @param {Array} array List of items to traverse
 	* @param {Object} obj object to traverse
@@ -663,7 +663,7 @@ k.utils.obj = (function ()
 		var value = iterator.call(context, obj);
 		var low = 0,
 			high = array.length;
-		
+
 		while (low < high) {
 			var mid = (low + high) >>> 1;
 			if (iterator.call(context, array[mid]) < value)
@@ -672,12 +672,12 @@ k.utils.obj = (function ()
 			}
 			else
 			{
-				high = mid;	
+				high = mid;
 			}
 		}
 		return low;
 	};
-	
+
 	/* @func Returns the index at which value can be found in the array, or -1 if value is not present in the array.
 	* @param {Array} array List of items to traverse
 	* @param {Object} item Object to find into the array
@@ -697,11 +697,11 @@ k.utils.obj = (function ()
 				return array[i] === item ? i : -1;
 			}
 		}
-		
+
 		if (nativeIndexOf && array.indexOf === nativeIndexOf) {
 			return array.indexOf(item, isSorted);
 		}
-		
+
 		for (; i < length; i++) {
 			if (array[i] === item) {
 				return i;
@@ -709,7 +709,7 @@ k.utils.obj = (function ()
 		}
 		return -1;
 	};
-	
+
 	var idCounter = 0;
 	/* @func Generate a unique integer id (unique within the entire client session).
 	* @param {String} prefix Optional prefix name
@@ -719,14 +719,17 @@ k.utils.obj = (function ()
 		var id = ++idCounter + '';
 		return prefix ? prefix + id : id;
 	};
-	
+
+	/* @func Returns the last element of an array. Passing n will return the last n elements of the array..
+	* @param {Integer} n Count of elements to return
+	* @returns {[Object] || Object} Array with the last n values if n is specified or just the object of the array
+	*/
 	var  __last = function (array, n, guard) {
-		//TODO TEST THIS
-		if (array === null || array === undefined) 
+		if (array === null || array === undefined)
 		{
 			return void 0;
 		}
-		if (n === null || n === undefined || guard) 
+		if (n === null || n === undefined || guard)
 		{
 			return array[array.length - 1];
 		}

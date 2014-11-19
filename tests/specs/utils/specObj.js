@@ -75,7 +75,7 @@ describe('Object Utils', function()
 				expect(e.name).toBe('Ejecutive');
 			});
 		});
-		
+
 		describe('defineProperty', function()
 		{
 			it('should at least specify context and property name', function()
@@ -511,7 +511,7 @@ describe('Object Utils', function()
 				expect(k.utils.obj.isNumber(true)).toBe(false);
 			});
 		});
-		
+
 		describe('isFunction', function()
 		{
 			it('should return true if the passed in parameter is a Function', function()
@@ -538,7 +538,7 @@ describe('Object Utils', function()
 				expect(k.utils.obj.isFunction(true)).toBe(false);
 			});
 		});
-		
+
 		describe('isBoolean', function()
 		{
 			it('should return true if the passed in parameter is a Boolean', function()
@@ -561,7 +561,7 @@ describe('Object Utils', function()
 				expect(k.utils.obj.isBoolean('a')).toBe(false);
 			});
 		});
-		
+
 		describe('isArguments', function()
 		{
 			it('should return true if the passed in parameter is an Arguments Array', function()
@@ -613,7 +613,7 @@ describe('Object Utils', function()
 				expect(k.utils.obj.isObject(function(){})).toBe(false);
 			});
 		});
-		
+
 		describe('isUndefined', function ()
 		{
 			it('should return true if the passed in parameter is Undefined', function()
@@ -792,82 +792,82 @@ describe('Object Utils', function()
 				expect(result).toEqual([2,4,6]);
 			});
 		});
-		
+
 		describe('reduce', function ()
 		{
 			it('should assume [] is passed null as object to iterate', function ()
 			{
 				var iterator = jasmine.createSpy('fake iterator');
 				k.utils.obj.reduce(null, iterator, '');
-				
+
 				expect(iterator).not.toHaveBeenCalled();
 			});
-			
+
 			it('should execute iteration function in the specifed context', function ()
 			{
 				var context = {
-						custom: true	
+						custom: true
 					},
 					specifedContext = false;
-				
+
 				k.utils.obj.reduce([1], function()
 				{
 					specifedContext = this.custom === true;
 				}, '', context);
-				
+
 				expect(specifedContext).toBe(true);
 			});
-			
+
 			it('should throw an error in the number of arguments is less or equal than 2', function ()
 			{
 				expect(function () {
 					k.utils.obj.reduce();
 				}).toThrow();
-				
+
 				expect(function () {
 					k.utils.obj.reduce([1]);
 				}).toThrow();
-				
+
 				expect(function () {
 					k.utils.obj.reduce([1], {});
 				}).toThrow();
 			});
-			
+
 			it('should execute our code calling the iteration function passing accumulated value, current value, index and the entier list when there are not native support for reduce', function ()
 			{
 				var fakeIterator = jasmine.createSpy('fake spy').and.returnValue('');
 				k.utils.obj.reduce([1,2], fakeIterator, '');
-				
+
 				expect(fakeIterator).toHaveBeenCalled();
 				expect(fakeIterator.calls.count()).toBe(2);
 				expect(fakeIterator.calls.argsFor(0)).toEqual(['', 1, 0, [1,2]]);
 				expect(fakeIterator.calls.argsFor(1)).toEqual(['', 2, 1, [1,2]]);
 			});
-			
+
 			it('should use the first value as inital value, if the initial value is not specified', function ()
 			{
 				var initialValue;
-				
+
 				k.utils.obj.reduce([1,2], function(acc, val, ind, list)
 				{
 					initialValue = acc;
 				});
-				
+
 				expect(initialValue).toEqual(1);
 			});
-			
+
 			it('should reduce the list passed based on the speicified iterator function', function ()
 			{
 				var result = k.utils.obj.reduce([1,2,3], function (acc, val)
 				{
 					return acc + val;
 				}, '');
-				
+
 				expect(result).toBe('123');
 			});
-			
+
 		});
-		
+
 		describe('bind', function ()
 		{
 			it('should call the specified function in the specified context', function ()
@@ -877,21 +877,21 @@ describe('Object Utils', function()
 					fn = function() {
 						ctx = this;
 					};
-					
+
 				k.utils.obj.bind(fn, ctxPasssed)();
-				
+
 				expect(ctx).toEqual(ctxPasssed);
 			});
-			
+
 			it('should throw if not passed in a valid function', function ()
 			{
-				expect(function () 
+				expect(function ()
 				{
 					k.utils.obj.bind(null, {});
 				}).toThrow();
 			});
 		});
-		
+
 		describe('filter', function ()
 		{
 			it('should returns only the values that retun thruly in the predicate', function ()
@@ -899,28 +899,28 @@ describe('Object Utils', function()
 				var result = k.utils.obj.filter([1,2,3,4,5,6,7,8,9,0], function (value){
 					return value % 2 === 0;
 				});
-				
+
 				expect(result).toEqual([2,4,6,8,0]);
-			});	
-			
+			});
+
 			it('should execute in the specifed context', function ()
 			{
 				var expectedCtx,
 					ctx = {custom:'yes'};
-					
+
 				k.utils.obj.filter([1,2], function (){
 					expectedCtx = this;
 				}, ctx);
-				
+
 				expect(expectedCtx).toBe(ctx);
 			});
-			
+
 			it('should resultl [] is passed in null', function ()
 			{
 				expect(k.utils.obj.filter(null)).toEqual([]);
 			});
 		});
-		
+
 		describe('any', function()
 		{
 			it('should return true if at least one elemnt pass the predicator function', function ()
@@ -929,54 +929,54 @@ describe('Object Utils', function()
 					result = k.utils.obj.any([1,2,3,4,5], function (value)
 					{
 						counter++;
-						return value === 2;	
+						return value === 2;
 					});
-					
+
 				expect(result).toBe(true);
 				expect(counter).toBe(2);
 			});
-			
+
 			it('should return false if obj is null', function ()
 			{
 				expect(k.utils.obj.any(null)).toBe(false);
 			});
-			
+
 			it('should return false if no element pass the predicate', function ()
 			{
 				var counter = 0,
 					result = k.utils.obj.any([1,2,3,4,5], function (value)
 					{
 						counter++;
-						return value === 0;	
+						return value === 0;
 					});
-					
+
 				expect(result).toBe(false);
 				expect(counter).toBe(5);
 			});
 		});
-		
+
 		describe('pluck', function()
 		{
 			it('shoould return an array with values of the property specifed', function ()
 			{
 				var stooges = [{name: 'moe', age: 40}, {name: 'larry', age: 50}, {name: 'curly', age: 60}];
 				var result = k.utils.obj.pluck(stooges, 'name');
-				
+
 				expect(result).toEqual(['moe', 'larry', 'curly']);
 			});
-			
+
 			it('should return [] if passed null', function()
 			{
 				expect(k.utils.obj.pluck(null)).toEqual([]);
 			});
-			
+
 			it('should return [undefined, undefined, undefined] if ', function()
 			{
 				var stooges = [{name: 'moe', age: 40}, {name: 'larry', age: 50}, {name: 'curly', age: 60}];
 				expect(k.utils.obj.pluck(stooges, 'fake')).toEqual([undefined, undefined, undefined]);
 			});
 		});
-		
+
 		describe('property', function ()
 		{
 			it('should return a function that accept an obect and return the value of the set property', function ()
@@ -985,41 +985,41 @@ describe('Object Utils', function()
 				var obj = {
 					name: 'result'
 				};
-				
+
 				expect(fn(obj)).toEqual('result');
 			});
-			
+
 			it('should undefined if the the property is not present in the obj', function ()
 			{
 				var fn = k.utils.obj.property('fakeProp');
 				var obj = {
 					name: 'result'
 				};
-				
+
 				expect(fn(obj)).toEqual(undefined);
 			});
 		});
-		
+
 		describe('sortBy', function ()
 		{
 			it('should return [] if pass null', function ()
 			{
 				expect(k.utils.obj.sortBy(null)).toEqual([]);
-			});	
-			
+			});
+
 			it('should execute the iterator function in the specified context', function ()
 			{
 				var expectedCtx = {cusotm: 'yes'},
 					ctx;
-					
+
 				k.utils.obj.sortBy([1,2], function()
 				{
 					ctx = this;
 				}, expectedCtx);
-				
+
 				expect(ctx).toBe(expectedCtx);
 			});
-			
+
 			it('should sort a list of object based on the property specifed by the itarion function', function ()
 			{
 				var result = k.utils.obj.sortBy([
@@ -1041,8 +1041,8 @@ describe('Object Utils', function()
 						}
 					], function (obj) {
 						return obj.index;
-					});	
-					
+					});
+
 				expect(result).toEqual([
 						{
 							name: 'ONE',
@@ -1062,112 +1062,112 @@ describe('Object Utils', function()
 						}
 					]);
 			});
-			
+
 			it('should return the list of number sorted as specified', function ()
 			{
 				var result = k.utils.obj.sortBy([1, 2, 3, 4, 5, 6], function(num){ return Math.sin(num); });
 				expect(result).toEqual([5, 4, 6, 3, 1, 2]);
 			});
-			
+
 			it('should return the same passed list if no sort function is specifed', function ()
 			{
 				var expectedList = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
 				expect(k.utils.obj.sortBy(expectedList)).toEqual([1,2,3,4,5,6,7,8,9,10]);
 			});
-			
+
 		});
-		
+
 		describe('find', function ()
 		{
 			it('should find the first object that fulfill the specified requirements', function ()
 			{
 				expect(k.utils.obj.find([1,2,3,4,5], function(i){return i === 2; })).toBe(2);
 			});
-			
+
 			it('should iterate the list just until the first element if found', function ()
 			{
 				var spyIterator = jasmine.createSpy('fake Iterator').and.callFake(function(i) {
 			      return i === 4;
 			    });
-			    
+
 				var result = k.utils.obj.find([1,2,3,4,5], spyIterator);
-				
+
 				expect(result).toBe(4);
 				expect(spyIterator).toHaveBeenCalled();
 				expect(spyIterator.calls.count()).toBe(4);
 			});
-			
+
 			it('should return undefiend if no item is found', function ()
 			{
 				expect(k.utils.obj.find([1,2,3,4,], function (){return false;})).toBeUndefined();
 			});
-			
+
 			it('should return undefined is passed in null', function ()
 			{
 				expect(k.utils.obj.find(null, function(){return true;})).toBeUndefined();
 			});
 		});
-		
+
 		describe('every', function()
 		{
 			it('should return true if all elemtns in the list return true in the predicate', function ()
 			{
 				expect(k.utils.obj.every([2,4,6,8,10], function(i) {return i % 2 === 0;})).toBe(true);
-			});	
-			
+			});
+
 			it('should return false if at least one item do not pass the predicate', function ()
 			{
 				expect(k.utils.obj.every([2,4,6,8,10,11], function(i) {return i % 2 === 0;})).toBe(false);
 			});
-			
+
 			it('should true if pass null', function ()
 			{
 				expect(k.utils.obj.every(null)).toBe(true);
 				expect(k.utils.obj.every([1,2,3])).toBe(true);
 			});
 		});
-		
+
 		describe('flatten', function ()
 		{
 			it('should flatten recursively all array that are passed in', function ()
 			{
 				var input = [1,2, [3, 4, [5, 6], 7, [8, [9, 10] ] ] ],
 					expectedOutput = [1,2,3,4,5,6,7,8,9, 10];
-					
+
 				expect(k.utils.obj.flatten(input)).toEqual(expectedOutput);
 			});
-			
+
 			it('should only flat the first level is shallow is true', function ()
 			{
 				var input = [ [ [1],[2]], [[3],[4]], [[5],[6]], [[7],[8]], [[9], [10]] ],
 					expectedOutput = [[1],[2],[3],[4],[5],[6],[7],[8],[9],[10]];
-					
+
 				expect(k.utils.obj.flatten(input, true)).toEqual(expectedOutput);
 			});
-			
+
 			it('should return [] is passed null', function ()
 			{
 				expect(k.utils.obj.flatten(null)).toEqual([]);
 			});
 		});
-		
+
 		describe('contains', function()
 		{
 			it('should return false if the passed in obj is null', function ()
 			{
 				expect(k.utils.obj.contains(null)).toBe(false);
 			});
-			
+
 			it('should return true if the list contains the specified element', function ()
 			{
 				expect(k.utils.obj.contains([1,2,3,4,5,6],6)).toBe(true);
 			});
-			
+
 			it('should return false if the item specified is not in the list', function ()
 			{
 				expect(k.utils.obj.contains([1,2,3,4,5,6],7)).toBe(false);
 			});
-			
+
 			it('should return false if looking for simple objects', function ()
 			{
 				expect(k.utils.obj.contains([
@@ -1185,14 +1185,14 @@ describe('Object Utils', function()
 					})).toBe(false);
 			});
 		});
-		
+
 		describe('uniq', function ()
 		{
 			it('should return the original list without duplicated values numbers', function ()
 			{
 				expect(k.utils.obj.uniq([1, 2, 1, 3, 1, 4])).toEqual([1, 2, 3, 4]);
 			});
-			
+
 			it('should detect duplicated objects based on the function specified', function ()
 			{
 				var result = k.utils.obj.uniq([
@@ -1206,30 +1206,30 @@ describe('Object Utils', function()
 						name: 'A'
 					},
 					{
-						name: 'B'	
+						name: 'B'
 					},
 					{
 						name: 'A'
 					}],false, function (item){
 						return item.name;
 					});
-					
+
 				expect(result).toEqual([{name:'A'},{name:'Z'},{name:'B'}]);
 			});
-			
+
 			it('should execute the function in the specified context', function ()
 			{
 				var expectedCtx = {custom:'yeap'},
 					ctx;
-					
+
 				k.utils.obj.uniq([1,2,1,3,1,4],false, function (i) {
-					ctx = this;	
+					ctx = this;
 					return i;
 				}, expectedCtx);
-				
+
 				expect(ctx).toBe(expectedCtx);
 			});
-			
+
 			it('should use as iterator function the second parameter if it is a function', function ()
 			{
 				var result = k.utils.obj.uniq([
@@ -1243,23 +1243,23 @@ describe('Object Utils', function()
 						name: 'A'
 					},
 					{
-						name: 'B'	
+						name: 'B'
 					},
 					{
 						name: 'A'
 					}], function (item){
 						return item.name;
 					});
-					
+
 				expect(result).toEqual([{name:'A'},{name:'Z'},{name:'B'}]);
 			});
-			
+
 			it('shoudl return [] if passed null', function ()
 			{
 				expect(k.utils.obj.uniq(null)).toEqual([]);
 			});
 		});
-		
+
 		describe('groupBy', function ()
 		{
 			it('should group the list based on the key retuned by the function', function ()
@@ -1267,19 +1267,19 @@ describe('Object Utils', function()
 				var result = k.utils.obj.groupBy([1.3, 2.1, 2.4], function(num){ return Math.floor(num); });
 				expect(result).toEqual({1: [1.3], 2: [2.1, 2.4]});
 			});
-			
+
 			it('should return {} if passed null', function ()
 			{
 				expect(k.utils.obj.groupBy(null)).toEqual({});
 			});
-			
+
 			it('shoudl return an object where each key is equal as its array value', function ()
 			{
 				var result = k.utils.obj.groupBy([1,2,3,4], function(i)
 				{
 					return i;
 				});
-				
+
 				expect(result).toEqual({
 					'1': [1],
 					'2': [2],
@@ -1287,28 +1287,28 @@ describe('Object Utils', function()
 					'4': [4]
 				});
 			});
-			
+
 			it('should execute the function in the specified context', function ()
 			{
 				var expectedCtx = {custom:'yeap'},
 					ctx;
-					
+
 				k.utils.obj.groupBy([1,2,3,4], function(i)
 				{
 					ctx = this;
 					return i;
 				}, expectedCtx);
-				
+
 				expect(ctx).toBe(expectedCtx);
 			});
-			
+
 			it('should group by the property passed if instead of a function a string is passed', function ()
 			{
 				var result = k.utils.obj.groupBy(['one', 'two', 'three'], 'length');
 				expect(result).toEqual({3: ['one', 'two'], 5: ['three']});
 			});
 		});
-		
+
 		describe('sortedIndex', function ()
 		{
 			it('should return the correct index when the items are integers', function ()
@@ -1316,48 +1316,48 @@ describe('Object Utils', function()
 				var result = k.utils.obj.sortedIndex([10, 20, 30, 40, 50], 35);
 				expect(result).toBe(3);
 			});
-			
+
 			it('should accept a string as an iterator that should be used as the property name when using objects', function ()
 			{
 				var stooges = [{name: 'moe', age: 40}, {name: 'curly', age: 60}];
 				var result = k.utils.obj.sortedIndex(stooges, {name: 'larry', age: 50}, 'age');
-				
+
 				expect(result).toBe(1);
 			});
-			
+
 			it('should return the correct index when using a function iterator', function ()
 			{
 				var stooges = [{name: 'moe', age: 40}, {name: 'curly', age: 60}];
 				var result = k.utils.obj.sortedIndex(stooges, {name: 'larry', age: 50}, function (item) {return item.age;});
-				
+
 				expect(result).toBe(1);
 			});
-			
+
 			it('should trow an exception when passing null', function ()
 			{
 				expect(function () {return k.utils.obj.sortedIndex(null, 1);} ).toThrow();
 			});
 		});
-		
+
 		describe('indexOf', function ()
 		{
 			it('should return the valid index when present in a number array', function ()
 			{
 				expect(k.utils.obj.indexOf([1,2,3],2)).toBe(1);
 			});
-			
+
 			it('should return -1 when the parameter is not present in a number array', function ()
 			{
 				expect(k.utils.obj.indexOf([1,2,3],5)).toBe(-1);
 			});
-			
+
 			it('should return the correct index in an object array', function ()
 			{
 				var p = {
 					name: 'A',
 					lastName: 'B'
 				};
-				
+
 				expect(k.utils.obj.indexOf([{
 					name: '1',
 					lastName: '2'
@@ -1368,14 +1368,14 @@ describe('Object Utils', function()
 				p
 				],p)).toBe(2);
 			});
-			
+
 			it('should return -1 if not passing the same (identity) object when in an object array', function ()
 			{
 				var p = {
 					name: 'A',
 					lastName: 'B'
 				};
-				
+
 				expect(k.utils.obj.indexOf([{
 					name: '1',
 					lastName: '2'
@@ -1387,22 +1387,49 @@ describe('Object Utils', function()
 				],p)).toBe(-1);
 			});
 		});
-		
-		describe('uniqueId', function () 
+
+		describe('uniqueId', function ()
 		{
 			it('should return a value with the specified prefix', function ()
 			{
 				var result = k.utils.obj.uniqueId('test');
 				expect(result.lastIndexOf('test', 0)).toBe(0);
 			});
-			
+
 			it ('return when getting twice, 2 differente values', function ()
 			{
 				var res1 = k.utils.obj.uniqueId(),
 					res2 = k.utils.obj.uniqueId();
-					
+
 				expect(res1).not.toBe(res2);
 				expect(res1).not.toEqual(res2);
+			});
+		});
+
+		describe('last', function ()
+		{
+			it('should return false fo not array is specified', function ()
+			{
+				expect(k.utils.obj.last()).toBeFalsy();
+			});
+
+			it('should return the last item in the array if no n is specifeid', function ()
+			{
+				expect(k.utils.obj.last([1,2,3,4])).toEqual(4);
+				expect(k.utils.obj.last([1,2,3,4, true])).toEqual(true);
+
+				var obj = {test:'yes'};
+				expect(k.utils.obj.last([1,2,3,4, obj])).toBe(obj);
+			});
+
+			it('should return an array with the n last values if n is specified', function ()
+			{
+				expect(k.utils.obj.last([1,2,3,4],3)).toEqual([2,3,4]);
+				expect(k.utils.obj.last([1,2,3,4],75)).toEqual([1,2,3,4]);
+				expect(k.utils.obj.last([1,2,3,4, true],2)).toEqual([4, true]);
+
+				var obj = {test:'yes'};
+				expect(k.utils.obj.last([1,2,3,4, obj],1)).toEqual([obj]);
 			});
 		});
 	});

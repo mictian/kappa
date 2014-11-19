@@ -168,7 +168,7 @@ k.utils.obj = (function ()
 	{
 		return Object.prototype.toString.call(n) === '[object Number]';
 	};
-	
+
 	/*
 	* @func Util function to determine if an object is or not a Function
 	* @param {Object} f object to check its type
@@ -178,7 +178,7 @@ k.utils.obj = (function ()
 	{
 		return Object.prototype.toString.call(f) === '[object Function]';
 	};
-	
+
 	/*
 	* @func Util function to determine if an object is or not Boolean
 	* @param {Object} b object to check its type
@@ -187,7 +187,7 @@ k.utils.obj = (function ()
 	var __isBoolean = function(b) {
 		return b === true || b === false || Object.prototype.toString.call(b) === '[object Boolean]';
 	};
-	
+
 	/*
 	* @func Util function to determine if an object is the JS Arguments array, which is of a particular type
 	* @param {Object} a object to check its type
@@ -197,13 +197,13 @@ k.utils.obj = (function ()
 	{
 		return Object.prototype.toString.call(a) === '[object Arguments]';
 	};
-	
+
 	if (!__isArguments(arguments)) {
 		__isArguments = function(a) {
 			return !!(a && __has(a, 'callee'));
 		};
 	}
-	
+
 	/*
 	* @func Util function to determine if an thing is or not a Object
 	* @param {Thing} n object to check its type
@@ -212,7 +212,7 @@ k.utils.obj = (function ()
 	var __isObject = function(obj) {
 		return obj === Object(obj) && !__isFunction(obj);
 	};
-	
+
 	/*
 	* @func Util function to determine if a thing is or not defined
 	* @param {Thing} obj object to check its state
@@ -221,7 +221,7 @@ k.utils.obj = (function ()
 	var __isUndefined = function(obj) {
 		return obj === void 0;
 	};
-	
+
 	/*
 	====================================================================================================================================
 	The next function are copied from underscorejs.org. These function are here because I want to be in control of all the code I manage.
@@ -352,8 +352,8 @@ k.utils.obj = (function ()
 		{
 			if (context)
 			{
-				iterator = __bind(iterator, context);	
-			} 
+				iterator = __bind(iterator, context);
+			}
 			return initial ? obj.reduce(iterator, memo) : obj.reduce(iterator);
 		}
 		__each(obj, function(value, index, list) {
@@ -369,10 +369,10 @@ k.utils.obj = (function ()
 		}
 		return memo;
 	};
-	
+
 	var Ctor = function(){};
-	
-	/* @func Bind a function to an object, meaning that whenever the function is called, the value of this will be the object. 
+
+	/* @func Bind a function to an object, meaning that whenever the function is called, the value of this will be the object.
 	* Optionally, pass arguments to the function to pre-fill them, also known as partial application
 	* @param {Function} func Function to wrap up
 	* @param {Object} context Object used as a context in the execution of func
@@ -403,7 +403,7 @@ k.utils.obj = (function ()
 		};
 		return bound;
 	};
-	
+
 	/* @func Iterate over the passed in first parameter and filter them based on the result of the predicate parameter
 	* @param {Object} obj object to traverse
 	* @param {Function} predicate function called per each item founded in obj to determine if the item is or no in the final result
@@ -418,7 +418,7 @@ k.utils.obj = (function ()
 		if (nativeFilter && obj.filter === nativeFilter) {
 			return obj.filter(predicate, context);
 		}
-		
+
 		__each(obj, function(value, index, list) {
 			if (predicate.call(context, value, index, list))
 			{
@@ -435,7 +435,7 @@ k.utils.obj = (function ()
 	var __identity = function(value) {
 		return value;
 	};
-	
+
 	/* @func Determine if at least one element in the object matches a truth test
 	* @param {Object} obj object to traverse
 	* @param {Function} predicate function called per each item founded in obj to determine if the item fullfil the requirements
@@ -445,13 +445,13 @@ k.utils.obj = (function ()
 	var __any = function(obj, predicate, context) {
 		predicate = predicate || __identity;
 		var result = false;
-		if (obj === null) { 
+		if (obj === null) {
 			return result;
 		}
 		if (nativeSome && obj.some === nativeSome) {
 			return obj.some(predicate, context);
 		}
-		
+
 		__each(obj, function(value, index, list) {
 			if (result || (result = predicate.call(context, value, index, list))) {
 				return breaker;
@@ -459,7 +459,7 @@ k.utils.obj = (function ()
 		});
 		return !!result;
 	};
-	
+
 	/* @func Convenience version of a common use case of map: fetching a property.
 	* @param {Object} obj Object to be traverse
 	* @param {String} key Name of the property to extract from eacj item in obje
@@ -468,7 +468,7 @@ k.utils.obj = (function ()
 	var __pluck = function(obj, key) {
 		return __map(obj, __property(key));
 	};
-	
+
 	/* @func Auxiliar and Internal function used to return an object's propert by settings using a closure the property name.
 	* Returns a function that will itself return the key property of any passed-in object
 	* @param {String} key Name of the property name to 'lock'
@@ -479,7 +479,7 @@ k.utils.obj = (function ()
 			return obj[key];
 		};
 	};
-	
+
 	/* @func An internal function to generate lookup iterators
 	* @param {Object} value Lookup
 	* @returns {Object} Object lookup
@@ -493,7 +493,7 @@ k.utils.obj = (function ()
 		}
 		return __property(value);
 	};
-	
+
 	/* @func Sort the object’s values by a criterion produced by an iterator.
 	* @param {Object} obj object to traverse
 	* @param {Function} iterator function called per each item founded in obj. Called with value, index, list
@@ -502,7 +502,7 @@ k.utils.obj = (function ()
 	*/
 	var __sortBy = function(obj, iterator, context) {
 		iterator = lookupIterator(iterator);
-		
+
 		return __pluck(__map(obj, function(value, index, list)
 		{
 			return {
@@ -514,17 +514,17 @@ k.utils.obj = (function ()
 			var a = left.criteria;
 			var b = right.criteria;
 			if (a !== b) {
-				if (a > b || a === void 0) { 
+				if (a > b || a === void 0) {
 					return 1;
 				}
-				if (a < b || b === void 0) { 
+				if (a < b || b === void 0) {
 					return -1;
 				}
 			}
 			return left.index - right.index;
 		}), 'value');
 	};
-	
+
 	/* @func Return the first value which passes a truth test
 	* @param {Object} obj object to traverse
 	* @param {Function} predicate function called per each item founded in obj
@@ -541,7 +541,7 @@ k.utils.obj = (function ()
 		});
 		return result;
 	};
-	
+
 	/* @func An internal function used for aggregate “group by” operations.
 	* @param {Array} obj object to traverse
 	* @param {Function} iterator function called per each item founded in obj
@@ -559,7 +559,7 @@ k.utils.obj = (function ()
 			return result;
 		};
 	};
-	
+
 	/* @func Determine whether all of the elements match a truth test.
 	* @param {Array} obj object to traverse
 	* @param {Function} predicate function called per each item founded in obj to determine if fulfill the requirements
@@ -576,14 +576,14 @@ k.utils.obj = (function ()
 			return obj.every(predicate, context);
 		}
 		__each(obj, function(value, index, list) {
-			if (!(result = result && predicate.call(context, value, index, list))) 
+			if (!(result = result && predicate.call(context, value, index, list)))
 			{
 				return breaker;
 			}
 		});
 		return !!result;
 	};
-	
+
 	/* @func Internal implementation of a recursive flatten function.
 	* @param {Array} input object to traverse
 	* @param {Boolean} shallow Indicate if the flattening should NOT be made recusrively (true: DO NOT make it recursively)
@@ -598,7 +598,7 @@ k.utils.obj = (function ()
 			if (__isArray(value) || __isArguments(value)) {
 				if (shallow) {
 					push.apply(output, value);
-				} else { 
+				} else {
 					flatten(value, shallow, output);
 				}
 			} else {
@@ -607,7 +607,7 @@ k.utils.obj = (function ()
 		});
 		return output;
 	};
-	
+
 	/* @func Flatten out an array, either recursively (by default), or just one level.
 	* @param {Array} array object to traverse
 	* @param {Boolean} shallow Indicate if the flattening should NOT be made recusrively (true: DO NOT make it recursively)
@@ -616,7 +616,7 @@ k.utils.obj = (function ()
 	var __flatten = function(array, shallow) {
 		return flatten(array, shallow, []);
 	};
-	
+
 	/* @func Determine if the array or object contains a given value (using ===).
 	* @param {Array} obj object to traverse
 	* @param {Object} target Object looked for
@@ -633,7 +633,7 @@ k.utils.obj = (function ()
 			return value === target;
 		});
 	};
-	
+
 	/* @func Produce a duplicate-free version of the array. If the array has already been sorted, you have the option of using a faster algorithm.
 	* @param {Array} array object to traverse
 	* @param {Boolean} isSorted indicate if the array is osrted or not
@@ -650,7 +650,7 @@ k.utils.obj = (function ()
 		var initial = iterator ? __map(array, iterator, context) : array,
 			results = [],
 			seen = [];
-		
+
 		__each(initial, function(value, index) {
 			if (isSorted ? (!index || seen[seen.length - 1] !== value) : !__contains(seen, value))
 			{
@@ -660,7 +660,7 @@ k.utils.obj = (function ()
 		});
 		return results;
 	};
-	
+
 	/* @func Groups the object’s values by a criterion. Pass either a string attribute to group by, or a function that returns the criterion
 	* @param {Array} obj object to traverse
 	* @param {Function} iterator function called per each item founded in obj
@@ -671,11 +671,11 @@ k.utils.obj = (function ()
 		if (__has(result, key))
 		{
 			result[key].push(value);
-		} else { 
+		} else {
 			result[key] = [value];
 		}
 	});
-	
+
 	/* @func Uses a binary search to determine the index at which the value should be inserted into the list in order to maintain the list's sorted order.
 	* @param {Array} array List of items to traverse
 	* @param {Object} obj object to traverse
@@ -689,7 +689,7 @@ k.utils.obj = (function ()
 		var value = iterator.call(context, obj);
 		var low = 0,
 			high = array.length;
-		
+
 		while (low < high) {
 			var mid = (low + high) >>> 1;
 			if (iterator.call(context, array[mid]) < value)
@@ -698,12 +698,12 @@ k.utils.obj = (function ()
 			}
 			else
 			{
-				high = mid;	
+				high = mid;
 			}
 		}
 		return low;
 	};
-	
+
 	/* @func Returns the index at which value can be found in the array, or -1 if value is not present in the array.
 	* @param {Array} array List of items to traverse
 	* @param {Object} item Object to find into the array
@@ -723,11 +723,11 @@ k.utils.obj = (function ()
 				return array[i] === item ? i : -1;
 			}
 		}
-		
+
 		if (nativeIndexOf && array.indexOf === nativeIndexOf) {
 			return array.indexOf(item, isSorted);
 		}
-		
+
 		for (; i < length; i++) {
 			if (array[i] === item) {
 				return i;
@@ -735,7 +735,7 @@ k.utils.obj = (function ()
 		}
 		return -1;
 	};
-	
+
 	var idCounter = 0;
 	/* @func Generate a unique integer id (unique within the entire client session).
 	* @param {String} prefix Optional prefix name
@@ -745,14 +745,17 @@ k.utils.obj = (function ()
 		var id = ++idCounter + '';
 		return prefix ? prefix + id : id;
 	};
-	
+
+	/* @func Returns the last element of an array. Passing n will return the last n elements of the array..
+	* @param {Integer} n Count of elements to return
+	* @returns {[Object] || Object} Array with the last n values if n is specified or just the object of the array
+	*/
 	var  __last = function (array, n, guard) {
-		//TODO TEST THIS
-		if (array === null || array === undefined) 
+		if (array === null || array === undefined)
 		{
 			return void 0;
 		}
-		if (n === null || n === undefined || guard) 
+		if (n === null || n === undefined || guard)
 		{
 			return array[array.length - 1];
 		}
@@ -1855,19 +1858,19 @@ k.data.sampleGrammars = {
 				tail: k.data.NonTerminal.fromArray(['E','Q', 'F']),
 				name: 'E1RULE'
 			}),
-	
+
 			E2 = new k.data.Rule({
 				head: 'E',
 				tail: k.data.NonTerminal.fromArray(['F']),
 				name: 'E2RULE'
 			}),
-	
+
 			Q = new k.data.Rule({
 				head: 'Q',
 				tail: [new k.data.Terminal({name:'DIV', body: /\//})],
 				name: 'QRULE'
 			}),
-	
+
 			F = new k.data.Rule({
 				head: 'F',
 				tail: [new k.data.Terminal({name:'NUMBER', body: /\d/})],
@@ -1913,24 +1916,24 @@ k.data.sampleGrammars = {
 				tail: k.data.NonTerminal.fromArray(['EXPS','EXP']),
 				name: 'EXPS1RULE'
 			}),
-	
+
 	        EXPS2 = new k.data.Rule({
 				head: 'EXPS',
 				name: 'EXPS2RULE'
 			}),
-	
+
 			EXP = new k.data.Rule({
 				head: 'EXP',
 				tail: [new k.data.Terminal({name:'id_terminal', body: /[a-zA-Z]+/})],
 				name: 'EXPRULE'
 			}),
-	
+
 			OPAREN = new k.data.Rule({
 				head: 'OPAREN',
 				tail: [new k.data.Terminal({name:'oparen_terminal', body: /\(/})],
 				name: 'OPARENRULE'
 			}),
-	
+
 			CPAREN = new k.data.Rule({
 				head: 'CPAREN',
 				tail: [new k.data.Terminal({name:'cparen_terminal', body: /\)/})],
@@ -1951,7 +1954,7 @@ k.data.sampleGrammars = {
 			CPAREN: CPAREN
 		};
 	})(),
-	
+
 	/*
 	003. Very simple grammar to represent number divisions with epsilon rule
 	*/
@@ -1965,7 +1968,7 @@ k.data.sampleGrammars = {
 		3. Q --> '%'
 		4. Q --> <EMPTY>
 		5. F --> 'number'
-		
+
 		*/
 		var S = new k.data.Rule({
 			head: 'S',
@@ -1978,24 +1981,24 @@ k.data.sampleGrammars = {
 				tail: k.data.NonTerminal.fromArray(['E','Q', 'F']),
 				name: 'E1RULE'
 			}),
-	
+
 			E2 = new k.data.Rule({
 				head: 'E',
 				tail: k.data.NonTerminal.fromArray(['F']),
 				name: 'E2RULE'
 			}),
-	
+
 			Q1 = new k.data.Rule({
 				head: 'Q',
 				tail: [new k.data.Terminal({name:'DIV', body: /\//})],
 				name: 'Q1RULE'
 			}),
-			
+
 			Q2 = new k.data.Rule({
 				head: 'Q',
 				name: 'Q2RULE'
 			}),
-	
+
 			F = new k.data.Rule({
 				head: 'F',
 				tail: [new k.data.Terminal({name:'NUMBER', body: /\d/})],
@@ -2016,7 +2019,7 @@ k.data.sampleGrammars = {
 			F: F
 		};
 	})(),
-	
+
 	/*
 	004. Very simple grammar for difference of numbers
 	*/
@@ -2038,43 +2041,43 @@ k.data.sampleGrammars = {
 				tail: k.data.NonTerminal.fromArray(['E']),
 				name: 'SRULE'
 			}),
-	
+
 			E1 = new k.data.Rule({
 				head: 'E',
 				tail: k.data.NonTerminal.fromArray(['E', 'R', 'T']),
 				name: 'E1RULE'
 			}),
-	
+
 			E2 = new k.data.Rule({
 				head: 'E',
 				tail: k.data.NonTerminal.fromArray(['T']),
 				name: 'E2RULE'
 			}),
-	
+
 			T1 = new k.data.Rule({
 				head: 'T',
 				tail: [new k.data.Terminal({name:'NUMBER', body: /\d/})],
 				name: 'T1RULE'
 			}),
-			
+
 			T2 = new k.data.Rule({
 				head: 'T',
 				tail: k.data.NonTerminal.fromArray(['OPAREN', 'E', 'CPAREN']),
 				name: 'T2RULE'
 			}),
-			
+
 			OPAREN = new k.data.Rule({
 				head: 'OPAREN',
 				tail: [new k.data.Terminal({name:'OPAREN', body: /\(/})],
 				name: 'OPARENRULE'
 			}),
-	
+
 			CPAREN = new k.data.Rule({
 				head: 'CPAREN',
 				tail: [new k.data.Terminal({name:'CPAREN', body: /\)/})],
 				name: 'CPARENRULE'
 			}),
-	
+
 			R = new k.data.Rule({
 				head: 'R',
 				tail: [new k.data.Terminal({name:'DIFF', body: '-'})],
@@ -2097,7 +2100,7 @@ k.data.sampleGrammars = {
 			R:R
 		};
 	})(),
-	
+
 	/*
 	005. Very simple grammar for a*b (b, ab, aab, aaaaaaab)
 	*/
@@ -2113,7 +2116,7 @@ k.data.sampleGrammars = {
 				tail: [new k.data.Terminal({name:'A_LET', body: 'a'}), new k.data.NonTerminal({name: 'A'})],
 				name: 'A1RULE'
 			}),
-	
+
 			A2 = new k.data.Rule({
 				head: 'A',
 				tail: [new k.data.Terminal({name:'B_LET', body: 'b'})],
@@ -2130,7 +2133,7 @@ k.data.sampleGrammars = {
 			A2: A2
 		};
 	})(),
-	
+
 	/*
 	006. Very simple grammar for a*
 	*/
@@ -2146,7 +2149,7 @@ k.data.sampleGrammars = {
 				tail: [new k.data.Terminal({name:'A_LET', body: 'a'}), new k.data.NonTerminal({name: 'S'})],
 				name: 'S1RULE'
 			}),
-			
+
 			S2 = new k.data.Rule({
 				head: 'S',
 				tail: [new k.data.Symbol({name:k.data.specialSymbol.EMPTY})],
@@ -2182,25 +2185,25 @@ k.data.sampleGrammars = {
 				tail: k.data.NonTerminal.fromArray(['E']),
 				name: 'SRULE'
 			}),
-	
+
 			E1 = new k.data.Rule({
 				head: 'E',
 				tail: [new k.data.NonTerminal({name: 'E'}), new k.data.Terminal({name:'DIFF', body: '-'}), new k.data.NonTerminal({name: 'T'})],
 				name: 'E1RULE'
 			}),
-	
+
 			E2 = new k.data.Rule({
 				head: 'E',
 				tail: k.data.NonTerminal.fromArray(['T']),
 				name: 'E2RULE'
 			}),
-	
+
 			T1 = new k.data.Rule({
 				head: 'T',
 				tail: [new k.data.Terminal({name:'NUMBER', body: /\d/})],
 				name: 'T1RULE'
 			}),
-			
+
 			T2 = new k.data.Rule({
 				head: 'T',
 				tail: [new k.data.Terminal({name:'OPAREN', body: /\(/}), new k.data.NonTerminal({name: 'E'}), new k.data.Terminal({name:'CPAREN', body: /\)/})],
@@ -2220,7 +2223,7 @@ k.data.sampleGrammars = {
 			T2: T2
 		};
 	})(),
-	
+
 	/*
 	008. Simple a^(n+1)b^(n) Grammar
 	*/
@@ -2238,25 +2241,25 @@ k.data.sampleGrammars = {
 				tail: k.data.NonTerminal.fromArray(['A','D']),
 				name: 'SRULE'
 			}),
-			
+
 			A1 = new k.data.Rule({
 				head: 'A',
 				tail: [new k.data.Terminal({name:'a_terminal', body: 'a'}), new k.data.NonTerminal({name: 'A'}), new k.data.Terminal({name:'b_terminal', body: 'b'})],
 				name: 'A1RULE'
 			}),
-			
+
 			A2 = new k.data.Rule({
 				head: 'A',
 				tail: [new k.data.Terminal({name:'a_terminal', body: 'a'})],
 				name: 'A2RULE'
 			}),
-			
+
 			D = new k.data.Rule({
 				head: 'D',
 				tail: [new k.data.Terminal({name:'d_terminal', body: 'd'})],
 				name: 'DRULE'
 			});
-			
+
 		return  {
 			g: new k.data.Grammar({
 				startSymbol: S.head,
@@ -2269,7 +2272,7 @@ k.data.sampleGrammars = {
 			D:D
 		};
 	})(),
-	
+
 	/*
 	009. Simple a^(n+1)b^(n) Grammar
 	*/
@@ -2282,30 +2285,31 @@ k.data.sampleGrammars = {
 		3. L --> S
 		4. L --> L ';' S
 		*/
+		//IMPORTANT: This grammar is intendely without precendence set!
 		var S1 = new k.data.Rule({
 				head: 'S',
 				tail: [new k.data.Terminal({name:'b_terminal', body: 'b'})],
 				name: 'S1RULE'
 			}),
-			
+
 			S2 = new k.data.Rule({
 				head: 'S',
 				tail: [new k.data.Terminal({name:'oparen_terminal', body: '('}), new k.data.NonTerminal({name: 'L'}), new k.data.Terminal({name:'cparen_terminal', body: ')'})],
 				name: 'S2RULE'
 			}),
-			
+
 			L1 = new k.data.Rule({
 				head: 'L',
 				tail: [new k.data.NonTerminal({name:'S'})],
 				name: 'L1RULE'
 			}),
-			
+
 			L2 = new k.data.Rule({
 				head: 'L',
 				tail: [new k.data.NonTerminal({name:'L'}), new k.data.Terminal({name:'semicol_terminal', body: ';'}), new k.data.NonTerminal({name:'S'})],
 				name: 'L2RULE'
 			});
-			
+
 		return  {
 			g: new k.data.Grammar({
 				startSymbol: S1.head,
@@ -2318,7 +2322,7 @@ k.data.sampleGrammars = {
 			L2:L2
 		};
 	})(),
-	
+
 	/*
 	010. Grammar for simple arithmetic expressions
 	*/
@@ -2330,11 +2334,11 @@ k.data.sampleGrammars = {
 		2. E --> E '-' E
 		3. E --> E '*' E
 		4. E --> E '/' E
-		5. E --> (E) 
+		5. E --> (E)
 		. E --> \d
 		*/
 		var E_NT = new k.data.NonTerminal({name: 'E'}),
-			
+
 			plus_T = new k.data.Terminal({name:'plus_terminal', body: '+', assoc: k.data.associativity.LEFT}),
 			minus_T = new k.data.Terminal({name:'minus_terminal', body: '-', assoc: k.data.associativity.LEFT}),
 			multi_T = new k.data.Terminal({name:'multi_terminal', body: '*', assoc: k.data.associativity.LEFT}),
@@ -2342,7 +2346,7 @@ k.data.sampleGrammars = {
 			oparen_T = new k.data.Terminal({name:'oparen_terminal', body: '('}),
 			cparen_T = new k.data.Terminal({name:'cparen_terminal', body: ')'}),
 			number_T = new k.data.Terminal({name:'number_terminal', body: /\d+/}),
-			
+
 			E1 = new k.data.Rule({
 				head: E_NT.name,
 				tail: [E_NT, plus_T, E_NT],
@@ -2353,7 +2357,7 @@ k.data.sampleGrammars = {
 				precendence: 10,
 				name: 'EPLUSRULE'
 			}),
-			
+
 			E2 = new k.data.Rule({
 				head: E_NT.name,
 				tail: [E_NT, minus_T, E_NT],
@@ -2364,7 +2368,7 @@ k.data.sampleGrammars = {
 				precendence: 10,
 				name: 'EMINUSRULE'
 			}),
-			
+
 			E3 = new k.data.Rule({
 				head: E_NT.name,
 				tail: [E_NT, multi_T, E_NT],
@@ -2375,7 +2379,7 @@ k.data.sampleGrammars = {
 				precendence: 20,
 				name: 'EMULTIRULE'
 			}),
-			
+
 			E4 = new k.data.Rule({
 				head: E_NT.name,
 				tail: [E_NT, div_T, E_NT],
@@ -2386,7 +2390,7 @@ k.data.sampleGrammars = {
 				precendence: 20,
 				name: 'EDIVRULE'
 			}),
-			
+
 			E5 = new k.data.Rule({
 				head: E_NT.name,
 				tail: [oparen_T, E_NT, cparen_T],
@@ -2397,7 +2401,7 @@ k.data.sampleGrammars = {
 				precendence: 30,
 				name: 'EPARENRULE'
 			}),
-			
+
 			EN = new k.data.Rule({
 				head: E_NT.name,
 				tail: [number_T],
@@ -2407,7 +2411,7 @@ k.data.sampleGrammars = {
 				},
 				name: 'ENUMBERRULE'
 			});
-			
+
 		return  {
 			g: new k.data.Grammar({
 				startSymbol: E1.head,
@@ -2419,7 +2423,7 @@ k.data.sampleGrammars = {
 			multi_T:multi_T,
 			div_T:div_T,
 			number_T:number_T,
-			
+
 			E1:E1,
 			E2:E2,
 			E3:E3,
@@ -3266,7 +3270,7 @@ k.parser.AutomataLR0Generator = (function(_super) {
 					action: k.parser.tableAction.SHIFT
 				};
 			}
-		}); 
+		});
 
 
 		return (function (actionTable) {
@@ -3294,7 +3298,7 @@ k.parser.AutomataLR0Generator = (function(_super) {
 		var reduceItems = state.getRecudeItems();
 
 		return !(reduceItems.length !== state.getOriginalItems().length && reduceItems.length > 0 || reduceItems.length > 1);
-	}
+	};
 
 	return automataLR0Generator;
 })(k.parser.AutomataLRGeneratorBase);
@@ -3732,7 +3736,6 @@ k.parser.AutomataLALR1Generator = (function(_super)
 	return automataLALR1Generator;
 })(k.parser.AutomataLRGeneratorBase);
 
-//TODO TEST ALL THIS CLASS!!
 
 /* Enum that describe valid types of conflict resolvers
 * @readonly
@@ -3760,17 +3763,17 @@ var ConflictResolver = k.parser.ConflictResolver = (function () {
 	*/
 	var conflictResolver = function (options)
 	{
-		this.options = options;
-		
+		this.options = options || {};
+
 		k.utils.obj.defineProperty(this, 'name');
 		k.utils.obj.defineProperty(this, 'type');
 		k.utils.obj.defineProperty(this, 'order');
 		k.utils.obj.defineProperty(this, 'resolveFnc');
-		
+
 		this.type = this.type || conflictResolverType.STATE_SHIFTREDUCE;
 		this.order = this.order || 9999;
 	};
-	
+
 	/* @function Resolve a conflict
 	* This method main idea is that sub-clases override it and implement the real logic. By defaukt it should return false.
 	* @param {Automata} automata Automata containing the state tothat is being validated.
@@ -3783,7 +3786,7 @@ var ConflictResolver = k.parser.ConflictResolver = (function () {
 	{
 		return  k.utils.obj.isFunction(this.resolveFnc) ? this.resolveFnc(automata, state, itemRule1, itemRule2) : false;
 	};
-	
+
 	/* @function Generate the default list of resolvers. These are:
 		Shift/Reduce Resolver: Precendence
 		Shift/Reduce Resolver: Associativity
@@ -3802,10 +3805,10 @@ var ConflictResolver = k.parser.ConflictResolver = (function () {
 							//If neither of the rules define precedence, we can resolve the conflict
 							return false;
 						}
-						
+
 						shiftItemRule.rule.precendence =  k.utils.obj.isNumber(shiftItemRule.rule.precendence) ? shiftItemRule.rule.precendence : 0;
 						reduceItemRule.rule.precendence =  k.utils.obj.isNumber(reduceItemRule.rule.precendence) ? reduceItemRule.rule.precendence : 0;
-						
+
 						if (shiftItemRule.rule.precendence > reduceItemRule.rule.precendence)
 						{
 							return {
@@ -3818,7 +3821,7 @@ var ConflictResolver = k.parser.ConflictResolver = (function () {
 							return {
 								itemRule: reduceItemRule,
 								action: k.parser.tableAction.REDUCE
-							};    
+							};
 						}
 						return false; // both rules have the same precendence
 					}
@@ -3844,13 +3847,13 @@ var ConflictResolver = k.parser.ConflictResolver = (function () {
 								itemRule: reduceItemRule
 							};
 						}
-						
+
 						return false;
 					}
 				})
 			];
 	};
-	
+
 	return conflictResolver;
 })();
 

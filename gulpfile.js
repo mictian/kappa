@@ -15,8 +15,10 @@ gulp.task('clean', function (cb)
     del([config.outputPath + '/*'], cb);
 });
 
-gulp.task('build-concat', function ()
+gulp.task('build-concat', ['clean'], function ()
 {
+    config = require('./gulp.config.js');
+
     return gulp.src(config.javascriptFiles)
         .pipe(newer(config.outputPath +'/'+ config.packageFileName))
         .pipe(jshint())
@@ -39,8 +41,10 @@ gulp.task('build', ['clean'], function ()
         .pipe(gulp.dest(config.outputPath));
 });
 
-gulp.task('gen-tests', function ()
+gulp.task('gen-tests', ['clean'], function ()
 {
+    config = require('./gulp.config.js');
+
     return gulp.src(config.specFiles)
         .pipe(newer(config.outputPath +'/'+ config.specsContainer))
         .pipe(concat(config.specsContainer))
@@ -49,5 +53,5 @@ gulp.task('gen-tests', function ()
 
 gulp.task('default', ['build-concat', 'gen-tests'], function ()
 {
-    gulp.watch(config.javascriptFiles.concat(config.specFiles), ['build-concat', 'gen-tests']);
+    gulp.watch(config.allFiles, ['build-concat', 'gen-tests']);
 });

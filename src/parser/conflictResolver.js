@@ -1,4 +1,3 @@
-//TODO TEST ALL THIS CLASS!!
 
 /* Enum that describe valid types of conflict resolvers
 * @readonly
@@ -26,17 +25,17 @@ var ConflictResolver = k.parser.ConflictResolver = (function () {
 	*/
 	var conflictResolver = function (options)
 	{
-		this.options = options;
-		
+		this.options = options || {};
+
 		k.utils.obj.defineProperty(this, 'name');
 		k.utils.obj.defineProperty(this, 'type');
 		k.utils.obj.defineProperty(this, 'order');
 		k.utils.obj.defineProperty(this, 'resolveFnc');
-		
+
 		this.type = this.type || conflictResolverType.STATE_SHIFTREDUCE;
 		this.order = this.order || 9999;
 	};
-	
+
 	/* @function Resolve a conflict
 	* This method main idea is that sub-clases override it and implement the real logic. By defaukt it should return false.
 	* @param {Automata} automata Automata containing the state tothat is being validated.
@@ -49,7 +48,7 @@ var ConflictResolver = k.parser.ConflictResolver = (function () {
 	{
 		return  k.utils.obj.isFunction(this.resolveFnc) ? this.resolveFnc(automata, state, itemRule1, itemRule2) : false;
 	};
-	
+
 	/* @function Generate the default list of resolvers. These are:
 		Shift/Reduce Resolver: Precendence
 		Shift/Reduce Resolver: Associativity
@@ -68,10 +67,10 @@ var ConflictResolver = k.parser.ConflictResolver = (function () {
 							//If neither of the rules define precedence, we can resolve the conflict
 							return false;
 						}
-						
+
 						shiftItemRule.rule.precendence =  k.utils.obj.isNumber(shiftItemRule.rule.precendence) ? shiftItemRule.rule.precendence : 0;
 						reduceItemRule.rule.precendence =  k.utils.obj.isNumber(reduceItemRule.rule.precendence) ? reduceItemRule.rule.precendence : 0;
-						
+
 						if (shiftItemRule.rule.precendence > reduceItemRule.rule.precendence)
 						{
 							return {
@@ -84,7 +83,7 @@ var ConflictResolver = k.parser.ConflictResolver = (function () {
 							return {
 								itemRule: reduceItemRule,
 								action: k.parser.tableAction.REDUCE
-							};    
+							};
 						}
 						return false; // both rules have the same precendence
 					}
@@ -110,12 +109,12 @@ var ConflictResolver = k.parser.ConflictResolver = (function () {
 								itemRule: reduceItemRule
 							};
 						}
-						
+
 						return false;
 					}
 				})
 			];
 	};
-	
+
 	return conflictResolver;
 })();

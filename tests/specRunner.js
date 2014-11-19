@@ -18,7 +18,7 @@ function addMatchers(jasmine)
             }
         });
     });
-} 
+}
 
 addMatchers(jasmine);
 

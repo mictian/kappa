@@ -81,7 +81,7 @@ k.parser.AutomataLR0Generator = (function(_super) {
 					action: k.parser.tableAction.SHIFT
 				};
 			}
-		}); 
+		});
 
 
 		return (function (actionTable) {
@@ -109,7 +109,7 @@ k.parser.AutomataLR0Generator = (function(_super) {
 		var reduceItems = state.getRecudeItems();
 
 		return !(reduceItems.length !== state.getOriginalItems().length && reduceItems.length > 0 || reduceItems.length > 1);
-	}
+	};
 
 	return automataLR0Generator;
 })(k.parser.AutomataLRGeneratorBase);

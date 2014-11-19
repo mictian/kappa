@@ -18,7 +18,7 @@ var javascript_files = ['__prologue__.js',
     ,   'parser/parser.js'
     ,   '__epilogue__.js'
         ].map(function (p) { return 'src/'+ p; })
-
+,   all_files = []
 ,   spec_files = [
         'data/specASTNode.js'
     ,   'data/specAutomata.js'
@@ -31,6 +31,7 @@ var javascript_files = ['__prologue__.js',
     ,   'parser/specAutomataLALR1Generator.js'
     ,   'parser/specAutomataLR0Generator.js'
     ,   'parser/specAutomataLRGeneratorBase.js'
+    ,   'parser/specConflictResolver.js'
     ,   'parser/specParser.js'
     ,   'utils/specObj.js'
     ,   'utils/specStr.js'
@@ -46,6 +47,9 @@ var javascript_files = ['__prologue__.js',
 
 spec_files.unshift('tests/specRunner.js');
 
+all_files = spec_files.concat(javascript_files);
+all_files.unshift('./gulp.config.js');
+
 
 module.exports = {
     specFiles: spec_files
@@ -55,4 +59,5 @@ module.exports = {
 ,   packageFileName: package_file_name
 ,   packageFileNameMin: package_file_name_min
 ,   outputPath: output_path
+,   allFiles: all_files
 };

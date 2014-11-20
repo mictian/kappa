@@ -6,6 +6,9 @@ var gulp = require('gulp')
 ,   newer = require('gulp-newer')
 ,   jshint = require('gulp-jshint')
 ,   config = require('./gulp.config.js')
+,   unzip = require('gulp-unzip')
+,   rename = require('gulp-rename')
+,   shell = require('gulp-shell')
 ,   del = require('del');
 
 
@@ -55,3 +58,23 @@ gulp.task('default', ['build-concat', 'gen-tests'], function ()
 {
     gulp.watch(config.allFiles, ['build-concat', 'gen-tests']);
 });
+
+
+
+gulp.task('install-jasmine', ['install-bower'], function ()
+{
+    var jasmine_path = 'bower_components/jasmine/dist/jasmine-standalone-2.0.0.zip';
+    return gulp.src(jasmine_path)
+        .pipe(unzip({
+            filter : function(entry)
+            {
+                return !!(/lib\/jasmine.+\/.+/.test(entry.path));
+            }
+        }))
+        .pipe(rename({
+            dirname: '/lib/jasmine'
+        }))
+        .pipe(gulp.dest('.'));
+});
+
+gulp.task('install-bower', shell.task(['bower install']));

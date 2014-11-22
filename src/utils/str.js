@@ -1,7 +1,7 @@
 k.utils.str = (function()
 {
 	'use strict';
-	
+
 	/*
 	* @func Util function used to determine if a string starts with anotherone
 	*
@@ -24,12 +24,34 @@ k.utils.str = (function()
 	};
 
 	/*
-	* @func Util function used to remove starting spaces
+	* @func Util function used to remove starting spaces NOT breaking lines
 	*
 	* @param {String} str Original string
 	* @returns {String} string without initial spaces
 	*/
 	var __ltrim = function(str) {
+		var space = /^[ \f\t\v\u00a0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000]+/;
+		return str.replace(space,'');
+	};
+
+	/*
+	* @func Util function used to remove starting breaking lines
+	*
+	* @param {String} str Original string
+	* @returns {String} string without initial enters
+	*/
+	var __ltrimBreaks = function (str)	{
+		return str.replace(/^[\n\r]+/,'');
+	};
+
+	/*
+	* @func Util function used to remove starting spaces. This method DO remove left breaking lines
+	*
+	* @param {String} str Original string
+	* @returns {String} string without initial spaces
+	*/
+	var __fullLtrim = function (str)
+	{
 		return str.replace(/^\s+/,'');
 	};
 
@@ -52,7 +74,7 @@ k.utils.str = (function()
 	var __fulltrim = function(str){
 		return str.replace(/(?:(?:^|\n)\s+|\s+(?:$|\n))/g,'').replace(/\s+/g,' ');
 	};
-	
+
 	/*
 	* @func Generates a stirng that is composed by various tabs
 	*
@@ -72,6 +94,8 @@ k.utils.str = (function()
 		startsWith: __startsWith,
 		trim: __trim,
 		ltrim: __ltrim,
+		ltrimBreaks:__ltrimBreaks,
+		fullLtrim: __fullLtrim,
 		rtrim: __rtrim,
 		fulltrim: __fulltrim,
 		tabs: __tabs

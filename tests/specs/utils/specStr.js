@@ -64,11 +64,74 @@ describe('String Utils', function()
 			expect(k.utils.str.ltrim('test  ')).toBe('test  ');
 		});
 
+		it('shoud not remove breaking lines', function()
+		{
+			expect(k.utils.str.ltrim('  \ntest')).toBe('\ntest');
+			expect(k.utils.str.ltrim('\n test  ')).toBe('\n test  ');
+		});
+
 		it('shoud throw an exception when passing a non string parameter', function()
 		{
 			expect(function() { k.utils.str.ltrim({});}).toThrow();
 			expect(function() { k.utils.str.ltrim(false);}).toThrow();
 			expect(function() { k.utils.str.ltrim(12);}).toThrow();
+		});
+	});
+
+	describe('fullLtrim', function()
+	{
+		it('shoud remove starting spaces', function()
+		{
+			expect(k.utils.str.fullLtrim(' test')).toBe('test');
+		});
+
+		it('shoud not remove ending spaces', function()
+		{
+			expect(k.utils.str.fullLtrim(' test')).toBe('test');
+			expect(k.utils.str.fullLtrim(' test  ')).toBe('test  ');
+			expect(k.utils.str.fullLtrim('test  ')).toBe('test  ');
+		});
+
+		it('shoud DO remove breaking lines', function()
+		{
+			expect(k.utils.str.fullLtrim('  \ntest')).toBe('test');
+			expect(k.utils.str.fullLtrim('\n test  ')).toBe('test  ');
+		});
+
+		it('shoud throw an exception when passing a non string parameter', function()
+		{
+			expect(function() { k.utils.str.fullLtrim({});}).toThrow();
+			expect(function() { k.utils.str.fullLtrim(false);}).toThrow();
+			expect(function() { k.utils.str.fullLtrim(12);}).toThrow();
+		});
+	});
+
+	describe('ltrimBreaks', function()
+	{
+		it('shoud not remove starting spaces', function()
+		{
+			expect(k.utils.str.ltrimBreaks(' test')).toBe(' test');
+		});
+
+		it('shoud not remove ending spaces', function()
+		{
+			expect(k.utils.str.ltrimBreaks(' test')).toBe(' test');
+			expect(k.utils.str.ltrimBreaks(' test  ')).toBe(' test  ');
+			expect(k.utils.str.ltrimBreaks('test  ')).toBe('test  ');
+		});
+
+		it('shoud DO remove starting breaking lines', function()
+		{
+			expect(k.utils.str.ltrimBreaks('\ntest\n\n')).toBe('test\n\n');
+			expect(k.utils.str.ltrimBreaks('\ntest\n\nfinal')).toBe('test\n\nfinal');
+			expect(k.utils.str.ltrimBreaks('\n test  ')).toBe(' test  ');
+		});
+
+		it('shoud throw an exception when passing a non string parameter', function()
+		{
+			expect(function() { k.utils.str.ltrimBreaks({});}).toThrow();
+			expect(function() { k.utils.str.ltrimBreaks(false);}).toThrow();
+			expect(function() { k.utils.str.ltrimBreaks(12);}).toThrow();
 		});
 	});
 
@@ -93,19 +156,19 @@ describe('String Utils', function()
 			expect(function() { k.utils.str.rtrim(12);}).toThrow();
 		});
 	});
-	
+
 	describe('tabs', function ()
 	{
 		it('should return empty string if passed in nothing', function ()
 		{
 			expect(k.utils.str.tabs()).toEqual('');
 		});
-		
+
 		it('should return string with the count of tabs specified', function ()
 		{
 			expect(k.utils.str.tabs(2)).toEqual('		');
 		});
-		
+
 		it('should return empty string if any unexpected value', function ()
 		{
 			expect(k.utils.str.tabs(null)).toEqual('');
@@ -113,7 +176,7 @@ describe('String Utils', function()
 			expect(k.utils.str.tabs('h')).toEqual('');
 			expect(k.utils.str.tabs(false)).toEqual('');
 		});
-		
+
 		it('should return a string with one tab if pass a true value', function ()
 		{
 			expect(k.utils.str.tabs(true)).toEqual('	');

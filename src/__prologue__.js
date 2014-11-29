@@ -17,9 +17,9 @@
 		__dependencies__: { /* 'dep': dep, ... */ },
 		__version__: '0.0.1',
 	// Namespaces.
-		utils: {}, 
-		data: {}, 
-		lexer: {}, 
+		utils: {},
+		data: {},
+		lexer: {},
 		parser: {},
 	};
 

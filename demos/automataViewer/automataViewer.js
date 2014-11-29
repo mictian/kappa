@@ -3,7 +3,7 @@ $(document).ready(function()
 {
     'use strict';
 
-    var grammar = kappa.data.sampleGrammars.arithmetic.g, //aPlusb.g,
+    var grammar = jsGrammar(kappa),//sampleGrammarsFunction(kappa).arithmetic.g, //aPlusb.g,
             automataGenerator = new kappa.parser.AutomataLALR1Generator({
                 grammar: grammar
             }),

@@ -75,7 +75,7 @@ k.utils.obj = (function ()
 	};
 
 	/*
-	* @func Util function to clone objects
+	* @func Util function to clone OBJECTS by using JSON.parser/stringify (a deep clone)
 	* @param {Object} obj object to clone
 	* @returns {Object} A copy of the passed in object
 	*/
@@ -736,6 +736,22 @@ k.utils.obj = (function ()
 		return slice.call(array, Math.max(array.length - n, 0));
 	};
 
+	/*
+	* @func Util function to shallow clone any kind of object
+	* @param {Object} obj object to clone
+	* @returns {Object} Shadow copy of the passed in object
+	*/
+	var __shallowClone = function (obj)
+	{
+		//TODO TEST THIS
+		if (!__isObject(obj))
+		{
+			return obj;
+		}
+
+    	return __isArray(obj) ? obj.slice() : __extend({}, obj);
+	};
+
 	return {
 		inherit: __inherit,
 		extend: __extend,
@@ -771,6 +787,7 @@ k.utils.obj = (function ()
 		sortedIndex: __sortedIndex,
 		indexOf: __indexOf,
 		uniqueId: __uniqueId,
-		last: __last
+		last: __last,
+		shallowClone: __shallowClone
 	};
 })();

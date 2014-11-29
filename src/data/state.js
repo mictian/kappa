@@ -23,14 +23,15 @@ k.data.State = (function(_super)
 
 		k.utils.obj.defineProperty(this, '_items');
 		k.utils.obj.defineProperty(this, '_registerItems');
-		k.utils.obj.defineProperty(this, '_index');
 		k.utils.obj.defineProperty(this, '_condencedView');
+		k.utils.obj.defineProperty(this, '_unprocessedItems');
 
 		this.isAcceptanceState = false;
 
 		this._items = options.items || [];
+		this._unprocessedItems = this._items.length ? k.utils.obj.shallowClone(this._items) : [];
 		options.items = null;
-		this._index = 0;
+
 		this._registerItems = {};
 
 		this._registerItemRules();
@@ -53,14 +54,15 @@ k.data.State = (function(_super)
 	/* @function Get the next unprocessed item rule
 	 * @returns {ItemRule} Next Item Rule */
 	state.prototype.getNextItem = function() {
-		return this._index < this._items.length ? this._items[this._index++] : null;
+		return this._unprocessedItems.splice(0,1)[0];
 	};
 
 	/* @function Adds an array of item rule into the state. Only the rules that are not already present in the state will be added
 	 * @param {[ItemRule]} itemRules Array of item rules to add into the state
-	 * @param {Boolean} options.hasLookAhead Determines if the adding action should take into account lookAhead (to merge them) when the item rule are already present
+	 * @param {Boolean} options.notMergeLookAhead If specified as true does not marge the lookAhead of the already existing items. Default: falsy
 	 * @returns {void} Nothing */
 	state.prototype.addItems = function(itemRules, options) {
+
 		this._id = null;
 		k.utils.obj.each(itemRules, function (itemRule)
 		{
@@ -70,12 +72,34 @@ k.data.State = (function(_super)
 			{
 				this._registerItems[itemRule.getIdentity()] = itemRule;
 				this._items.push(itemRule);
+				this._unprocessedItems.push(itemRule);
 			}
-			else if (options && options.hasLookAhead)
+			else if (!options || !options.notMergeLookAhead)
 			{
-				//As the way to of generating a LR(1) automata adds a item rule for each lookAhead we simply merge its lookAheads
-				var mergedLookAheads = this._registerItems[itemRule.getIdentity()].lookAhead.concat(itemRule.lookAhead);
-				this._registerItems[itemRule.getIdentity()].lookAhead = k.utils.obj.uniq(mergedLookAheads, function (item) { return item.name;});
+				//As a way of generating a LALR(1) automata adds a item rule for each lookAhead we simply merge its lookAheads
+				var original_itemRule = this._registerItems[itemRule.getIdentity()];
+
+				if (itemRule.lookAhead && itemRule.lookAhead.length)
+				{
+					original_itemRule.lookAhead = original_itemRule.lookAhead || [];
+					itemRule.lookAhead = itemRule.lookAhead || [];
+
+					var mergedLookAheads = original_itemRule.lookAhead.concat(itemRule.lookAhead),
+						original_itemRule_lookAhead_length = this._registerItems[itemRule.getIdentity()].lookAhead.length;
+
+					this._registerItems[itemRule.getIdentity()].lookAhead = k.utils.obj.uniq(mergedLookAheads, function (item) { return item.name;});
+
+					var is_item_already_queued = k.utils.obj.filter(this._unprocessedItems, function (unprocessed_item)
+					{
+						return unprocessed_item.getIdentity() === itemRule.getIdentity();
+					}).length > 0;
+
+					//If there were changes in the lookAhead and the rule is not already queued.
+					if (original_itemRule_lookAhead_length !== this._registerItems[itemRule.getIdentity()].lookAhead.length && !is_item_already_queued)
+					{
+						this._unprocessedItems.push(itemRule);
+					}
+				}
 			}
 		}, this);
 	};

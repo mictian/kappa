@@ -23,6 +23,5 @@ function addMatchers(jasmine)
 addMatchers(jasmine);
 
 
-var k = kappa
-,   sampleGrammars = k.data.sampleGrammars;
+var k = kappa;
 

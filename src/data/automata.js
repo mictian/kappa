@@ -48,7 +48,6 @@ k.data.Automata = (function() {
 	automata.prototype.getNextState = function()
 	{
 		return this._unprocessedStates.splice(0,1)[0];
-		//this._index < this.states.length ? this.states[this._index++] : null;
 	};
 
 	/* @function Set or get the initial state.
@@ -75,7 +74,7 @@ k.data.Automata = (function() {
 		}
 		else if (this.hasLookAhead)
 		{
-			//When the states are the same in rules but its only difference is in its the look aheads, as a easy-to-implement a LALR(1) parser, we merge this look-aheads
+			//When the states are the same in rules but its only difference is in its the look aheads, as a easy-to-implement LALR(1) parser, we merge this look-aheads
 			var currentState = this._registerStates[newState.getIdentity()],
 				currentStateHasChange = false;
 

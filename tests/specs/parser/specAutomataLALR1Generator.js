@@ -8,7 +8,7 @@ describe('Automata LALR(1) Generator', function ()
 		function getItemByRuleName(items, ruleName)
 		{
 			return k.utils.obj.find(items, function(item) {
-			    return (item.rule.name === ruleName);
+				return (item.rule.name === ruleName);
 			});
 		}
 
@@ -160,6 +160,124 @@ describe('Automata LALR(1) Generator', function ()
 			expect(itemExp2.dotLocation).toBe(1);
 			expect(itemExp2.rule).toBe(sampleGrammars.idsList.EXPS2);
 		});
+
+		it('should propagate all lookAhead when the rule that generate the lookAhead come last', function ()
+		{
+			var sourceElements_NT = new k.data.NonTerminal({name: 'sourceElements'}),
+				sourceElement_NT = new k.data.NonTerminal({name: 'sourceElement'}),
+				statement_NT = new k.data.NonTerminal({name: 'statement'}),
+				block_NT = new k.data.NonTerminal({name: 'block'}),
+
+				LBRACE = new k.data.Terminal({name:'lbrace_terminal', body: '{'}),
+				RBRACE = new k.data.Terminal({name:'rbrace_terminal', body: '}'});
+
+			var program = new k.data.Rule({
+					head: 'program',
+					tail: [sourceElements_NT],
+					name: 'program-sourceElements'
+				}),
+				/*sourceElements : sourceElement
+							| sourceElements sourceElement  */
+				sourceElements_sourceElement = new k.data.Rule({
+					head: sourceElements_NT.name,
+					tail: [sourceElement_NT],
+					name: 'sourceElements-sourceElement'
+				}),
+
+				sourceElements_sourceElements_sourceElement = new k.data.Rule({
+					head: sourceElements_NT.name,
+					tail: [sourceElements_NT, sourceElement_NT],
+					name: 'sourceElements-sourceElements-sourceElement'
+				}),
+				/*sourceElement: statement */
+				sourceElement_statement = new k.data.Rule({
+					head: sourceElement_NT.name,
+					tail: [statement_NT],
+					name: 'sourceElement-statement'
+				}),
+				statement_block = new k.data.Rule({
+					head: statement_NT.name,
+					tail: [block_NT],
+					name: 'statement-block'
+				}),
+				block_empty = new k.data.Rule({
+					head: block_NT.name,
+					tail: [LBRACE, RBRACE],
+					name: 'block-empty'
+				}),
+
+				rules = [
+					program,
+					sourceElements_sourceElement,
+					sourceElements_sourceElements_sourceElement,
+					sourceElement_statement,
+					statement_block,
+					block_empty
+				],
+
+				grammar = new k.data.Grammar({
+					startSymbol: program.head,
+					rules: rules,
+					name:'js'
+				});
+
+			var ag = new k.parser.AutomataLALR1Generator({
+					grammar: grammar
+				}),
+				items = k.data.ItemRule.newFromRules(ag.grammar.getRulesFromNonTerminal(program.head));
+
+			var initialState = new k.data.State({
+					items: items
+				});
+
+			var state = ag.expandItem(initialState),
+				itemsState = state.getItems();
+
+			expect(itemsState.length).toBe(6);
+
+
+			var itemProgram = getItemByRuleName(itemsState, 'program-sourceElements');
+			expect(itemProgram).toBeDefined();
+			expect(itemProgram.dotLocation).toBe(0);
+			expect(itemProgram.rule).toBe(program);
+			expect(itemProgram.lookAhead.length).toBe(0);
+
+			var itemSES_SE = getItemByRuleName(itemsState, 'sourceElements-sourceElement');
+			expect(itemSES_SE).toBeDefined();
+			expect(itemSES_SE.dotLocation).toBe(0);
+			expect(itemSES_SE.rule).toBe(sourceElements_sourceElement);
+			expect(itemSES_SE.lookAhead.length).toBe(1);
+			expect(itemSES_SE.lookAhead[0]).toBe(LBRACE);
+
+
+			var itemSES_SES_SE = getItemByRuleName(itemsState, 'sourceElements-sourceElements-sourceElement');
+			expect(itemSES_SES_SE).toBeDefined();
+			expect(itemSES_SES_SE.dotLocation).toBe(0);
+			expect(itemSES_SES_SE.rule).toBe(sourceElements_sourceElements_sourceElement);
+			expect(itemSES_SES_SE.lookAhead.length).toBe(1);
+			expect(itemSES_SES_SE.lookAhead[0]).toBe(LBRACE);
+
+			var itemSE_ST = getItemByRuleName(itemsState, 'sourceElement-statement');
+			expect(itemSE_ST).toBeDefined();
+			expect(itemSE_ST.dotLocation).toBe(0);
+			expect(itemSE_ST.rule).toBe(sourceElement_statement);
+			expect(itemSE_ST.lookAhead.length).toBe(1);
+			expect(itemSE_ST.lookAhead[0]).toBe(LBRACE);
+
+			var itemST_BL = getItemByRuleName(itemsState, 'statement-block');
+			expect(itemST_BL).toBeDefined();
+			expect(itemST_BL.dotLocation).toBe(0);
+			expect(itemST_BL.rule).toBe(statement_block);
+			expect(itemST_BL.lookAhead.length).toBe(1);
+			expect(itemST_BL.lookAhead[0]).toBe(LBRACE);
+
+			var itemBL = getItemByRuleName(itemsState, 'block-empty');
+			expect(itemBL).toBeDefined();
+			expect(itemBL.dotLocation).toBe(0);
+			expect(itemBL.rule).toBe(block_empty);
+			expect(itemBL.lookAhead.length).toBe(1);
+			expect(itemBL.lookAhead[0]).toBe(LBRACE);
+		});
 	});
 
 	describe('generateAutomata', function()
@@ -184,7 +302,7 @@ describe('Automata LALR(1) Generator', function ()
 
 				k.utils.obj.each(lookAhead[itemRuleId], function (expectedLookAhead)
 				{
-				 	var lookAheadFound = !!k.utils.obj.find(itemRule.lookAhead, function (symbol)
+					var lookAheadFound = !!k.utils.obj.find(itemRule.lookAhead, function (symbol)
 					{
 						return symbol.name === expectedLookAhead;
 					});
@@ -1219,7 +1337,7 @@ describe('Automata LALR(1) Generator', function ()
 
 		it('should return false if there is a Shift/Reduce conflict and the resolvers cannot resolve the issue', function()
 		{
-		    var ag = new k.parser.AutomataLALR1Generator({
+			var ag = new k.parser.AutomataLALR1Generator({
 					grammar: sampleGrammars.aPlusb.g
 				}),
 				reduceItem = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S1])[0],
@@ -1304,7 +1422,7 @@ describe('Automata LALR(1) Generator', function ()
 
 		it('should return false if there is a Reduce/Reduce conflict and there is no resolvers', function()
 		{
-		    var ag = new k.parser.AutomataLALR1Generator({
+			var ag = new k.parser.AutomataLALR1Generator({
 					grammar: sampleGrammars.aPlusb.g
 				}),
 				reduceItem1 = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S1])[0],
@@ -1331,7 +1449,7 @@ describe('Automata LALR(1) Generator', function ()
 
 		it('should return false if there is a Reduce/Reduce conflict and the resolvers cannot resolve the issue', function()
 		{
-		    var ag = new k.parser.AutomataLALR1Generator({
+			var ag = new k.parser.AutomataLALR1Generator({
 					grammar: sampleGrammars.aPlusb.g
 				}),
 				reduceItem1 = k.data.ItemRule.newFromRules([sampleGrammars.selectedBs.S1])[0],

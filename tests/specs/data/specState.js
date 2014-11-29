@@ -50,14 +50,15 @@ describe('State', function()
 		{
 			var expectedResultOptions = {
 					rule: {
-						index: 0,
 						tail:[]
 					}
 				},
 				items = [new k.data.ItemRule(expectedResultOptions)],
 				s = new k.data.State({
-					items: items
+					items: []
 				});
+
+			s.addItems(items);
 
 			var result = s.getNextItem();
 
@@ -73,9 +74,12 @@ describe('State', function()
 					}
 				},
 				items = [new k.data.ItemRule(expectedResultOptions)],
-				s = new k.data.State({
-					items: items
-				});
+				s = new k.data.State({});
+
+			s.addItems(items);
+			s.addItems(items); //when adding the same without change multi-times or
+			items[0].lookAhead = ['test'];
+			s.addItems(items); //when adding the same with changes multi-times
 
 			var result = s.getNextItem();
 			expect(result).toBe(items[0]);
@@ -86,6 +90,11 @@ describe('State', function()
 			expect(result).toBeFalsy();
 			result = s.getNextItem();
 			expect(result).toBeFalsy();
+		});
+
+		xit('should return the items added in the constructor', function ()
+		{
+			expect(1).toBe(2);
 		});
 	});
 
@@ -102,9 +111,11 @@ describe('State', function()
 				});
 
 			s.addItems([item]);
-			var result = s.getNextItem();
+			var items_result = s.getOriginalItems();
 
-			expect(result).toBe(item);
+			expect(items_result).toBeDefined();
+			expect(items_result.length).toBe(1);
+			expect(items_result[0]).toBe(item);
 		});
 
 		it('should not add an item into the state if it is duplicated', function()
@@ -126,11 +137,9 @@ describe('State', function()
 					});
 
 			s.addItems([item]);
-			var result = s.getNextItem();
-			expect(result).toEqual(item);
-
-			result = s.getNextItem();
-			expect(result).toBeFalsy();
+			var items_result = s.getOriginalItems();
+			expect(items_result.length).toBe(1);
+			expect(items_result[0]).toBe(items[0]);
 		});
 
 		it('should get available the added item to the getNextItem method', function()
@@ -146,6 +155,26 @@ describe('State', function()
 			s.addItems([item]);
 			var result = s.getNextItem();
 			expect(result).toBe(item);
+		});
+
+		xit('should merge lookAhead by default', function ()
+		{
+			expect(1).toBe(2);
+		});
+
+		xit('should NOT merge lookAhead if specified', function ()
+		{
+			expect(1).toBe(2);
+		});
+
+		xit('should add items into the unprocessed list just the the item is not already there', function ()
+		{
+			expect(1).toBe(2);
+		});
+
+		xit('should add items into the unprocessed list just the the new item add changes in the lookAhead', function ()
+		{
+			expect(1).toBe(2);
 		});
 	});
 

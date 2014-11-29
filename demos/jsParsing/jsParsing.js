@@ -2,8 +2,9 @@ $(document).ready(function ()
 {
     var pContainer = kappa.parser.parserCreator.create(
 			    {
-					grammar: sampleGrammarsFunction(kappa).arithmetic.g
+					grammar: jsGrammar(kappa)
 				});
+
 
     $('#inputarea').keypress(function (e)
     {
@@ -15,7 +16,8 @@ $(document).ready(function ()
             var parsingValue = pContainer.parser.parse(pContainer.lexer);
             if (parsingValue)
             {
-                $('#result').text(parsingValue.currentValue);
+                // $('#result').text(parsingValue.currentValue);
+                $('#result').text('RECOGNIZED');
             }
             else
             {

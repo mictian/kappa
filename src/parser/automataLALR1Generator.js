@@ -28,14 +28,14 @@ k.parser.AutomataLALR1Generator = (function(_super)
 		return k.data.ItemRule.newFromRules(this.grammar.getRulesFromNonTerminal(currentSymbol), lookAhead);
 	};
 
-	/* @function Override super method to return the object require to indicate that new item rules added into a state should take into account the lookAhead
-	* @returns {Object} Object used by State.addItemRules indicating to DO use lookAhead to merge new items */
-	automataLALR1Generator.prototype._getExpansionItemNewItemsOptions = function ()
-	{
-		return {
-			hasLookAhead: true
-		};
-	};
+	// /* @function Override super method to return the object require to indicate that new item rules added into a state should take into account the lookAhead
+	// * @returns {Object} Object used by State.addItemRules indicating to DO use lookAhead to merge new items */
+	// automataLALR1Generator.prototype._getExpansionItemNewItemsOptions = function ()
+	// {
+	// 	return {
+	// 		hasLookAhead: true
+	// 	};
+	// };
 
 	/* @function Gets the array of look-ahead for the particular item rule taking into account the dot location fo the specified item rule.
 	* @param {ItemRule} itemRule Item rule to find FIRST Set
@@ -122,7 +122,6 @@ k.parser.AutomataLALR1Generator = (function(_super)
 				};
 				options = k.utils.obj.extendInNew(defaultActionTableStateOptions, options || {});
 
-				// var stateItems = state.getShiftReduceItemRule(options);
 				var stateItems = this.getShiftReduceItemRuleFromState(state, options);
 
 				if (!stateItems)

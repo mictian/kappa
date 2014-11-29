@@ -59,9 +59,7 @@ k.parser.AutomataLRGeneratorBase = (function() {
 	* @returns {Object} An object specifying the options used by the state.addItems method to include methods */
 	automataLRGeneratorBase.prototype._getExpansionItemNewItemsOptions = function ()
 	{
-		return {
-			hasLookAhead: false
-		};
+		return {};
 	};
 
 	/* @function Generate the list of item rules that can be getted from a state when expanding it in the automata creation prcoess.

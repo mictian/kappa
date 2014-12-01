@@ -1432,4 +1432,48 @@ describe('Object Utils', function()
 				expect(k.utils.obj.last([1,2,3,4, obj],1)).toEqual([obj]);
 			});
 		});
+
+		describe('shallowClone', function ()
+		{
+			it('should return the same param if the passed in parameter is NOT an object', function ()
+			{
+				expect(k.utils.obj.shallowClone(false)).toBe(false);
+				expect(k.utils.obj.shallowClone('')).toEqual('');
+				expect(k.utils.obj.shallowClone()).toBeUndefined();
+				expect(k.utils.obj.shallowClone(function(){})).toEqual(jasmine.any(Function));
+			});
+
+			it('should clone an array but not its items', function ()
+			{
+				var item1 = {},
+					item2 = 2,
+					item3 = {name:'tester'},
+					array = [item1, item2, item3];
+
+				var result = k.utils.obj.shallowClone(array);
+
+				expect(result).toEqual(jasmine.any(Array));
+				expect(result.length).toBe(3);
+				expect(result).not.toBe(array);
+				expect(result[0]).toBe(item1);
+				expect(result[1]).toBe(item2);
+				expect(result[2]).toBe(item3);
+			});
+
+			it('should made a shallow copy of object', function ()
+			{
+				var propObj = {name: 'tester', lastName: 'doe'},
+					input = {
+						name: 'string',
+						obj: propObj
+					},
+					result = k.utils.obj.shallowClone(input);
+
+				expect(result).not.toBe(input);
+				expect(result).toEqual(input);
+				expect(result.obj).toBe(propObj);
+
+			});
+
+		});
 	});

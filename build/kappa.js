@@ -769,7 +769,6 @@ k.utils.obj = (function ()
 	*/
 	var __shallowClone = function (obj)
 	{
-		//TODO TEST THIS
 		if (!__isObject(obj))
 		{
 			return obj;
@@ -2470,6 +2469,7 @@ var tableAction = k.parser.tableAction = {
 * @classdesc This is the base class for all LR automatas generator. The idea is simplify the autamata creation process */
 k.parser.AutomataLRGeneratorBase = (function() {
 	'use strict';
+
 	/*
 	* Initialize a new Automaton Generator
 	*
@@ -2604,8 +2604,8 @@ k.parser.AutomataLRGeneratorBase = (function() {
 	automataLRGeneratorBase.prototype._getNewAutomataOptions = function (initialState)
 	{
 		return {
-				states: [this.expandItem(initialState)]
-			};
+			states: [this.expandItem(initialState)]
+		};
 	};
 
 	/* @function Returns the initial list of item rules that will take part in the initial state of the automata. This can differ if the automata has or not lookahead
@@ -2839,15 +2839,6 @@ k.parser.AutomataLALR1Generator = (function(_super)
 		var lookAhead = this._getFirstSet(currentItem);
 		return k.data.ItemRule.newFromRules(this.grammar.getRulesFromNonTerminal(currentSymbol), lookAhead);
 	};
-
-	// /* @function Override super method to return the object require to indicate that new item rules added into a state should take into account the lookAhead
-	// * @returns {Object} Object used by State.addItemRules indicating to DO use lookAhead to merge new items */
-	// automataLALR1Generator.prototype._getExpansionItemNewItemsOptions = function ()
-	// {
-	// 	return {
-	// 		hasLookAhead: true
-	// 	};
-	// };
 
 	/* @function Gets the array of look-ahead for the particular item rule taking into account the dot location fo the specified item rule.
 	* @param {ItemRule} itemRule Item rule to find FIRST Set

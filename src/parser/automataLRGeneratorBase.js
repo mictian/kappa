@@ -14,6 +14,7 @@ var tableAction = k.parser.tableAction = {
 * @classdesc This is the base class for all LR automatas generator. The idea is simplify the autamata creation process */
 k.parser.AutomataLRGeneratorBase = (function() {
 	'use strict';
+
 	/*
 	* Initialize a new Automaton Generator
 	*
@@ -148,8 +149,8 @@ k.parser.AutomataLRGeneratorBase = (function() {
 	automataLRGeneratorBase.prototype._getNewAutomataOptions = function (initialState)
 	{
 		return {
-				states: [this.expandItem(initialState)]
-			};
+			states: [this.expandItem(initialState)]
+		};
 	};
 
 	/* @function Returns the initial list of item rules that will take part in the initial state of the automata. This can differ if the automata has or not lookahead

@@ -743,7 +743,6 @@ k.utils.obj = (function ()
 	*/
 	var __shallowClone = function (obj)
 	{
-		//TODO TEST THIS
 		if (!__isObject(obj))
 		{
 			return obj;

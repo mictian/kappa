@@ -2666,9 +2666,25 @@ describe('State', function()
 			expect(result).toBeFalsy();
 		});
 
-		xit('should return the items added in the constructor', function ()
+		it('should return the items added in the constructor', function ()
 		{
-			expect(1).toBe(2);
+			var item1 = new k.data.ItemRule({
+					rule: sampleGrammars.selectedBs.L1
+				}),
+				item2 = new k.data.ItemRule({
+					rule: sampleGrammars.selectedBs.L1
+				}),
+				s = new k.data.State({
+					items: [item1,item2]
+				});
+
+			var result = s.getNextItem();
+			expect(result).toBe(item1);
+
+			result = s.getNextItem();
+			expect(result).toBe(item2);
+
+			expect(s.getNextItem()).toBeUndefined();
 		});
 	});
 
@@ -2731,24 +2747,98 @@ describe('State', function()
 			expect(result).toBe(item);
 		});
 
-		xit('should merge lookAhead by default', function ()
+		it('should merge lookAhead by default', function ()
 		{
-			expect(1).toBe(2);
+			var s = new k.data.State({}),
+				item1 = new k.data.ItemRule({
+					rule: sampleGrammars.selectedBs.L1
+				}),
+				item2 = new k.data.ItemRule({
+					rule: sampleGrammars.selectedBs.L1
+				});
+
+			item1.lookAhead = [{name:1}, {name:2}];
+			item2.lookAhead = [{name:1}, {name:3}];
+
+			s.addItems([item1]);
+			s.addItems([item2]);
+
+			var result = s.getOriginalItems();
+
+			expect(result).toEqual(jasmine.any(Array));
+			expect(result.length).toBe(1);
+			expect(result[0].lookAhead).toEqual([{name:1},{name:2},{name:3}]);
 		});
 
-		xit('should NOT merge lookAhead if specified', function ()
+		it('should NOT merge lookAhead if specified', function ()
 		{
-			expect(1).toBe(2);
+			var s = new k.data.State({}),
+				item1 = new k.data.ItemRule({
+					rule: sampleGrammars.selectedBs.L1
+				}),
+				item2 = new k.data.ItemRule({
+					rule: sampleGrammars.selectedBs.L1
+				});
+
+			item1.lookAhead = [];
+			item2.lookAhead = [{name:1}, {name:3}];
+
+			s.addItems([item1], {notMergeLookAhead:true});
+			s.addItems([item2], {notMergeLookAhead:true});
+
+			var result = s.getOriginalItems();
+
+			expect(result).toEqual(jasmine.any(Array));
+			expect(result.length).toBe(1);
+			expect(result[0].lookAhead).toEqual([]);
 		});
 
-		xit('should add items into the unprocessed list just the the item is not already there', function ()
+		it('should add items into the unprocessed list just the the item is not already there', function ()
 		{
-			expect(1).toBe(2);
+			var s = new k.data.State({}),
+				item1 = new k.data.ItemRule({
+					rule: sampleGrammars.selectedBs.L1
+				});
+
+			s.addItems([item1]);
+			s.addItems([item1]);
+			s.addItems([item1]);
+			s.addItems([item1]);
+			s.addItems([item1]);
+			s.addItems([item1]);
+
+			var result = s.getNextItem();
+			expect(result).toBe(item1);
+			expect(s.getNextItem()).toBeUndefined();
+			expect(s.getNextItem()).toBeUndefined();
+			expect(s.getNextItem()).toBeUndefined();
 		});
 
-		xit('should add items into the unprocessed list just the the new item add changes in the lookAhead', function ()
+		it('should add items into the unprocessed list just the the new item add changes in the lookAhead', function ()
 		{
-			expect(1).toBe(2);
+			var s = new k.data.State({}),
+				item1 = new k.data.ItemRule({
+					rule: sampleGrammars.selectedBs.L1
+				}),
+				item2 = new k.data.ItemRule({
+					rule: sampleGrammars.selectedBs.L1
+				});
+
+			item1.lookAhead = [];
+			s.addItems([item1]);
+
+			var result = s.getNextItem();
+			expect(result).toBe(item1);
+			expect(s.getNextItem()).toBeUndefined();
+
+			item2.lookAhead = [{name:1}, {name:3}];
+			s.addItems([item2]);
+
+			//the returned instance is NOT GUARANTY that was the first or the second one!
+			result = s.getNextItem();
+			expect(result.options).toEqual(item2.options);
+			expect(s.getNextItem()).toBeUndefined();
+
 		});
 	});
 
@@ -7279,6 +7369,50 @@ describe('Object Utils', function()
 				var obj = {test:'yes'};
 				expect(k.utils.obj.last([1,2,3,4, obj],1)).toEqual([obj]);
 			});
+		});
+
+		describe('shallowClone', function ()
+		{
+			it('should return the same param if the passed in parameter is NOT an object', function ()
+			{
+				expect(k.utils.obj.shallowClone(false)).toBe(false);
+				expect(k.utils.obj.shallowClone('')).toEqual('');
+				expect(k.utils.obj.shallowClone()).toBeUndefined();
+				expect(k.utils.obj.shallowClone(function(){})).toEqual(jasmine.any(Function));
+			});
+
+			it('should clone an array but not its items', function ()
+			{
+				var item1 = {},
+					item2 = 2,
+					item3 = {name:'tester'},
+					array = [item1, item2, item3];
+
+				var result = k.utils.obj.shallowClone(array);
+
+				expect(result).toEqual(jasmine.any(Array));
+				expect(result.length).toBe(3);
+				expect(result).not.toBe(array);
+				expect(result[0]).toBe(item1);
+				expect(result[1]).toBe(item2);
+				expect(result[2]).toBe(item3);
+			});
+
+			it('should made a shallow copy of object', function ()
+			{
+				var propObj = {name: 'tester', lastName: 'doe'},
+					input = {
+						name: 'string',
+						obj: propObj
+					},
+					result = k.utils.obj.shallowClone(input);
+
+				expect(result).not.toBe(input);
+				expect(result).toEqual(input);
+				expect(result.obj).toBe(propObj);
+
+			});
+
 		});
 	});
 

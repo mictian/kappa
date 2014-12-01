@@ -92,9 +92,25 @@ describe('State', function()
 			expect(result).toBeFalsy();
 		});
 
-		xit('should return the items added in the constructor', function ()
+		it('should return the items added in the constructor', function ()
 		{
-			expect(1).toBe(2);
+			var item1 = new k.data.ItemRule({
+					rule: sampleGrammars.selectedBs.L1
+				}),
+				item2 = new k.data.ItemRule({
+					rule: sampleGrammars.selectedBs.L1
+				}),
+				s = new k.data.State({
+					items: [item1,item2]
+				});
+
+			var result = s.getNextItem();
+			expect(result).toBe(item1);
+
+			result = s.getNextItem();
+			expect(result).toBe(item2);
+
+			expect(s.getNextItem()).toBeUndefined();
 		});
 	});
 
@@ -157,24 +173,98 @@ describe('State', function()
 			expect(result).toBe(item);
 		});
 
-		xit('should merge lookAhead by default', function ()
+		it('should merge lookAhead by default', function ()
 		{
-			expect(1).toBe(2);
+			var s = new k.data.State({}),
+				item1 = new k.data.ItemRule({
+					rule: sampleGrammars.selectedBs.L1
+				}),
+				item2 = new k.data.ItemRule({
+					rule: sampleGrammars.selectedBs.L1
+				});
+
+			item1.lookAhead = [{name:1}, {name:2}];
+			item2.lookAhead = [{name:1}, {name:3}];
+
+			s.addItems([item1]);
+			s.addItems([item2]);
+
+			var result = s.getOriginalItems();
+
+			expect(result).toEqual(jasmine.any(Array));
+			expect(result.length).toBe(1);
+			expect(result[0].lookAhead).toEqual([{name:1},{name:2},{name:3}]);
 		});
 
-		xit('should NOT merge lookAhead if specified', function ()
+		it('should NOT merge lookAhead if specified', function ()
 		{
-			expect(1).toBe(2);
+			var s = new k.data.State({}),
+				item1 = new k.data.ItemRule({
+					rule: sampleGrammars.selectedBs.L1
+				}),
+				item2 = new k.data.ItemRule({
+					rule: sampleGrammars.selectedBs.L1
+				});
+
+			item1.lookAhead = [];
+			item2.lookAhead = [{name:1}, {name:3}];
+
+			s.addItems([item1], {notMergeLookAhead:true});
+			s.addItems([item2], {notMergeLookAhead:true});
+
+			var result = s.getOriginalItems();
+
+			expect(result).toEqual(jasmine.any(Array));
+			expect(result.length).toBe(1);
+			expect(result[0].lookAhead).toEqual([]);
 		});
 
-		xit('should add items into the unprocessed list just the the item is not already there', function ()
+		it('should add items into the unprocessed list just the the item is not already there', function ()
 		{
-			expect(1).toBe(2);
+			var s = new k.data.State({}),
+				item1 = new k.data.ItemRule({
+					rule: sampleGrammars.selectedBs.L1
+				});
+
+			s.addItems([item1]);
+			s.addItems([item1]);
+			s.addItems([item1]);
+			s.addItems([item1]);
+			s.addItems([item1]);
+			s.addItems([item1]);
+
+			var result = s.getNextItem();
+			expect(result).toBe(item1);
+			expect(s.getNextItem()).toBeUndefined();
+			expect(s.getNextItem()).toBeUndefined();
+			expect(s.getNextItem()).toBeUndefined();
 		});
 
-		xit('should add items into the unprocessed list just the the new item add changes in the lookAhead', function ()
+		it('should add items into the unprocessed list just the the new item add changes in the lookAhead', function ()
 		{
-			expect(1).toBe(2);
+			var s = new k.data.State({}),
+				item1 = new k.data.ItemRule({
+					rule: sampleGrammars.selectedBs.L1
+				}),
+				item2 = new k.data.ItemRule({
+					rule: sampleGrammars.selectedBs.L1
+				});
+
+			item1.lookAhead = [];
+			s.addItems([item1]);
+
+			var result = s.getNextItem();
+			expect(result).toBe(item1);
+			expect(s.getNextItem()).toBeUndefined();
+
+			item2.lookAhead = [{name:1}, {name:3}];
+			s.addItems([item2]);
+
+			//the returned instance is NOT GUARANTY that was the first or the second one!
+			result = s.getNextItem();
+			expect(result.options).toEqual(item2.options);
+			expect(s.getNextItem()).toBeUndefined();
+
 		});
 	});
 

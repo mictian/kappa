@@ -37,7 +37,7 @@ k.data.State = (function(_super)
 		this._registerItemRules();
 	}
 
-	/* @function REgister the list of item rules of the current stateso they are assesible by its id
+	/* @method REgister the list of item rules of the current stateso they are assesible by its id
 	 * @returns {Void} */
 	state.prototype._registerItemRules = function ()
 	{
@@ -51,13 +51,13 @@ k.data.State = (function(_super)
 		AcceptanceStateName: 'AcceptanceState'
 	};
 
-	/* @function Get the next unprocessed item rule
+	/* @method Get the next unprocessed item rule
 	 * @returns {ItemRule} Next Item Rule */
 	state.prototype.getNextItem = function() {
 		return this._unprocessedItems.splice(0,1)[0];
 	};
 
-	/* @function Adds an array of item rule into the state. Only the rules that are not already present in the state will be added
+	/* @method Adds an array of item rule into the state. Only the rules that are not already present in the state will be added
 	 * @param {[ItemRule]} itemRules Array of item rules to add into the state
 	 * @param {Boolean} options.notMergeLookAhead If specified as true does not marge the lookAhead of the already existing items. Default: falsy
 	 * @returns {void} Nothing */
@@ -104,7 +104,7 @@ k.data.State = (function(_super)
 		}, this);
 	};
 
-	/* @function Convert the current state to its string representation
+	/* @method Convert the current state to its string representation
 	 * @returns {String} formatted string */
 	state.prototype.toString = function() {
 		var strResult = 'ID: ' + this.getIdentity() + '\n' +
@@ -118,7 +118,7 @@ k.data.State = (function(_super)
 		return strResult;
 	};
 
-	/* @function Returns the condenced (one line) string that reprenset the current 'state' of the current state
+	/* @method Returns the condenced (one line) string that reprenset the current 'state' of the current state
 	 * @returns {String} State Representation in one line  */
 	state.prototype.getCondencedString = function() {
 		if(!this._condencedView)
@@ -128,7 +128,7 @@ k.data.State = (function(_super)
 		return this._condencedView;
 	};
 
-	/* @function Internal method to generate a condenced (one line) string that reprenset the current 'state' of the current state
+	/* @method Internal method to generate a condenced (one line) string that reprenset the current 'state' of the current state
 	 * @returns {String} State Representation in one line  */
 	state.prototype._generateCondencedString = function() {
 		return  k.utils.obj.map(
@@ -141,7 +141,7 @@ k.data.State = (function(_super)
 			}).join('-');
 	};
 
-	/* @function Generates an ID that identify this state from any other state
+	/* @method Generates an ID that identify this state from any other state
 	 * @returns {String} Generated ID  */
 	state.prototype._generateIdentity = function() {
 
@@ -164,7 +164,7 @@ k.data.State = (function(_super)
 			}, '');
 	};
 
-	/* @function Returns a copy the items contained in the current state
+	/* @method Returns a copy the items contained in the current state
 	 * @returns {[ItemRule]} Array of cloned item rules  */
 	state.prototype.getItems = function() {
 		return k.utils.obj.map(this._items, function(item) {
@@ -172,21 +172,21 @@ k.data.State = (function(_super)
 		});
 	};
 
-	/* @function Returns an orignal item rule based on its id.
+	/* @method Returns an orignal item rule based on its id.
 		This method is intended to be use as READ-ONLY, editing the returned items will affect the state and the rest of the automata at with this state belongs to.
 	 * @returns {[ItemRule]} Array of current item rules  */
 	state.prototype.getOriginalItems = function() {
 		return this._items;
 	};
 
-	/* @function Returns an orignal item rule based on its id.
+	/* @method Returns an orignal item rule based on its id.
 		This method is intended to be use as READ-ONLY, editing the returned items will affect the state and the rest of the automata at with this state belongs to.
 	 * @returns {ItemRule} Item rule corresponding to the id passed in if present or null otherwise  */
 	state.prototype.getOriginalItemById = function(id) {
 		return this._registerItems[id];
 	};
 
-	/** @function Get the list of all supported symbol which are valid to generata transition from the current state.
+	/** @method Get the list of all supported symbol which are valid to generata transition from the current state.
 	 * @returns {[Object]} Array of object of the form: {symbol, items} where items have an array of item rules  */
 	state.prototype.getSupportedTransitionSymbols = function() {
 		var itemsAux = {},
@@ -215,7 +215,7 @@ k.data.State = (function(_super)
 		return result;
 	};
 
-	/* @function Responsible of new transitions. We override this method to use the correct variable names and be more meanful
+	/* @method Responsible of new transitions. We override this method to use the correct variable names and be more meanful
 	 * @param {Symbol} symbol Symbol use to make the transition, like the name of the transition
 	 * @param {State} state Destination state arrived when moving with the specified tranisiotn
 	 * @returns {Object} Transition object  */
@@ -226,7 +226,7 @@ k.data.State = (function(_super)
 		};
 	};
 
-	/* @function Returns the list of item rules contained in the current state that are reduce item rules.
+	/* @method Returns the list of item rules contained in the current state that are reduce item rules.
 	 * @returns {[ItemRule]} Recude Item Rules  */
 	state.prototype.getRecudeItems = function () {
 		return k.utils.obj.filter(this._items, function (item) {

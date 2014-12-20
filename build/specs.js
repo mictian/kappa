@@ -26,8 +26,9 @@ addMatchers(jasmine);
 var k = kappa;
 
 
-/* global expect: true, describe: true, it:  true, beforeEach: true */
+/* global k:true  */
 var sampleGrammars = {
+
 	/*
 	001. Very simple grammar to represent number divisions
 	*/
@@ -479,7 +480,7 @@ var sampleGrammars = {
 		3. L --> S
 		4. L --> L ';' S
 		*/
-		//IMPORTANT: This grammar is intendely without precendence set!
+		//IMPORTANT: This grammar is intentionally without precendence set!
 		var S1 = new k.data.Rule({
 				head: 'S',
 				tail: [new k.data.Terminal({name:'b_terminal', body: 'b'})],
@@ -625,6 +626,139 @@ var sampleGrammars = {
 			E5:E5,
 			EN:EN
 		};
+	})(),
+
+	/*
+	011. Simple [test|succeeded]*
+	*/
+	testSucceeded: (function () {
+		'use strict';
+		/*
+		LR(0)
+		1. S --> 'test'
+		2. S --> S L
+		3. L --> 'succeeded'
+		*/
+		var S1 = new k.data.Rule({
+				head: 'S',
+				tail: [new k.data.Terminal({name:'test_terminal', body: 'test'})],
+				name: 'S1RULE'
+			}),
+
+			S2 = new k.data.Rule({
+				head: 'S',
+				tail: [new k.data.NonTerminal({name:'S'}), new k.data.NonTerminal({name: 'L'})],
+				name: 'S2RULE'
+			}),
+
+			L1 = new k.data.Rule({
+				head: 'L',
+				tail: [new k.data.Terminal({name:'test_terminal', body: 'test'})],
+				name: 'L1RULE'
+			});
+
+		return  {
+			g: new k.data.Grammar({
+				startSymbol: S1.head,
+				rules:[S1, S2, L1],
+				name:'testSucceeded'
+			}),
+			S1:S1,
+			S2:S2,
+			L1:L1
+		};
+	})(),
+
+	/*
+	012. Simple [te\nst|succeeded]*
+	*/
+	testSucceededEnter: (function () {
+		'use strict';
+		/*
+		LR(0)
+		1. S --> 'test'
+		2. S --> S L
+		3. L --> 'succeeded'
+		*/
+		var S1 = new k.data.Rule({
+				head: 'S',
+				tail: [new k.data.Terminal({name:'test_terminal', body: 'te\nst'})],
+				name: 'S1RULE'
+			}),
+
+			S2 = new k.data.Rule({
+				head: 'S',
+				tail: [new k.data.NonTerminal({name:'S'}), new k.data.NonTerminal({name: 'L'})],
+				name: 'S2RULE'
+			}),
+
+			L1 = new k.data.Rule({
+				head: 'L',
+				tail: [new k.data.Terminal({name:'test_terminal', body: 'test'})],
+				name: 'L1RULE'
+			});
+
+		return  {
+			g: new k.data.Grammar({
+				startSymbol: S1.head,
+				rules:[S1, S2, L1],
+				name:'testSucceeded'
+			}),
+			S1:S1,
+			S2:S2,
+			L1:L1
+		};
+	})(),
+
+	/*
+	013. Simple Grammar used to test lexer's priority and multiple matchign features
+	IMPORTNAT: DO NOT UPDATE THIS GRAMMAR, otherwise some lexer test will fail!
+	*/
+	testPrioritiesMultipleMatching: (function ()
+	{
+		'use strict';
+		/*
+		LR(0)
+		1. S --> id
+		2. S --> S L
+		3. L --> ','
+		3. L --> lower_letter
+		*/
+		var S1 = new k.data.Rule({
+				head: 'S',
+				tail: [new k.data.Terminal({name:'id_terminal', priority: 10, body: /[A-Za-z]+/})],
+				name: 'S1RULE'
+			}),
+
+			S2 = new k.data.Rule({
+				head: 'S',
+				tail: [new k.data.NonTerminal({name:'S'}), new k.data.NonTerminal({name: 'L'})],
+				name: 'S2RULE'
+			}),
+
+			L1 = new k.data.Rule({
+				head: 'L',
+				tail: [new k.data.Terminal({name:'comma_terminal', body: ','})],
+				name: 'L1RULE'
+			}),
+
+			L2 = new k.data.Rule({
+				head: 'L',
+				tail: [new k.data.Terminal({name:'lower_letter_terminal', priority: 15, body: /[a-z]+/})],
+				name: 'L2RULE'
+			});
+
+		return  {
+			g: new k.data.Grammar({
+				startSymbol: S1.head,
+				rules:[S1, S2, L1, L2],
+				name:'testSucceeded'
+			}),
+			S1:S1,
+			S2:S2,
+			L1:L1,
+			L2:L2
+		};
 	})()
 };
 /* global expect: true, describe: true, it: true, beforeEach: true, k: true */
@@ -676,7 +810,7 @@ describe('AST Node', function()
 
 describe('automata', function()
 {
-	it('shoud override toString', function()
+	it('should override toString', function()
 	{
 		var a = new k.data.Automata({});
 		expect(Object.getPrototypeOf(a).hasOwnProperty('toString')).toBe(true);
@@ -1215,7 +1349,6 @@ describe('Rule', function()
 
 describe('Grammar', function()
 {
-
 	var S,
 		EXPS1,
 		EXPS2,
@@ -1260,7 +1393,7 @@ describe('Grammar', function()
 			rules: [S, EXPS1, EXPS2, EXP, OPAREN, CPAREN]
 		});
 	});
-	
+
 	it ('should have .toString overridden', function(){
 		expect(k.data.Grammar.prototype.toString).toBeDefined();
 	});
@@ -1342,19 +1475,19 @@ describe('Grammar', function()
 			expect(terminal).toBe(CPAREN.tail[0]);
 
 		});
-		
+
 		it ('should expand the original grammar adding an extra initial rule', function (){
 			expect(g.rules.length).toBe(7);
 		});
-		
+
 		it ('should put the extra rule at first place', function (){
 			expect(g.rules[0].name).toBe(k.data.Grammar.constants.AugmentedRuleName);
 		});
-		
-		it ('shoud preserve the specified start symbol as specifiedStartSymbol', function (){
+
+		it ('should preserve the specified start symbol as specifiedStartSymbol', function (){
 			expect(g.specifiedStartSymbol).toBe(S.head);
 		});
-		
+
 		describe('un-productive rules detection', function ()
 		{
 			it ('shoud remove unproductive rules is nothing is specified', function ()
@@ -1383,10 +1516,10 @@ describe('Grammar', function()
 						startSymbol: Sa.head,
 						rules: [Sa, Sa1, Sa2, A, B]
 					});
-				
+
 				expect(g1.rules.length).toBe(2);
 			});
-			
+
 			it ('should convert the grammar to only generate epsilon if all the rules are non-productive', function ()
 			{
 					var Sa = new k.data.Rule({
@@ -1405,13 +1538,13 @@ describe('Grammar', function()
 							startSymbol: Sa.head,
 							rules: [Sa, Sa2, B]
 						});
-						
+
 					expect(g1.rules.length).toBe(1);
 					expect(g1.rules[0].name).toEqual(k.data.Grammar.constants.AugmentedRuleName);
 					expect(g1.rules[0].tail.length).toBe(2);
 					expect(g1.rules[0].tail[0].name).toEqual(k.data.specialSymbol.EMPTY);
 			});
-			
+
 			it ('should set as unproductive rules that are reachable but are cyclic', function ()
 			{
 				var Sa = new k.data.Rule({
@@ -1434,21 +1567,21 @@ describe('Grammar', function()
 						head: 'B',
 						tail: [new k.data.Terminal({name:'a_terminal', body: 'a'}), new k.data.NonTerminal({name: 'A'})]
 					});
-					
+
 				//Calling this constructor update the grammar's symbols!
 				new k.data.Grammar({
 					startSymbol: Sa.head,
 					rules: [Sa, Sa1, Sa2, A, B],
 					preserveNonProductiveRules: true
 				});
-				
+
 				expect(Sa.isProductive).toBe(true);
 				expect(Sa1.isProductive).toBe(false);
 				expect(Sa2.isProductive).toBe(false);
 				expect(A.isProductive).toBe(false);
 				expect(B.isProductive).toBe(false);
 			});
-			
+
 			it ('should consider empsilon rules as productive', function ()
 			{
 				var Sa = new k.data.Rule({
@@ -1468,14 +1601,14 @@ describe('Grammar', function()
 					rules: [Sa, Sa1, A],
 					preserveNonProductiveRules: true
 				});
-					
+
 				expect(Sa.isProductive).toBe(true);
 				expect(Sa1.isProductive).toBe(true);
 				expect(A.isProductive).toBe(true);
 			});
-			
+
 		});
-		
+
 		describe('epsilon rule tails remove process', function ()
 		{
 			it ('should remove epsilon in the middle of a rule when epsilon is not the only element in the rule', function ()
@@ -1503,12 +1636,12 @@ describe('Grammar', function()
 						startSymbol: Sa.head,
 						rules: [Sa, Sa1, Sa2, A, B]
 					});
-				
+
 				expect(g1.rules.length).toBe(6);
 				expect(Sa.tail.length).toBe(1);
 				expect(A.tail.length).toBe(1);
 			});
-			
+
 			it ('should preseve epsilon in the initial rule', function ()
 			{
 				var Sa = new k.data.Rule({
@@ -1526,13 +1659,13 @@ describe('Grammar', function()
 						startSymbol: Sa.head,
 						rules: [Sa, Sa2, B]
 					});
-					
+
 				expect(Sa.tail.length).toBe(1);
 				expect(Sa.tail[0].name).toBe(k.data.specialSymbol.EMPTY);
 				expect(g1.rules.length).toBe(4);
 				expect(B.tail.length).toBe(1);
 			});
-			
+
 			it ('should preseve epsilon in the initial GENERATED (when the specifeid rules are all removed) rule', function ()
 			{
 				var Sa = new k.data.Rule({
@@ -1547,14 +1680,14 @@ describe('Grammar', function()
 						startSymbol: Sa.head,
 						rules: [Sa, B]
 					});
-				
+
 				expect(g1.rules.length).toBe(1);
 				expect(g1.rules[0].tail.length).toBe(2);
 				expect(g1.rules[0].index).toBe(0);
 				expect(g1.rules[0].tail[0].name).toBe(k.data.specialSymbol.EMPTY);
 				expect(g1.rules[0].tail[1].name).toBe(k.data.specialSymbol.EOF);
 			});
-			
+
 			it ('should preserve epsilon in rules where it is the only element in the tail', function ()
 			{
 				var Sa = new k.data.Rule({
@@ -1580,13 +1713,13 @@ describe('Grammar', function()
 						startSymbol: Sa.head,
 						rules: [Sa, Sa1, Sa2, A, B]
 					});
-				
+
 				expect(g1.rules.length).toBe(6);
 				expect(B.tail.length).toBe(1);
 				expect(A.tail.length).toBe(1);
 			});
 		});
-		
+
 		describe('unrechable nonTerminal removal', function()
 		{
 			it('should remove all rules that are unrechable from the initial start symbol', function()
@@ -1610,7 +1743,7 @@ describe('Grammar', function()
 						startSymbol: Sa.head,
 						rules: [Sa, Sa2, A, B]
 					});
-				
+
 				expect(g1.rules.length).toBe(4);
 				expect(A.isProductive).toBe(true);
 				expect(A.isReachable).toBe(false);
@@ -1618,7 +1751,7 @@ describe('Grammar', function()
 				expect(Sa2.isReachable).toBe(true);
 				expect(B.isReachable).toBe(true);
 			});
-			
+
 			it('should preseve all rules even those that are unrechable from the initial start symbol if it is specified', function()
 			{
 				var Sa = new k.data.Rule({
@@ -1641,11 +1774,11 @@ describe('Grammar', function()
 						preserveUnReachableRules: true,
 						rules: [Sa, Sa2, A, B]
 					});
-				
+
 				expect(g1.rules.length).toBe(5);
 			});
 		});
-		
+
 		describe('determine nullable non terminals', function ()
 		{
 			it('should mark as nullable nontermials that are head of empty rules', function ()
@@ -1673,15 +1806,15 @@ describe('Grammar', function()
 						startSymbol: Sa.head,
 						rules: [Sa, Sa2, A, B, C]
 					});
-					
+
 				expect(A.head.isNullable).toBe(true);
-				
+
 				expect(Sa.head.isNullable).toBe(true);
 				expect(Sa2.head.isNullable).toBe(true);
-				
+
 				expect(g1.nullableNonTerminals.indexOf(A.head.name) >= 0).toBe(true);
 			});
-			
+
 			it('should mark as nullable item that are indirect nullable', function ()
 			{
 				var Sa = new k.data.Rule({
@@ -1703,13 +1836,13 @@ describe('Grammar', function()
 						startSymbol: Sa.head,
 						rules: [Sa, Sa2, A, B]
 					});
-				
+
 				expect(g1.rules.length).toBe(4);
 				expect(A.head.isNullable).toBe(false);
 				expect(B.head.isNullable).toBe(true);
 			});
 		});
-		
+
 		describe('pre calculate FIRST SETs', function ()
 		{
 			it('Should include terminal "a" with the simple rule A->"a"', function ()
@@ -1722,12 +1855,12 @@ describe('Grammar', function()
 						startSymbol: B.head,
 						rules: [B]
 					});
-				
+
 				expect(g1.rules.length).toBe(2);
 				expect(g1.firstSetsByHeader[B.head.name].length).toBe(1);
 				expect(g1.firstSetsByHeader[B.head.name][0].name).toBe('b_terminal');
 			});
-			
+
 			it('Should return epsilon for a simple rule S->EMPTY', function ()
 			{
 				var B = new k.data.Rule({
@@ -1737,12 +1870,12 @@ describe('Grammar', function()
 						startSymbol: B.head,
 						rules: [B]
 					});
-				
+
 				expect(g1.rules.length).toBe(2);
 				expect(g1.firstSetsByHeader[B.head.name].length).toBe(1);
 				expect(g1.firstSetsByHeader[B.head.name][0].name).toBe('EMPTY');
 			});
-			
+
 			it('Should return terminals and EMPTY if the non terminal is nullable', function ()
 			{
 				var B = new k.data.Rule({
@@ -1756,26 +1889,26 @@ describe('Grammar', function()
 						startSymbol: B.head,
 						rules: [B, B1]
 					});
-				
+
 				expect(g1.rules.length).toBe(3);
 				var head_firstset = g1.firstSetsByHeader[B.head.name];
 				expect(head_firstset.length).toBe(2);
 				expect(head_firstset[0].name).toBe('b_terminal');
 			});
-			
+
 			it('Should supprt valid recursions', function ()
 			{
 				//This grammar contains recursive rules: EXPS -> EXPS EXP
 				var g = sampleGrammars.idsList.g,
 					expsNT = sampleGrammars.idsList.EXPS1.head;
-				
+
 				expect(g.rules.length).toBe(7);
 				expect(g.firstSetsByHeader[expsNT.name].length).toBe(2);
 				var exps_firsset = g.firstSetsByHeader[expsNT.name];
 				expect(exps_firsset[0].name).toBe('id_terminal');
 				expect(exps_firsset[1].name).toBe('EMPTY');
 			});
-			
+
 			it('Should return multiples terminals when needed', function ()
 			{
 				var Sa = new k.data.Rule({
@@ -1794,7 +1927,7 @@ describe('Grammar', function()
 						startSymbol: Sa.head,
 						rules: [Sa, Sa2, B]
 					});
-				
+
 				var head_firstset = g1.firstSetsByHeader[Sa.head.name];
 				expect(head_firstset.length).toBe(2);
 				expect(head_firstset[0].name).toBe('a_terminal');
@@ -2291,31 +2424,6 @@ describe('Lexer', function ()
 
     describe('getNext', function()
     {
-        it ('should return ERROR if the string contains enters, the grammar does not support it and notIgnoreNewLines IS true', function ()
-        {
-            var short = new k.data.Rule({
-                    head: 'short',
-                    tail: [new k.data.Terminal({name:'hi', body: 'hi'})]
-				}),
-				grammar = new k.data.Grammar({
-					startSymbol: short.head,
-					rules: [short]
-				}),
-				lexer = new k.lexer.Lexer({
-					grammar: grammar,
-					notIgnoreSpaces: true,
-					notIgnoreNewLines: true,
-					stream: '\nfin'
-                });
-
-            var result = lexer.getNext();
-
-            expect(result.length).toBe(-1);
-            expect(result.string).toBe('\nfin');
-            expect(result.terminal).toBeUndefined();
-            expect(result.ERROR).toBeDefined();
-        });
-
         it ('should return EOF if the only string remaining is enter and IgnoreNewLines is true', function ()
         {
             var lexer = new k.lexer.Lexer({
@@ -2332,7 +2440,7 @@ describe('Lexer', function ()
             expect(result.terminal.name).toBe(k.data.specialSymbol.EOF);
         });
 
-        it ('shoud left trim the input after reading a valid input if ignore spaced is specified', function()
+        it ('should left trim the input after reading a valid input if ignore spaced is specified', function()
         {
             var lexer = new k.lexer.Lexer({
 				grammar: sampleGrammars.idsList.g,
@@ -2346,7 +2454,7 @@ describe('Lexer', function ()
             expect(lexer.inputStream).toBe('IS A TEST) ');
         });
 
-        it ('shoud return EOF if there is no more input to process (ignore spaces equals true)', function()
+        it ('should return EOF if there is no more input to process (ignore spaces equals true)', function()
         {
             var lexer = new k.lexer.Lexer({
 				grammar: sampleGrammars.idsList.g,
@@ -2404,83 +2512,10 @@ describe('Lexer', function ()
             expect(result.length).toBe(-1);
             expect(result.string).toBeUndefined();
             expect(result.terminal.name).toBe('EOF');
-            expect(result.ERROR).toBeUndefined();
+            expect(result.error).toBeUndefined();
         });
 
-        it ('should return ERROR if the only remaining string is "" and not ignoring spaced and there are NOT rule with empty', function ()
-        {
-        	var short = new k.data.Rule({
-                    head: 'short',
-                    tail: [new k.data.Terminal({name:'hi', body: 'hi'})]
-				}),
-				grammar = new k.data.Grammar({
-					startSymbol: short.head,
-					rules: [short]
-				}),
-				lexer = new k.lexer.Lexer({
-					grammar: grammar,
-					notIgnoreSpaces: true,
-					notIgnoreNewLines: true,
-					stream: ''
-                });
-
-            var result = lexer.getNext();
-
-            expect(result.length).toBe(-1);
-            expect(result.string).toBe('');
-            expect(result.terminal).toBeUndefined();
-            expect(result.ERROR).toBeDefined();
-        });
-
-        it ('should return ERROR if the current input do NOT match any terminal NOT ignoring paces', function ()
-        {
-        	var sort = new k.data.Rule({
-                    head: 'sort',
-                    tail: [new k.data.Terminal({name:'hi', body: 'hi'})]
-				}),
-				grammar = new k.data.Grammar({
-					startSymbol: sort.head,
-					rules: [sort]
-				}),
-				lexer = new k.lexer.Lexer({
-					grammar: grammar,
-					notIgnoreSpaces: true,
-					stream: 'not match'
-                });
-
-            var result = lexer.getNext();
-
-            expect(result.length).toBe(-1);
-            expect(result.string).toBe('not match');
-            expect(result.terminal).toBeUndefined();
-            expect(result.ERROR).toBeDefined();
-        });
-
-        it ('should return ERROR if the current input do NOT match any terminal ignoring paces', function ()
-        {
-        	var sort = new k.data.Rule({
-                    head: 'sort',
-                    tail: [new k.data.Terminal({name:'hi', body: 'hi'})]
-				}),
-				grammar = new k.data.Grammar({
-					startSymbol: sort.head,
-					rules: [sort]
-				}),
-				lexer = new k.lexer.Lexer({
-					grammar: grammar,
-					notIgnoreSpaces: false,
-					stream: 'not match'
-                });
-
-            var result = lexer.getNext();
-
-            expect(result.length).toBe(-1);
-            expect(result.string).toBe('not match');
-            expect(result.terminal).toBeUndefined();
-            expect(result.ERROR).toBeDefined();
-        });
-
-        it ('shoud return the larget possible match when regexp', function()
+        it ('should return the larget possible match when regexp', function()
         {
             var init = new k.data.Rule({
                     head: 'init',
@@ -2509,7 +2544,7 @@ describe('Lexer', function ()
 			expect(result.terminal.name).toBe('LARGE_TERMINAL');
         });
 
-        it ('shoud return the larget possible match when string', function()
+        it ('should return the larget possible match when string', function()
         {
 			 var init = new k.data.Rule({
                     head: 'init',
@@ -2568,6 +2603,272 @@ describe('Lexer', function ()
             n = l.getNext();
             expect(n.string).toBe(')');
             expect(n.terminal.name).toBe('cparen_terminal');
+        });
+
+        //FEARURES
+        it ('should not use by default multi-matching', function ()
+        {
+            var l = new k.lexer.Lexer({
+				grammar: sampleGrammars.idsList.g
+            });
+
+            expect(l.useMultipleMatching).toBeFalsy();
+        });
+
+        it ('should not use by default priorities', function ()
+        {
+            var l = new k.lexer.Lexer({
+				grammar: sampleGrammars.idsList.g
+            });
+
+            expect(l.usePriorities).toBeFalsy();
+        });
+
+        it ('should return the most priority token and ignore the passed in valid next tokens if not using multi-matching and using priorities', function ()
+        {
+            var l = new k.lexer.Lexer({
+				grammar: sampleGrammars.testPrioritiesMultipleMatching.g,
+				usePriorities: true,
+				stream: 'this IS, A test '
+            });
+
+            var token = l.getNext(['FAIL', 'IGNORABLE', {TEST: true}, false]);
+
+            expect(token.terminal.name).toEqual('lower_letter_terminal');
+        });
+
+        it ('should return the most priority token from the list of valid tokens when using priorities and multi-matching', function ()
+        {
+             var l = new k.lexer.Lexer({
+				grammar: sampleGrammars.testPrioritiesMultipleMatching.g,
+				usePriorities: true,
+				useMultipleMatching: true,
+				stream: 'this IS, A test '
+            });
+
+            var token = l.getNext(['comma_terminal', 'id_terminal']);
+
+            expect(token.terminal.name).toEqual('id_terminal');
+            expect(token.string).toEqual('this');
+        });
+
+        it ('should return the first defined matching token although its priority is lowen then other matching token when not using priorities', function ()
+        {
+            var l = new k.lexer.Lexer({
+				grammar: sampleGrammars.testPrioritiesMultipleMatching.g,
+				usePriorities: false,
+				stream: 'this IS, A test '
+            });
+
+            var token = l.getNext(['FAIL', 'IGNORABLE']);
+
+            expect(token.terminal.name).toEqual('id_terminal');
+        });
+
+        it ('should return the most priority token when using priorities and more than one token match', function ()
+        {
+            var l = new k.lexer.Lexer({
+				grammar: sampleGrammars.testPrioritiesMultipleMatching.g,
+				usePriorities: true,
+				stream: 'this IS, A test '
+            });
+
+            var token = l.getNext();
+
+            expect(token.terminal.name).toEqual('lower_letter_terminal');
+        });
+
+        // ERRORS
+        it ('should return ERROR if using multi-matching and there is no match in the input Stream', function ()
+        {
+            var l = new k.lexer.Lexer({
+				grammar: sampleGrammars.testPrioritiesMultipleMatching.g,
+				usePriorities: false,
+				useMultipleMatching: true,
+				stream: ': '
+            });
+
+            var token = l.getNext(['comma_terminal', 'fake_termianl']);
+
+            expect(token.error).toBeTruthy();
+            expect(token.length).toEqual(-1);
+        });
+
+        it ('should return ERROR if using multi-matching and there is no match with the list of passed in valid tokens', function ()
+        {
+            var l = new k.lexer.Lexer({
+				grammar: sampleGrammars.testPrioritiesMultipleMatching.g,
+				usePriorities: true,
+				useMultipleMatching: true,
+				stream: 'this IS, A test '
+            });
+
+            var token = l.getNext(['comma_terminal', 'fake_termianl']);
+
+            expect(token.error).toBeTruthy();
+            expect(token.length).toEqual(-1);
+        });
+
+        it ('should return ERROR if not matching is found and priorities is being used', function ()
+        {
+            var l = new k.lexer.Lexer({
+				grammar: sampleGrammars.testPrioritiesMultipleMatching.g,
+				usePriorities: true,
+				useMultipleMatching: false,
+				stream: ': '
+            });
+
+            var token = l.getNext();
+
+            expect(token.error).toBeTruthy();
+        });
+
+        it ('should return ERROR if the string contains enters, the grammar does not support it and notIgnoreNewLines IS true', function ()
+        {
+            var short = new k.data.Rule({
+                    head: 'short',
+                    tail: [new k.data.Terminal({name:'hi', body: 'hi'})]
+				}),
+				grammar = new k.data.Grammar({
+					startSymbol: short.head,
+					rules: [short]
+				}),
+				lexer = new k.lexer.Lexer({
+					grammar: grammar,
+					notIgnoreSpaces: true,
+					notIgnoreNewLines: true,
+					stream: '\nfin'
+                });
+
+            var result = lexer.getNext();
+
+            expect(result.length).toBe(-1);
+            expect(result.string).toBe('\nfin');
+            expect(result.terminal).toBeUndefined();
+            expect(result.error).toBeDefined();
+        });
+
+        it ('should return ERROR if the only remaining string is "" and not ignoring spaced and there are NOT rule with empty', function ()
+        {
+        	var short = new k.data.Rule({
+                    head: 'short',
+                    tail: [new k.data.Terminal({name:'hi', body: 'hi'})]
+				}),
+				grammar = new k.data.Grammar({
+					startSymbol: short.head,
+					rules: [short]
+				}),
+				lexer = new k.lexer.Lexer({
+					grammar: grammar,
+					notIgnoreSpaces: true,
+					notIgnoreNewLines: true,
+					stream: ''
+                });
+
+            var result = lexer.getNext();
+
+            expect(result.length).toBe(-1);
+            expect(result.string).toBe('');
+            expect(result.terminal).toBeUndefined();
+            expect(result.error).toBeDefined();
+        });
+
+        it ('should return ERROR if the current input do NOT match any terminal NOT ignoring paces', function ()
+        {
+        	var sort = new k.data.Rule({
+                    head: 'sort',
+                    tail: [new k.data.Terminal({name:'hi', body: 'hi'})]
+				}),
+				grammar = new k.data.Grammar({
+					startSymbol: sort.head,
+					rules: [sort]
+				}),
+				lexer = new k.lexer.Lexer({
+					grammar: grammar,
+					notIgnoreSpaces: true,
+					stream: 'not match'
+                });
+
+            var result = lexer.getNext();
+
+            expect(result.length).toBe(-1);
+            expect(result.string).toBe('not match');
+            expect(result.terminal).toBeUndefined();
+            expect(result.error).toBeDefined();
+        });
+
+        it ('should return ERROR if the current input do NOT match any terminal ignoring paces', function ()
+        {
+        	var sort = new k.data.Rule({
+                    head: 'sort',
+                    tail: [new k.data.Terminal({name:'hi', body: 'hi'})]
+				}),
+				grammar = new k.data.Grammar({
+					startSymbol: sort.head,
+					rules: [sort]
+				}),
+				lexer = new k.lexer.Lexer({
+					grammar: grammar,
+					notIgnoreSpaces: false,
+					stream: 'not match'
+                });
+
+            var result = lexer.getNext();
+
+            expect(result.length).toBe(-1);
+            expect(result.string).toBe('not match');
+            expect(result.terminal).toBeUndefined();
+            expect(result.error).toBeDefined();
+        });
+
+        it ('should say line number 0 in the case of error when the error is in the line 0', function ()
+        {
+            var l = new k.lexer.Lexer({
+				grammar: sampleGrammars.testSucceeded.g,
+				stream: 'xtest test\ntest\ntest'
+            });
+
+            var result = l.getNext();
+
+            expect(result.error).toBeTruthy();
+            expect(result.line).toBe(0);
+            expect(result.character).toBe(0);
+            expect(result.string).toEqual('xtest test\ntest\ntest');
+        });
+
+        it ('should say line number 3 in the case of error when the error is in the line 3 (even if a valid token contains enter)', function ()
+        {
+            var l = new k.lexer.Lexer({
+				grammar: sampleGrammars.testSucceededEnter.g,
+				stream: 'te\nst te\nst \n te\nXst'
+            });
+
+            var result = l.getNext();   // first valid 'test'
+            result = l.getNext();       // second valid 'test'
+            result = l.getNext();
+
+            expect(result.error).toBeTruthy();
+            expect(result.line).toBe(3);
+            expect(result.character).toBe(1);
+            expect(result.string).toEqual('te\nXst');
+        });
+
+        it ('should say line number 2 in the case of error when the error is in the line 2', function ()
+        {
+            var l = new k.lexer.Lexer({
+				grammar: sampleGrammars.testSucceeded.g,
+				stream: 'test test\ntest\nxtest'
+            });
+
+            var result = l.getNext();   // first valid 'test'
+            result = l.getNext();       // second valid 'test'
+            result = l.getNext();       // third valid 'test'
+            result = l.getNext();
+
+            expect(result.error).toBeTruthy();
+            expect(result.line).toBe(2);
+            expect(result.character).toBe(0);
+            expect(result.string).toEqual('xtest');
         });
 
     });
@@ -4301,7 +4602,7 @@ describe('Automata LALR(1) Generator', function ()
 				'1(0)':['EOF'],
 				'2(0)':['EOF','DIV'],
 				'3(0)':['EOF','DIV'],
-				'5(0)':['EOF']
+				'5(0)':['EOF','DIV']
 			});
 			validateState(states, '1(1)2(1)4(0)', 3,
 			{
@@ -4312,7 +4613,7 @@ describe('Automata LALR(1) Generator', function ()
 			validateState(states, '2(2)5(0)', 2,
 			{
 				'2(2)':['EOF', 'DIV'],
-				'5(0)':['EOF']
+				'5(0)':['EOF', 'DIV']
 			});
 			validateState(states, '2(3)', 1,
 			{
@@ -4328,7 +4629,7 @@ describe('Automata LALR(1) Generator', function ()
 			});
 			validateState(states, '5(1)', 1,
 			{
-				'5(1)':['EOF']
+				'5(1)':['EOF','DIV']
 			});
 			validateState(states, '0(1)', 1,
 			{
@@ -4359,34 +4660,34 @@ describe('Automata LALR(1) Generator', function ()
 				'1(0)':['EOF'],
 				'2(0)':['EOF','DIFF'],
 				'3(0)':['EOF','DIFF'],
-				'4(0)':['EOF'],
-				'5(0)':['EOF'],
+				'4(0)':['EOF','DIFF'],
+				'5(0)':['EOF','DIFF'],
 				'6(0)':['NUMBER','OPAREN'],
 			});
 			validateState(states, '2(0)3(0)4(0)5(1)5(0)6(1)6(0)', 7,
 			{
 				'2(0)':['CPAREN', 'DIFF'],
 				'3(0)':['CPAREN', 'DIFF'],
-				'4(0)':['CPAREN'],
-				'5(0)':['CPAREN'],
-				'5(1)':['CPAREN', 'EOF'],
+				'4(0)':['CPAREN', 'DIFF'],
+				'5(0)':['CPAREN', 'DIFF'],
+				'5(1)':['CPAREN', 'EOF', 'DIFF'],
 				'6(1)':['NUMBER', 'OPAREN'],
 				'6(0)':['NUMBER', 'OPAREN']
 			});
 			validateState(states, '2(2)4(0)5(0)6(0)', 4,
 			{
 				'2(2)':['EOF','DIFF','CPAREN'],
-				'4(0)':['EOF','CPAREN'],
-				'5(0)':['EOF','CPAREN'],
+				'4(0)':['EOF','DIFF','CPAREN'],
+				'5(0)':['EOF','DIFF','CPAREN'],
 				'6(0)':['NUMBER','OPAREN']
 			});
 
 			validateState(states, '2(1)5(2)7(0)8(0)', 4,
 			{
 				'2(1)':['CPAREN','DIFF'],
-				'5(2)':['EOF', 'CPAREN'],
+				'5(2)':['EOF', 'DIFF', 'CPAREN'],
 				'8(0)':['NUMBER', 'OPAREN'],
-				'7(0)':['EOF']
+				'7(0)':['EOF','DIFF','CPAREN']
 			});
 			validateState(states, '1(1)2(1)8(0)', 3,
 			{
@@ -4396,8 +4697,8 @@ describe('Automata LALR(1) Generator', function ()
 			});
 			validateState(states, '5(3)7(1)', 2,
 			{
-				'5(3)':['EOF', 'CPAREN'],
-				'7(1)':['EOF']
+				'5(3)':['EOF', 'DIFF', 'CPAREN'],
+				'7(1)':['EOF', 'DIFF', 'CPAREN']
 			});
 			validateState(states, '2(3)', 1,
 			{
@@ -4409,7 +4710,7 @@ describe('Automata LALR(1) Generator', function ()
 			});
 			validateState(states, '4(1)', 1,
 			{
-				'4(1)':['EOF','CPAREN']
+				'4(1)':['EOF','CPAREN','DIFF']
 			});
 			validateState(states, '8(1)', 1,
 			{
@@ -4541,8 +4842,8 @@ describe('Automata LALR(1) Generator', function ()
 				'1(0)':['EOF'],
 				'2(0)':['EOF', 'DIFF'],
 				'3(0)':['EOF', 'DIFF'],
-				'4(0)':['EOF'],
-				'5(0)':['EOF']
+				'4(0)':['EOF', 'DIFF'],
+				'5(0)':['EOF', 'DIFF']
 			});
 			validateState(states, '0(1)', 1,
 			{
@@ -4559,26 +4860,26 @@ describe('Automata LALR(1) Generator', function ()
 			});
 			validateState(states, '4(1)', 1,
 			{
-				'4(1)': ['EOF', 'CPAREN']
+				'4(1)': ['EOF', 'DIFF', 'CPAREN']
 			});
 			validateState(states, '2(0)3(0)4(0)5(1)5(0)', 5,
 			{
-				'5(1)': ['EOF', 'CPAREN'],
+				'5(1)': ['EOF', 'DIFF', 'CPAREN'],
 				'2(0)': ['CPAREN', 'DIFF'],
 				'3(0)': ['CPAREN', 'DIFF'],
-				'4(0)': ['CPAREN'],
-				'5(0)': ['CPAREN']
+				'4(0)': ['CPAREN', 'DIFF'],
+				'5(0)': ['CPAREN', 'DIFF']
 			});
 			validateState(states, '2(2)4(0)5(0)', 3,
 			{
 				'2(2)': ['EOF', 'CPAREN', 'DIFF'],
-				'4(0)': ['EOF', 'CPAREN'],
-				'5(0)': ['EOF', 'CPAREN']
+				'4(0)': ['EOF', 'CPAREN', 'DIFF'],
+				'5(0)': ['EOF', 'CPAREN', 'DIFF']
 			});
 			validateState(states, '2(1)5(2)', 2,
 			{
 				'2(1)': ['CPAREN', 'DIFF'],
-				'5(2)': ['EOF', 'CPAREN']
+				'5(2)': ['EOF', 'DIFF', 'CPAREN']
 			});
 			validateState(states, '2(3)', 1,
 			{
@@ -4586,7 +4887,7 @@ describe('Automata LALR(1) Generator', function ()
 			});
 			validateState(states, '5(3)', 1,
 			{
-				'5(3)': ['EOF', 'CPAREN']
+				'5(3)': ['EOF','DIFF', 'CPAREN']
 			});
 			validateState(states, 'AcceptanceState', 1,
 			{
@@ -4605,28 +4906,28 @@ describe('Automata LALR(1) Generator', function ()
 				automata = ag.generateAutomata(),
 				actionTable = ag.generateACTIONTable(automata);
 
-			expect(actionTable).toEqual(jasmine.any(Function));
+			expect(actionTable).toEqual(jasmine.any(Object));
 
-			expect(actionTable('0(0)1(0)2(0)', {name:'A_LET'})).toEqual({action: k.parser.tableAction.SHIFT});
+			expect(actionTable['0(0)1(0)2(0)']['A_LET']).toEqual({action: k.parser.tableAction.SHIFT});
 
-			expect(actionTable('0(0)1(0)2(0)', {name:''})).toEqual({action: k.parser.tableAction.ERROR});
-			expect(actionTable('0(0)1(0)2(0)', {name:'fake_value'})).toEqual({action: k.parser.tableAction.ERROR});
-			expect(actionTable('0(0)1(0)2(0)', {name:'_A_LET'})).toEqual({action: k.parser.tableAction.ERROR});
+			expect(actionTable['0(0)1(0)2(0)']['']).toBeUndefined();
+			expect(actionTable['0(0)1(0)2(0)']['fake_value']).toBeUndefined();
+			expect(actionTable['0(0)1(0)2(0)']['_A_LET']).toBeUndefined();
 
-			expect(actionTable('1(1)1(0)2(0)', {name:'A_LET'})).toEqual({action: k.parser.tableAction.SHIFT});
-			expect(actionTable('1(1)1(0)2(0)', {name:'A_LET'})).toEqual({action: k.parser.tableAction.SHIFT});
+			expect(actionTable['1(1)1(0)2(0)']['A_LET']).toEqual({action: k.parser.tableAction.SHIFT});
+			expect(actionTable['1(1)1(0)2(0)']['A_LET']).toEqual({action: k.parser.tableAction.SHIFT});
 
-			expect(actionTable('0(1)', {name:'EOF'})).toEqual({action: k.parser.tableAction.SHIFT});
+			expect(actionTable['0(1)']['EOF']).toEqual({action: k.parser.tableAction.SHIFT});
 
-			expect(actionTable('2(1)', {name:'EOF'}).action).toEqual(k.parser.tableAction.REDUCE);
-			expect(actionTable('2(1)', {name:'EOF'}).rule.name).toEqual(sampleGrammars.aPlusb.A2.name);
+			expect(actionTable['2(1)']['EOF'].action).toEqual(k.parser.tableAction.REDUCE);
+			expect(actionTable['2(1)']['EOF'].rule.name).toEqual(sampleGrammars.aPlusb.A2.name);
 
-			expect(actionTable('2(1)', {name:'A_LET'}).action).toEqual(k.parser.tableAction.ERROR);
+			expect(actionTable['2(1)']['A_LET']).toBeUndefined();
 
-			expect(actionTable('1(2)', {name:'EOF'}).action).toEqual(k.parser.tableAction.REDUCE);
-			expect(actionTable('1(2)', {name:'EOF'}).rule.name).toEqual(sampleGrammars.aPlusb.A1.name);
+			expect(actionTable['1(2)']['EOF'].action).toEqual(k.parser.tableAction.REDUCE);
+			expect(actionTable['1(2)']['EOF'].rule.name).toEqual(sampleGrammars.aPlusb.A1.name);
 
-			expect(actionTable('AcceptanceState', {name:'EOF'}).action).toEqual('ACCEPT');
+			expect(actionTable['AcceptanceState']['EOF'].action).toEqual('ACCEPT');
 		});
 
 		it('should return the expected action function (table) for the simple LR1 grammar num Diff Condenced', function ()
@@ -4637,106 +4938,106 @@ describe('Automata LALR(1) Generator', function ()
 				automata = ag.generateAutomata(),
 				actionTable = ag.generateACTIONTable(automata);
 
-			expect(actionTable).toEqual(jasmine.any(Function));
+			expect(actionTable).toEqual(jasmine.any(Object));
 
-			expect(actionTable('0(0)1(0)2(0)3(0)4(0)5(0)', {name:'NUMBER'}).action).toEqual(k.parser.tableAction.SHIFT);
-			expect(actionTable('0(0)1(0)2(0)3(0)4(0)5(0)', {name:'OPAREN'}).action).toEqual(k.parser.tableAction.SHIFT);
+			expect(actionTable['0(0)1(0)2(0)3(0)4(0)5(0)']['NUMBER'].action).toEqual(k.parser.tableAction.SHIFT);
+			expect(actionTable['0(0)1(0)2(0)3(0)4(0)5(0)']['OPAREN'].action).toEqual(k.parser.tableAction.SHIFT);
 
-			expect(actionTable('0(0)1(0)2(0)3(0)4(0)5(0)', {name:'CPAREN'}).action).toEqual(k.parser.tableAction.ERROR);
-			expect(actionTable('0(0)1(0)2(0)3(0)4(0)5(0)', {name:'EOF'}).action).toEqual(k.parser.tableAction.ERROR);
-			expect(actionTable('0(0)1(0)2(0)3(0)4(0)5(0)', {name:'DIFF'}).action).toEqual(k.parser.tableAction.ERROR);
-
-
-			expect(actionTable('0(1)', {name:'EOF'}).action).toEqual(k.parser.tableAction.SHIFT);
-
-			expect(actionTable('0(1)', {name:'CPAREN'}).action).toEqual( k.parser.tableAction.ERROR);
-			expect(actionTable('0(1)', {name:'OPAREN'}).action).toEqual( k.parser.tableAction.ERROR);
-			expect(actionTable('0(1)', {name:'DIFF'}).action).toEqual(k.parser.tableAction.ERROR);
-			expect(actionTable('0(1)', {name:'NUMBER'}).action).toEqual(k.parser.tableAction.ERROR);
+			expect(actionTable['0(0)1(0)2(0)3(0)4(0)5(0)']['CPAREN']).toBeUndefined();
+			expect(actionTable['0(0)1(0)2(0)3(0)4(0)5(0)']['EOF']).toBeUndefined();
+			expect(actionTable['0(0)1(0)2(0)3(0)4(0)5(0)']['DIFF']).toBeUndefined();
 
 
-			expect(actionTable('1(1)2(1)', {name:'DIFF'}).action).toEqual(k.parser.tableAction.SHIFT);
-			expect(actionTable('1(1)2(1)', {name:'EOF'}).action).toEqual(k.parser.tableAction.REDUCE);
-			expect(actionTable('1(1)2(1)', {name:'EOF'}).rule.name).toEqual(sampleGrammars.numDiffCondenced.S.name);
+			expect(actionTable['0(1)']['EOF'].action).toEqual(k.parser.tableAction.SHIFT);
 
-			expect(actionTable('1(1)2(1)', {name:'OPAREN'}).action).toEqual(k.parser.tableAction.ERROR);
-			expect(actionTable('1(1)2(1)', {name:'CPAREN'}).action).toEqual(k.parser.tableAction.ERROR);
-			expect(actionTable('1(1)2(1)', {name:'NUMBER'}).action).toEqual(k.parser.tableAction.ERROR);
-
-
-			expect(actionTable('2(0)3(0)4(0)5(1)5(0)', {name:'NUMBER'}).action).toEqual(k.parser.tableAction.SHIFT);
-			expect(actionTable('2(0)3(0)4(0)5(1)5(0)', {name:'OPAREN'}).action).toEqual(k.parser.tableAction.SHIFT);
-
-			expect(actionTable('2(0)3(0)4(0)5(1)5(0)', {name:'EOF'}).action).toEqual(k.parser.tableAction.ERROR);
-			expect(actionTable('2(0)3(0)4(0)5(1)5(0)', {name:'DIFF'}).action).toEqual(k.parser.tableAction.ERROR);
-			expect(actionTable('2(0)3(0)4(0)5(1)5(0)', {name:'CPAREN'}).action).toEqual(k.parser.tableAction.ERROR);
+			expect(actionTable['0(1)']['CPAREN']).toBeUndefined();
+			expect(actionTable['0(1)']['OPAREN']).toBeUndefined();
+			expect(actionTable['0(1)']['DIFF']).toBeUndefined();
+			expect(actionTable['0(1)']['NUMBER']).toBeUndefined();
 
 
-			expect(actionTable('2(1)5(2)', {name:'CPAREN'}).action).toEqual(k.parser.tableAction.SHIFT);
-			expect(actionTable('2(1)5(2)', {name:'DIFF'}).action).toEqual(k.parser.tableAction.SHIFT);
+			expect(actionTable['1(1)2(1)']['DIFF'].action).toEqual(k.parser.tableAction.SHIFT);
+			expect(actionTable['1(1)2(1)']['EOF'].action).toEqual(k.parser.tableAction.REDUCE);
+			expect(actionTable['1(1)2(1)']['EOF'].rule.name).toEqual(sampleGrammars.numDiffCondenced.S.name);
 
-			expect(actionTable('2(1)5(2)', {name:'EOF'}).action).toEqual(k.parser.tableAction.ERROR);
-			expect(actionTable('2(1)5(2)', {name:'OPAREN'}).action).toEqual(k.parser.tableAction.ERROR);
-			expect(actionTable('2(1)5(2)', {name:'NUMBER'}).action).toEqual(k.parser.tableAction.ERROR);
-
-
-			expect(actionTable('2(2)4(0)5(0)', {name:'NUMBER'}).action).toEqual(k.parser.tableAction.SHIFT);
-			expect(actionTable('2(2)4(0)5(0)', {name:'OPAREN'}).action).toEqual(k.parser.tableAction.SHIFT);
-
-			expect(actionTable('2(2)4(0)5(0)', {name:'CPAREN'}).action).toEqual(k.parser.tableAction.ERROR);
-			expect(actionTable('2(2)4(0)5(0)', {name:'EOF'}).action).toEqual(k.parser.tableAction.ERROR);
-			expect(actionTable('2(2)4(0)5(0)', {name:'DIFF'}).action).toEqual(k.parser.tableAction.ERROR);
+			expect(actionTable['1(1)2(1)']['OPAREN']).toBeUndefined();
+			expect(actionTable['1(1)2(1)']['CPAREN']).toBeUndefined();
+			expect(actionTable['1(1)2(1)']['NUMBER']).toBeUndefined();
 
 
-			expect(actionTable('2(3)', {name:'DIFF'}).action).toEqual(k.parser.tableAction.REDUCE);
-			expect(actionTable('2(3)', {name:'DIFF'}).rule.name).toEqual(sampleGrammars.numDiffCondenced.E1.name);
-			expect(actionTable('2(3)', {name:'EOF'}).action).toEqual(k.parser.tableAction.REDUCE);
-			expect(actionTable('2(3)', {name:'EOF'}).rule.name).toEqual(sampleGrammars.numDiffCondenced.E1.name);
-			expect(actionTable('2(3)', {name:'CPAREN'}).action).toEqual(k.parser.tableAction.REDUCE);
-			expect(actionTable('2(3)', {name:'CPAREN'}).rule.name).toEqual(sampleGrammars.numDiffCondenced.E1.name);
+			expect(actionTable['2(0)3(0)4(0)5(1)5(0)']['NUMBER'].action).toEqual(k.parser.tableAction.SHIFT);
+			expect(actionTable['2(0)3(0)4(0)5(1)5(0)']['OPAREN'].action).toEqual(k.parser.tableAction.SHIFT);
 
-			expect(actionTable('2(3)', {name:'OPAREN'}).action).toEqual(k.parser.tableAction.ERROR);
-			expect(actionTable('2(3)', {name:'NUMBER'}).action).toEqual(k.parser.tableAction.ERROR);
+			expect(actionTable['2(0)3(0)4(0)5(1)5(0)']['EOF']).toBeUndefined();
+			expect(actionTable['2(0)3(0)4(0)5(1)5(0)']['DIFF']).toBeUndefined();
+			expect(actionTable['2(0)3(0)4(0)5(1)5(0)']['CPAREN']).toBeUndefined();
 
 
-			expect(actionTable('3(1)', {name:'CPAREN'}).action).toEqual(k.parser.tableAction.REDUCE);
-			expect(actionTable('3(1)', {name:'CPAREN'}).rule.name).toEqual(sampleGrammars.numDiffCondenced.E2.name);
-			expect(actionTable('3(1)', {name:'DIFF'}).action).toEqual(k.parser.tableAction.REDUCE);
-			expect(actionTable('3(1)', {name:'DIFF'}).rule.name).toEqual(sampleGrammars.numDiffCondenced.E2.name);
-			expect(actionTable('3(1)', {name:'EOF'}).action).toEqual(k.parser.tableAction.REDUCE);
-			expect(actionTable('3(1)', {name:'EOF'}).rule.name).toEqual(sampleGrammars.numDiffCondenced.E2.name);
+			expect(actionTable['2(1)5(2)']['CPAREN'].action).toEqual(k.parser.tableAction.SHIFT);
+			expect(actionTable['2(1)5(2)']['DIFF'].action).toEqual(k.parser.tableAction.SHIFT);
 
-			expect(actionTable('3(1)', {name:'NUMBER'}).action).toEqual(k.parser.tableAction.ERROR);
-			expect(actionTable('3(1)', {name:'OPAREN'}).action).toEqual(k.parser.tableAction.ERROR);
+			expect(actionTable['2(1)5(2)']['EOF']).toBeUndefined();
+			expect(actionTable['2(1)5(2)']['OPAREN']).toBeUndefined();
+			expect(actionTable['2(1)5(2)']['NUMBER']).toBeUndefined();
 
 
-			expect(actionTable('4(1)', {name:'CPAREN'}).action).toEqual(k.parser.tableAction.REDUCE);
-			expect(actionTable('4(1)', {name:'CPAREN'}).rule.name).toEqual(sampleGrammars.numDiffCondenced.T1.name);
-			expect(actionTable('4(1)', {name:'EOF'}).action).toEqual(k.parser.tableAction.REDUCE);
-			expect(actionTable('4(1)', {name:'EOF'}).rule.name).toEqual(sampleGrammars.numDiffCondenced.T1.name);
+			expect(actionTable['2(2)4(0)5(0)']['NUMBER'].action).toEqual(k.parser.tableAction.SHIFT);
+			expect(actionTable['2(2)4(0)5(0)']['OPAREN'].action).toEqual(k.parser.tableAction.SHIFT);
 
-			expect(actionTable('4(1)', {name:'OPAREN'}).action).toEqual(k.parser.tableAction.ERROR);
-			expect(actionTable('4(1)', {name:'DIFF'}).action).toEqual(k.parser.tableAction.ERROR);
-			expect(actionTable('4(1)', {name:'NUM'}).action).toEqual(k.parser.tableAction.ERROR);
+			expect(actionTable['2(2)4(0)5(0)']['CPAREN']).toBeUndefined();
+			expect(actionTable['2(2)4(0)5(0)']['EOF']).toBeUndefined();
+			expect(actionTable['2(2)4(0)5(0)']['DIFF']).toBeUndefined();
 
 
-			expect(actionTable('5(3)', {name:'EOF'}).action).toEqual(k.parser.tableAction.REDUCE);
-			expect(actionTable('5(3)', {name:'EOF'}).rule.name).toEqual(sampleGrammars.numDiffCondenced.T2.name);
-			expect(actionTable('5(3)', {name:'CPAREN'}).action).toEqual(k.parser.tableAction.REDUCE);
-			expect(actionTable('5(3)', {name:'CPAREN'}).rule.name).toEqual(sampleGrammars.numDiffCondenced.T2.name);
+			expect(actionTable['2(3)']['DIFF'].action).toEqual(k.parser.tableAction.REDUCE);
+			expect(actionTable['2(3)']['DIFF'].rule.name).toEqual(sampleGrammars.numDiffCondenced.E1.name);
+			expect(actionTable['2(3)']['EOF'].action).toEqual(k.parser.tableAction.REDUCE);
+			expect(actionTable['2(3)']['EOF'].rule.name).toEqual(sampleGrammars.numDiffCondenced.E1.name);
+			expect(actionTable['2(3)']['CPAREN'].action).toEqual(k.parser.tableAction.REDUCE);
+			expect(actionTable['2(3)']['CPAREN'].rule.name).toEqual(sampleGrammars.numDiffCondenced.E1.name);
 
-			expect(actionTable('5(3)', {name:'NUM'}).action).toEqual(k.parser.tableAction.ERROR);
-			expect(actionTable('5(3)', {name:'OPAREN'}).action).toEqual(k.parser.tableAction.ERROR);
-			expect(actionTable('5(3)', {name:'DIFF'}).action).toEqual(k.parser.tableAction.ERROR);
+			expect(actionTable['2(3)']['OPAREN']).toBeUndefined();
+			expect(actionTable['2(3)']['NUMBER']).toBeUndefined();
 
 
-			expect(actionTable(k.data.State.constants.AcceptanceStateName, {name:'EOF'}).action).toEqual(k.parser.tableAction.ACCEPT);
-			expect(actionTable(k.data.State.constants.AcceptanceStateName, {name:'EOF'}).rule.name).toEqual(k.data.Grammar.constants.AugmentedRuleName);
+			expect(actionTable['3(1)']['CPAREN'].action).toEqual(k.parser.tableAction.REDUCE);
+			expect(actionTable['3(1)']['CPAREN'].rule.name).toEqual(sampleGrammars.numDiffCondenced.E2.name);
+			expect(actionTable['3(1)']['DIFF'].action).toEqual(k.parser.tableAction.REDUCE);
+			expect(actionTable['3(1)']['DIFF'].rule.name).toEqual(sampleGrammars.numDiffCondenced.E2.name);
+			expect(actionTable['3(1)']['EOF'].action).toEqual(k.parser.tableAction.REDUCE);
+			expect(actionTable['3(1)']['EOF'].rule.name).toEqual(sampleGrammars.numDiffCondenced.E2.name);
 
-			expect(actionTable(k.data.State.constants.AcceptanceStateName, {name:'OPAREN'}).action).toEqual(k.parser.tableAction.ERROR);
-			expect(actionTable(k.data.State.constants.AcceptanceStateName, {name:'CPAREN'}).action).toEqual(k.parser.tableAction.ERROR);
-			expect(actionTable(k.data.State.constants.AcceptanceStateName, {name:'NUMBER'}).action).toEqual(k.parser.tableAction.ERROR);
-			expect(actionTable(k.data.State.constants.AcceptanceStateName, {name:'DIFF'}).action).toEqual(k.parser.tableAction.ERROR);
+			expect(actionTable['3(1)']['NUMBER']).toBeUndefined();
+			expect(actionTable['3(1)']['OPAREN']).toBeUndefined();
+
+
+			expect(actionTable['4(1)']['CPAREN'].action).toEqual(k.parser.tableAction.REDUCE);
+			expect(actionTable['4(1)']['CPAREN'].rule.name).toEqual(sampleGrammars.numDiffCondenced.T1.name);
+			expect(actionTable['4(1)']['EOF'].action).toEqual(k.parser.tableAction.REDUCE);
+			expect(actionTable['4(1)']['EOF'].rule.name).toEqual(sampleGrammars.numDiffCondenced.T1.name);
+
+			expect(actionTable['4(1)']['OPAREN']).toBeUndefined();
+			expect(actionTable['4(1)']['DIFF'].action).toEqual(k.parser.tableAction.REDUCE);
+			expect(actionTable['4(1)']['NUM']).toBeUndefined();
+
+
+			expect(actionTable['5(3)']['EOF'].action).toEqual(k.parser.tableAction.REDUCE);
+			expect(actionTable['5(3)']['EOF'].rule.name).toEqual(sampleGrammars.numDiffCondenced.T2.name);
+			expect(actionTable['5(3)']['CPAREN'].action).toEqual(k.parser.tableAction.REDUCE);
+			expect(actionTable['5(3)']['CPAREN'].rule.name).toEqual(sampleGrammars.numDiffCondenced.T2.name);
+
+			expect(actionTable['5(3)']['NUM']).toBeUndefined();
+			expect(actionTable['5(3)']['OPAREN']).toBeUndefined();
+			expect(actionTable['5(3)']['DIFF'].action).toEqual(k.parser.tableAction.REDUCE);
+
+
+			expect(actionTable[k.data.State.constants.AcceptanceStateName]['EOF'].action).toEqual(k.parser.tableAction.ACCEPT);
+			expect(actionTable[k.data.State.constants.AcceptanceStateName]['EOF'].rule.name).toEqual(k.data.Grammar.constants.AugmentedRuleName);
+
+			expect(actionTable[k.data.State.constants.AcceptanceStateName]['OPAREN']).toBeUndefined();
+			expect(actionTable[k.data.State.constants.AcceptanceStateName]['CPAREN']).toBeUndefined();
+			expect(actionTable[k.data.State.constants.AcceptanceStateName]['NUMBER']).toBeUndefined();
+			expect(actionTable[k.data.State.constants.AcceptanceStateName]['DIFF']).toBeUndefined();
 		});
 
 	});
@@ -5749,12 +6050,12 @@ describe('Parser', function ()
 					actionTable: {},
 					initialState: {},
 				});
-				
+
 			expect(parser.stack).toEqual(jasmine.any(Array));
 		});
-		
+
 	});
-	
+
 	describe('parse', function ()
 	{
 		it('should accept the string "aab" for the grammar a+b', function()
@@ -5764,11 +6065,11 @@ describe('Parser', function ()
 					grammar: sampleGrammars.aPlusb.g,
 					strInput: 'aab'
 				});
-	        
+
 	        var result = p.parser.parse(p.lexer);
 	        expect(result).toBeTruthy();
 		});
-		
+
 		it('should reject the string "aaa" for the grammar a+b', function()
 		{
 			var p = k.parser.parserCreator.create(
@@ -5776,12 +6077,12 @@ describe('Parser', function ()
 					grammar: sampleGrammars.aPlusb.g,
 					strInput: 'aaa'
 				});
-	        
+
 	        var result = p.parser.parse(p.lexer);
-	        
-	        expect(result).toBe(false);
+
+	        expect(result.error).toBeTruthy();
 		});
-		
+
 		it('should reject the string "" for the grammar a+b', function()
 		{
 			var p = k.parser.parserCreator.create(
@@ -5789,10 +6090,10 @@ describe('Parser', function ()
 					grammar: sampleGrammars.aPlusb.g,
 					strInput: ''
 				});
-	        
+
 	        var result = p.parser.parse(p.lexer);
-	        
-	        expect(result).toBe(false);
+
+	        expect(result.error).toBeTruthy();
 		});
 
 		it('should accept the string "" for the grammar aPlusEMPTY', function()
@@ -5802,13 +6103,13 @@ describe('Parser', function ()
 					grammar: sampleGrammars.aPlusEMPTY.g,
 					strInput: ''
 				});
-	        
+
 	        var result = p.parser.parse(p.lexer);
 	        expect(result).toBeTruthy();
 	        expect(result.nodes.length).toBe(0); //The only rule that applies is the one present at the root!
 	        expect(result.rule.name).toEqual('S2RULE');
 		});
-		
+
 		it('should accept the string "aa" for the grammar aPlusEMPTY', function()
 		{
 			var p = k.parser.parserCreator.create(
@@ -5816,18 +6117,18 @@ describe('Parser', function ()
 					grammar: sampleGrammars.aPlusEMPTY.g,
 					strInput: 'aa'
 				});
-	        
+
 	        var result = p.parser.parse(p.lexer);
 	        expect(result).toBeTruthy();
 		});
-		
+
 		function getResult (lexer, parser, input)
 		{
 			lexer.setStream(input);
 	        var result = parser.parse(lexer);
 	        return result ? result.currentValue : result;
 		}
-		
+
 		it('should resturn the expected arithmetic result for an arithmetic grammar', function()
 		{
 			var	grammar = sampleGrammars.arithmetic.g,
@@ -5851,13 +6152,13 @@ describe('Parser', function ()
 					actionTable: actionTable,
 					initialState: automata.initialStateAccessor()
 				});
-	        
-	        
+
+
 	        lexer.setStream('(1+1)');
 	        var result = parser.parse(lexer);
 	        expect(result.currentValue).toBe(2);
-	        
-	        
+
+
 	        expect(getResult(lexer, parser, '1+1')).toBe(2);
 	        expect(getResult(lexer, parser, '1+2*2')).toBe(5);
 	        expect(getResult(lexer, parser, '(1+2)*2')).toBe(6);
@@ -5877,9 +6178,9 @@ describe('parserCreator', function ()
 	{
 		it('should throw an exception if a grammar is not specified', function ()
 		{
-			expect(function(){return k.parser.parserCreator.create();}).toThrow();	
+			expect(function(){return k.parser.parserCreator.create();}).toThrow();
 		});
-		
+
 		it('should create a parser and a lexer with the specified Automata constructor', function ()
 		{
 			//As the default Automata Generator is LALR1 and the grammar is LR1, when the automta gets validated will generate return false
@@ -5890,15 +6191,15 @@ describe('parserCreator', function ()
 				});
 			};
 			expect(contructorFnc).toThrow();
-			
+
 			var r = k.parser.parserCreator.create({
 				grammar: sampleGrammars.idsList.g
 			});
-			
+
 			expect(r).toBeDefined();
-			
+
 		});
-		
+
 		it('should use the Automata LALR 1 generator by default if one is not specified', function ()
 		{
 			var contructorFnc = function () {
@@ -5907,14 +6208,14 @@ describe('parserCreator', function ()
 				});
 			};
 			expect(contructorFnc).not.toThrow();
-			
+
 			var r = k.parser.parserCreator.create({
-				grammar: sampleGrammars.aPlusb.g	
+				grammar: sampleGrammars.aPlusb.g
 			});
-			
+
 			expect(r).toBeDefined();
 		});
-		
+
 		it('should accept an input string to be used by the lexer', function ()
 		{
 			var rStr = k.parser.parserCreator.create({
@@ -5924,14 +6225,14 @@ describe('parserCreator', function ()
 				r = k.parser.parserCreator.create({
 					grammar: sampleGrammars.aPlusb.g
 				});
-			
+
 			var token = rStr.lexer.getNext();
-			
+
 			expect(token).toBeDefined();
 			expect(token.length).toBe(1);
 			expect(token.string).toEqual('a');
 			expect(token.terminal.name).toEqual('A_LET');
-			
+
 			expect(r.lexer.getNext).toThrow();
 		});
 	});
@@ -7410,9 +7711,139 @@ describe('Object Utils', function()
 				expect(result).not.toBe(input);
 				expect(result).toEqual(input);
 				expect(result.obj).toBe(propObj);
+			});
+
+		});
+
+		describe('max', function ()
+		{
+			it('should return the maximun integer value in an array of numbers', function ()
+			{
+				expect(k.utils.obj.max([1,55,7,3,9])).toBe(55);
+			});
+
+			it('should project the property to filter the maximun value from the passed in string parameter', function ()
+			{
+				expect(k.utils.obj.max([{age:0}, {age:-1},{age:33},{age:11}],'age')).toEqual({age:33});
+			});
+
+			it('should accepts a function that returns the value of each object used to find the maximun final result', function ()
+			{
+				expect(k.utils.obj.max([{age:0}, {age:-1},{age:33},{age:11}],function (item)
+				{
+					return 10 - item.age;
+				})).toEqual({age:-1});
+			});
+
+			it('should accepts a context object', function ()
+			{
+				var context = {
+					searchValue: 11
+				};
+
+				expect(k.utils.obj.max([{age:0}, {age:-1},{age:33},{age:11}],function (item)
+				{
+					return this.searchValue === item.age ? 1 : 0;
+				}, context)).toEqual({age:11});
 
 			});
 
+			it('should throw and excpetion if called with no parameters', function ()
+			{
+				expect(k.utils.obj.max).toThrow();
+			});
+
+			it('should return -infinity when the obj to iterate over is empty', function ()
+			{
+				expect(k.utils.obj.max({})).toBe(-Infinity);
+				expect(k.utils.obj.max([])).toBe(-Infinity);
+				expect(k.utils.obj.max(false)).toBe(-Infinity);
+				expect(k.utils.obj.max(true)).toBe(-Infinity);
+			});
+
+			it('should return -infinity when the obj to iterate over is the only specifed parameter and it is an array of objects', function ()
+			{
+				expect(k.utils.obj.max([{name:'John'}, {name: 'Mictian'}])).toBe(-Infinity);
+			});
+
+			it('should return the last letter in the alfaber if a string is passed', function ()
+			{
+				expect(k.utils.obj.max('hi therez this is a test')).toEqual('z');
+			});
+		});
+
+		describe('pairs', function ()
+		{
+			it('should return an array with the values of the assed in object', function ()
+			{
+				var result = k.utils.obj.pairs({one: 1, two: 2, three: 3});
+				expect(result).toEqual([["one", 1], ["two", 2], ["three", 3]]);
+			});
+
+			it('should an empty array when no pairs can be extracted', function ()
+			{
+				expect(k.utils.obj.pairs()).toEqual([]);
+				expect(k.utils.obj.pairs({})).toEqual([]);
+				expect(k.utils.obj.pairs([])).toEqual([]);
+				expect(k.utils.obj.pairs(false)).toEqual([]);
+				expect(k.utils.obj.pairs(true)).toEqual([]);
+				expect(k.utils.obj.pairs(22)).toEqual([]);
+			});
+		});
+
+		describe('matches', function ()
+		{
+			it('should return a function that mathc object like the passed one', function ()
+			{
+				var objMatching = {
+						name: 'John',
+						age: 27
+					},
+					resultFunction = k.utils.obj.matches(objMatching);
+
+				expect(resultFunction).toEqual(jasmine.any(Function));
+				expect(resultFunction(objMatching)).toEqual(true);
+				expect(resultFunction(false)).toEqual(false);
+				expect(resultFunction(123)).toEqual(false);
+				expect(resultFunction({name: 'John', age: 28})).toEqual(false);
+				expect(resultFunction({name: 'John2', age: 27})).toEqual(false);
+
+			});
+
+			it ('should return true if the function is generated with anything else rather than an object or an empty one', function ()
+			{
+				expect(k.utils.obj.matches(function (){})(false)).toEqual(true);
+				expect(k.utils.obj.matches(function (){})(true)).toEqual(true);
+				expect(k.utils.obj.matches(function (){})(function (){})).toEqual(true);
+				expect(k.utils.obj.matches(function (){})({})).toEqual(true);
+
+				expect(k.utils.obj.matches(false)({})).toEqual(true);
+				expect(k.utils.obj.matches(false)(false)).toEqual(true);
+				expect(k.utils.obj.matches(false)(true)).toEqual(true);
+				expect(k.utils.obj.matches(false)(12)).toEqual(true);
+			});
+		});
+
+		describe('values', function ()
+		{
+			it ('should return the values for each of the properties of the passed in object', function ()
+			{
+				expect(k.utils.obj.values({
+					prop1: 'rojo',
+					prop2: true,
+					prop3: 12,
+					prop5: {}
+				})).toEqual(['rojo', true, 12, {}]);
+
+
+				var result = k.utils.obj.values(
+					{
+						prop1:function (){}
+					}
+					)[0];
+
+				expect(result).toEqual(jasmine.any(Function));
+			});
 		});
 	});
 
@@ -7598,6 +8029,48 @@ describe('String Utils', function()
 		it('should return a string with one tab if pass a true value', function ()
 		{
 			expect(k.utils.str.tabs(true)).toEqual('	');
+		});
+	});
+
+	describe('getIndicesOf', function ()
+	{
+		it('should return an empty array if there is not matches', function ()
+		{
+			var result = k.utils.str.getIndicesOf('Hi elevator, and elegant elephant, how are you?', 'wrong');
+
+			expect(result).toEqual([]);
+
+			result = k.utils.str.getIndicesOf('', 'wrong');
+
+			expect(result).toEqual([]);
+		});
+
+		it('should return the index of all maches', function ()
+		{
+			var result = k.utils.str.getIndicesOf('el', 'Hi elevator, and elegant elephant, how are you?');
+
+			expect(result).toEqual([3, 17, 25]);
+		});
+
+		it('should return all matches ignoring caseSensitive by default', function ()
+		{
+			var result = k.utils.str.getIndicesOf('el', 'Hi elevator, and eLegant Elephant, how are you?');
+
+			expect(result).toEqual([3, 17, 25]);
+		});
+
+		it('should take into accoiunt case sensitive if specified', function ()
+		{
+			var result = k.utils.str.getIndicesOf('el', 'Hi elevator, and eLegant Elephant, how are you?', true);
+
+			expect(result).toEqual([3]);
+		});
+
+		it('should return an empty array if the string to search in if not valid', function ()
+		{
+			var result = k.utils.str.getIndicesOf(false, 'wrong');
+
+			expect(result).toEqual([]);
 		});
 	});
 });

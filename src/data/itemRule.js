@@ -37,7 +37,7 @@ var ItemRule = k.data.ItemRule = (function() {
 		}
 	};
 
-	/* @function Convert the current item rule to its string representation
+	/* @method Convert the current item rule to its string representation
 	* @returns {String} formatted string */
 	itemRule.prototype.toString = function()
 	{
@@ -53,7 +53,7 @@ var ItemRule = k.data.ItemRule = (function() {
 		return aux;
 	};
 
-	/* @function Clone the current item, altering its state by the params specified in cloneUpdateOptions
+	/* @method Clone the current item, altering its state by the params specified in cloneUpdateOptions
 	* @param {Integer} cloneUpdateOptions.dotLocationIncrement Increment that will be applied into the dot location of the new item. Default: 0
 	* @param {Object} creationOptions Optional object use to expand current option used to create the returned clone
 	* @returns {ItemRule} A clean new item */
@@ -69,7 +69,7 @@ var ItemRule = k.data.ItemRule = (function() {
 		return result;
 	};
 
-	/* @function Clone the current item's options
+	/* @method Clone the current item's options
 	* @param {Object} cloneUpdateOptions Optional object use to control the way the options are being cloned
 	* @param {Object} extendedOptions Optional object use to expand current options and create the returned clone
 	* @returns {Object} A copy of the current options (The referenced rule is not copied, hte same rule instance is used) */
@@ -89,7 +89,7 @@ var ItemRule = k.data.ItemRule = (function() {
 		return result;
 	};
 
-	/* @function Increase the dot location by the number specified by parameter
+	/* @method Increase the dot location by the number specified by parameter
 	* @param {Integer} increment Increment that will be applied into the dot location of the new item. Default: 1
 	* @returns {Void} */
 	itemRule.prototype._incrementDotLocation = function(increment)
@@ -100,7 +100,7 @@ var ItemRule = k.data.ItemRule = (function() {
 		this.dotLocation = optionsValue + incrementValue;
 	};
 	
-	/* @function Gets a string id that uniquely identity the current item rule
+	/* @method Gets a string id that uniquely identity the current item rule
 	* @returns {String} Id */
 	itemRule.prototype.getIdentity = function ()
 	{
@@ -111,14 +111,14 @@ var ItemRule = k.data.ItemRule = (function() {
 		return this._id;
 	};
 	
-	/* @function Internal method to generate a unique Id
+	/* @method Internal method to generate a unique Id
 	* @returns {String} Id */
 	itemRule.prototype._generateIdentity = function ()
 	{
 		return this.rule.index + '(' + this.dotLocation + ')';
 	};
 
-	/* @function Returns the right next symbol to the dot location
+	/* @method Returns the right next symbol to the dot location
 	* @returns {Symbol} Next symbol or null if there is not next symbol */
 	itemRule.prototype.getCurrentSymbol = function ()
 	{
@@ -127,14 +127,14 @@ var ItemRule = k.data.ItemRule = (function() {
 		return this.dotLocation < (this.rule.tail.length + 1) ? this.rule.tail[this.dotLocation] : null;
 	};
 	
-	/* @function Determines if the current item rule is a reduce one or not
+	/* @method Determines if the current item rule is a reduce one or not
 	* @returns {Boolean} True if the current item is a reduce item, false otherwise */
 	itemRule.prototype.isReduce = function ()
 	{
 		return this.dotLocation === this.rule.tail.length;
 	};
 
-	/* @function Create an array of item rules from an array of rules
+	/* @method Create an array of item rules from an array of rules
 	* @param {[Rule]} rules Array of rules used to create the item rules. Each new item rule will have 0 as dot location
 	* @param {[Symbol]} lookAhead Array of symbols that will be set to each of the item rules created as its lookahead array
 	* @returns {[ItemRule]} Array of new Item Rules */

@@ -3,6 +3,16 @@ k.utils.str = (function()
 	'use strict';
 
 	/*
+	* @function Util function to determine if an object is or not a String
+	* @param {Object} s object to check its type
+	* @returns {Boolean} True if the object passed in is a String or false otherwise
+	*/
+	var __isString = function (s)
+	{
+		return Object.prototype.toString.call(s) === '[object String]';
+	};
+
+	/*
 	* @func Util function used to determine if a string starts with anotherone
 	*
 	* @param {String} source Original string
@@ -76,18 +86,51 @@ k.utils.str = (function()
 	};
 
 	/*
-	* @func Generates a stirng that is composed by various tabs
+	* @func Generates a string that is composed by various tabs
 	*
 	* @param {String} counter Number of tabs to add
 	* @returns {String} string composed by counter tabs
 	*/
-	var __tabs = function (counter)
-	{
+	var __tabs = function (counter) {
 		var result = '';
 		for (var i = counter; i--; ) {
 			result += '\t';
 		}
 		return result;
+	};
+
+	/*
+	* @func Returns an array with all the location of the string searchStr found into str.
+	* IMPORTANT: This code is extracted from: http://stackoverflow.com/a/3410557/1000146
+	*
+	* @param {String} searchStr Pattern to look for
+	* @param {String} str String where to search
+	* @param {Boolean} caseSensitive Indicate if the search should take into account the characters case or not
+	* @returns {[Number]} Array of numbers containng each of the found locations
+	*/
+	var __getIndicesOf = function (searchStr, str, caseSensitive) {
+		var startIndex = 0,
+			searchStrLen = searchStr.length,
+			index,
+			indices = [];
+
+		if (searchStr === '' || !__isString(searchStr) || !__isString(str))
+		{
+			return [];
+		}
+
+		if (!caseSensitive)
+		{
+			str = str.toLowerCase();
+			searchStr = searchStr.toLowerCase();
+		}
+
+		while ((index = str.indexOf(searchStr, startIndex)) > -1) {
+			indices.push(index);
+			startIndex = index + searchStrLen;
+		}
+
+		return indices;
 	};
 
 	return {
@@ -98,7 +141,8 @@ k.utils.str = (function()
 		fullLtrim: __fullLtrim,
 		rtrim: __rtrim,
 		fulltrim: __fulltrim,
-		tabs: __tabs
+		tabs: __tabs,
+		getIndicesOf: __getIndicesOf
 	};
 
 })();

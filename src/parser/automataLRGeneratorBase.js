@@ -33,7 +33,7 @@ k.parser.AutomataLRGeneratorBase = (function() {
 		}
 	};
 
-	/* @function Expands a state adding in it the full list of require items (item rules)
+	/* @method Expands a state adding in it the full list of require items (item rules)
 	* @param {State} currentState State that will be expanded
 	* @returns {State} The full state with all its require items */
 	automataLRGeneratorBase.prototype.expandItem = function (currentState)
@@ -56,25 +56,25 @@ k.parser.AutomataLRGeneratorBase = (function() {
 		return currentState;
 	};
 
-	/* @function Generate the options used to add item rules into the states when thy are being expanded
+	/* @method Generate the options used to add item rules into the states when thy are being expanded
 	* @returns {Object} An object specifying the options used by the state.addItems method to include methods */
 	automataLRGeneratorBase.prototype._getExpansionItemNewItemsOptions = function ()
 	{
 		return {};
 	};
 
-	/* @function Generate the list of item rules that can be getted from a state when expanding it in the automata creation prcoess.
+	/* @method Generate the list of item rules that can be getted from a state when expanding it in the automata creation prcoess.
 	* This method is intended to be overwritten!.
 	* @param {ItemRule} currentItem The current item rule from which the new item rule are being generated.
 	* @param {Symbol} currentSymbol Is the symbol used to find new item rules.
-	* @returns {[ItemRule]} Array of item rule ready to be part of the current processing state */
+	* @returns {Array<ItemRule>} Array of item rule ready to be part of the current processing state */
 	automataLRGeneratorBase.prototype._newItemRulesForStateExpansion = function (currentItem, currentSymbol)
 	{};
 
-	/* @function Generate the requested automata
+	/* @method Generate the requested automata
 	* This method allows that sub-clases override it and have already almost all the implementation done in the method _generateAutomata()
 	* @param {Boolean} options.notValidate Indicate if the resulting automata should be validated for the current lookAhead or not. False by default (DO validate the automata).
-	* @param {[ConflicResolver]} options.conflictResolvers ORDERED List of conflicts resolvers used in case of conflicts in the state.
+	* @param {Array<ConflicResolver>} options.conflictResolvers ORDERED List of conflicts resolvers used in case of conflicts in the state.
 	* @returns {Automata} The corresponding automata for the specified grammar */
 	automataLRGeneratorBase.prototype.generateAutomata = function (options)
 	{
@@ -95,9 +95,9 @@ k.parser.AutomataLRGeneratorBase = (function() {
 		return automata;
 	};
 
-	/* @function Validates an automata based on the current generator type (consider or not look-ahead)
+	/* @method Validates an automata based on the current generator type (consider or not look-ahead)
 	* @param {Autamata} automata Automata instances to be validated
-	* @param {[ConflicResolver]} options.conflictResolvers ORDERED List of conflicts resolvers used in case of conflicts in the state.
+	* @param {Array<ConflicResolver>} options.conflictResolvers ORDERED List of conflicts resolvers used in case of conflicts in the state.
 	* @returns {Boolean} true in case the automata is valid, false otherwise */
 	automataLRGeneratorBase.prototype.isAutomataValid = function (automata, options)
 	{
@@ -113,7 +113,7 @@ k.parser.AutomataLRGeneratorBase = (function() {
 		}, this);
 	};
 
-	/* @function Determine if the indicated state is valid or not.
+	/* @method Determine if the indicated state is valid or not.
 	* This method is intended to be overwritten!.
 	* @param {State} state State to validate
 	* @param {Boolean} options.considerLookAhead Indicate if the state should take into account look ahead to validate. Default: false
@@ -123,13 +123,13 @@ k.parser.AutomataLRGeneratorBase = (function() {
 	{
 	};
 
-	/* @function Generate the conflict resolvers list use to solve any possible conflict when validating the automata and when creating the Action table.
+	/* @method Generate the conflict resolvers list use to solve any possible conflict when validating the automata and when creating the Action table.
 	* @returns {Automata} The corresponding automata for the specified grammar */
 	automataLRGeneratorBase.prototype._getConflictResolvers = function ()
 	{
 	};
 
-	/* @function Actually Generate an automata
+	/* @method Actually Generate an automata
 	* @returns {Automata} The corresponding automata for the specified grammar */
 	automataLRGeneratorBase.prototype._generateAutomata = function()
 	{
@@ -143,7 +143,7 @@ k.parser.AutomataLRGeneratorBase = (function() {
 		return automata;
 	};
 
-	/* @function Generate the construction object used to initialize the new automata
+	/* @method Generate the construction object used to initialize the new automata
 	* @param {State} initialState State that only contains the items rules from the start symbol of the grammar. This is the initial state before being expanded.
 	* @returns {Object} Object containing all the options used to create the new automata */
 	automataLRGeneratorBase.prototype._getNewAutomataOptions = function (initialState)
@@ -153,12 +153,12 @@ k.parser.AutomataLRGeneratorBase = (function() {
 		};
 	};
 
-	/* @function Returns the initial list of item rules that will take part in the initial state of the automata. This can differ if the automata has or not lookahead
-	* @returns {[ItemRule]} The initial list of item rule. */
+	/* @method Returns the initial list of item rules that will take part in the initial state of the automata. This can differ if the automata has or not lookahead
+	* @returns {Array<ItemRule>} The initial list of item rule. */
 	automataLRGeneratorBase.prototype._getInitialStateItemRules = function ()
 	{};
 
-	/* @function Internal method which resive an inital automata with only it inital state and generate a full automata
+	/* @method Internal method which resive an inital automata with only it inital state and generate a full automata
 	* @param {Automata} automata Automatma to be expanded
 	* @returns {Automata} A full automata */
 	automataLRGeneratorBase.prototype._expandAutomata = function(automata)
@@ -207,7 +207,7 @@ k.parser.AutomataLRGeneratorBase = (function() {
 		}
 	};
 
-	/* @function Given an automata returnes its GOTO Table. The table is represented by an object where each state is a property (row) and each possible symbol is a property of the previous object (column)
+	/* @method Given an automata returnes its GOTO Table. The table is represented by an object where each state is a property (row) and each possible symbol is a property of the previous object (column)
 	* Sample: table[<state>][<symbol>] = [undefined = error|<state id - string>]
 	* @param {Automata} automata Automatma used as a base of the calculation
 	* @returns {Object} A GOTO Table */
@@ -227,12 +227,12 @@ k.parser.AutomataLRGeneratorBase = (function() {
 		return table;
 	};
 
-	/* @function Given an automata returnes its ACTION Table.
+	/* @method Given an automata returnes its ACTION Table.
 	* The intend of this method is to be overwriten by each son class
 	* @param {Automata} automata Automatma used as a base of the calculation.
 	* @param {Boolean} options.ignoreErrors Indicate that when a state is in an error that cannot be resolver, continue the execution anyway.
 	* @param {Boolean} options.conflictResolvers List of resolver in case of conflic in any state.
-	* @returns {Function} Function that given the a state id and a lookAhead returns the action to take */
+	* @returns {Object} An object that represent the table, the first keys are the row and the second (in case there exist) are the columns */
 	automataLRGeneratorBase.prototype.generateACTIONTable = function (automata, options)
 	{};
 

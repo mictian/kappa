@@ -7,7 +7,7 @@
 	} else if (typeof module === 'object' && module.exports) {
 		module.exports = init(/* require("dep'), ... */ ); // CommonJS module.
 	} else { // Browser or web worker (probably).
-		global.kappa = init(/* global.dep, ... */); // Assumes base is loaded.
+		global.k = global.kappa = init(/* global.dep, ... */); // Assumes base is loaded.
 	}
 })(this, function __init__() {
 
@@ -29,7 +29,7 @@ k.utils.obj = (function ()
 {
 	'use strict';
 	/*
-	* @func Util function used to apply "Inheritance"
+	* @function Util function used to apply "Inheritance"
 	*
 	* @param {Object} superType Object to inherit from
 	* @param {Object} subType Enhanced Object
@@ -52,7 +52,7 @@ k.utils.obj = (function ()
 	};
 
 	/*
-	* @func Util function used to define properties in objects, Common to define alias, insteas od using instance.options.property, used instance.property
+	* @function Util function used to define properties in objects, Common to define alias, insteas od using instance.options.property, used instance.property
 	* It is VERY IMPORTANT to notice that all propoerties are set and get from a property called options in the context object, unless getter and setter functions are specified
 	*
 	* @param {Object} ctx Object containing the options. Father object
@@ -83,7 +83,7 @@ k.utils.obj = (function ()
 	};
 
 	/*
-	* @func Util function to extend an object. This function accepts n arguments and the first one will be the same as the retuned one (the extended)
+	* @function Util function to extend an object. This function accepts n arguments and the first one will be the same as the retuned one (the extended)
 	* @param {Object} obj object to extend form
 	* @returns {Object} The initial object with the added properties form next arguments
 	*/
@@ -101,7 +101,7 @@ k.utils.obj = (function ()
 	};
 
 	/*
-	* @func Util function to clone OBJECTS by using JSON.parser/stringify (a deep clone)
+	* @function Util function to clone OBJECTS by using JSON.parser/stringify (a deep clone)
 	* @param {Object} obj object to clone
 	* @returns {Object} A copy of the passed in object
 	*/
@@ -111,7 +111,7 @@ k.utils.obj = (function ()
 	};
 
 	/*
-	* @func Util function to extend an object. This function accepts n arguments and the first one will be the same as the retuned one (the extended)
+	* @function Util function to extend an object. This function accepts n arguments and the first one will be the same as the retuned one (the extended)
 	* @param {Object} obj object to extend form
 	* @returns {Object} A new object with the added properties form next arguments
 	*/
@@ -130,7 +130,7 @@ k.utils.obj = (function ()
 	};
 
 	/*
-	* @func Util function to determine if an object is or not an array
+	* @function Util function to determine if an object is or not an array
 	* @param {Object} o object to check its type
 	* @returns {Boolean} True if the object passed in is an Array or false otherwise
 	*/
@@ -140,7 +140,7 @@ k.utils.obj = (function ()
 	};
 
 	/*
-	* @func Util function to determine if an object is or not a String
+	* @function Util function to determine if an object is or not a String
 	* @param {Object} s object to check its type
 	* @returns {Boolean} True if the object passed in is a String or false otherwise
 	*/
@@ -150,7 +150,7 @@ k.utils.obj = (function ()
 	};
 
 	/*
-	* @func Util function to determine if an object is or not a Regular Expression
+	* @function Util function to determine if an object is or not a Regular Expression
 	* @param {Object} s object to check its type
 	* @returns {Boolean} True if the object passed in is a Regular Expresion, false otherwise
 	*/
@@ -160,7 +160,7 @@ k.utils.obj = (function ()
 	};
 
 	/*
-	* @func Util function to determine if an object is or not a Number
+	* @function Util function to determine if an object is or not a Number
 	* @param {Object} n object to check its type
 	* @returns {Boolean} True if the object passed in is a Number, false otherwise
 	*/
@@ -170,7 +170,7 @@ k.utils.obj = (function ()
 	};
 
 	/*
-	* @func Util function to determine if an object is or not a Function
+	* @function Util function to determine if an object is or not a Function
 	* @param {Object} f object to check its type
 	* @returns {Boolean} True if the object passed in is a Function, false otherwise
 	*/
@@ -180,7 +180,7 @@ k.utils.obj = (function ()
 	};
 
 	/*
-	* @func Util function to determine if an object is or not Boolean
+	* @function Util function to determine if an object is or not Boolean
 	* @param {Object} b object to check its type
 	* @returns {Boolean} True if the object passed in is Boolean, false otherwise
 	*/
@@ -189,7 +189,7 @@ k.utils.obj = (function ()
 	};
 
 	/*
-	* @func Util function to determine if an object is the JS Arguments array, which is of a particular type
+	* @function Util function to determine if an object is the JS Arguments array, which is of a particular type
 	* @param {Object} a object to check its type
 	* @returns {Boolean} True if the object passed in is an Arguments Array, false otherwise
 	*/
@@ -205,7 +205,7 @@ k.utils.obj = (function ()
 	}
 
 	/*
-	* @func Util function to determine if an thing is or not a Object
+	* @function Util function to determine if an thing is or not a Object
 	* @param {Thing} n object to check its type
 	* @returns {Boolean} True if the thing passed in is a Object, false otherwise
 	*/
@@ -214,7 +214,7 @@ k.utils.obj = (function ()
 	};
 
 	/*
-	* @func Util function to determine if a thing is or not defined
+	* @function Util function to determine if a thing is or not defined
 	* @param {Thing} obj object to check its state
 	* @returns {Boolean} True if the thing passed in is Undefined, false otherwise
 	*/
@@ -245,7 +245,7 @@ k.utils.obj = (function ()
 		nativeIndexOf		= ArrayProto.indexOf,
 		slice				= ArrayProto.slice;
 
-	/* @func Alias of hasOwnProperty just for brevety
+	/* @function Alias of hasOwnProperty just for brevety
 	* @param {Object} obj object to check ownership of property
 	* @param {String} key Property name to verify
 	* @returns {Boolean} True if the object posses that property
@@ -254,7 +254,7 @@ k.utils.obj = (function ()
 		return hasOwnProperty.call(obj, key);
 	};
 
-	/* @func Returns the list of own properties of an object
+	/* @function Returns the list of own properties of an object
 	* @param {Object} obj object from which extract keys
 	* @returns {Array} List of string keys of property names of the object passed in
 	*/
@@ -277,7 +277,7 @@ k.utils.obj = (function ()
 		return keys;
 	};
 
-	/* @func Iterate over the passed in first parameter calling the iterator with the specified context
+	/* @function Iterate over the passed in first parameter calling the iterator with the specified context
 	* @param {Object} obj object to traverse
 	* @param {Function} iterator function called per each item founded in obj
 	* @param {Object} context object from which extract keys
@@ -316,7 +316,7 @@ k.utils.obj = (function ()
 		return obj;
 	};
 
-	/* @func Iterate over the passed in first parameter and mapping each of its valur according the iteration logic
+	/* @function Iterate over the passed in first parameter and mapping each of its valur according the iteration logic
 	* @param {Object} obj object to traverse
 	* @param {Function} iterator function called per each item founded in obj
 	* @param {Object} context object from which extract keys
@@ -336,7 +336,7 @@ k.utils.obj = (function ()
 
 	var reduceError = 'Reduce of empty array with no initial value';
 
-	/* @func Iterate over the passed in first parameter and group them all into the result by applying the iteralot logic
+	/* @function Iterate over the passed in first parameter and group them all into the result by applying the iteralot logic
 	* @param {Object} obj object to traverse
 	* @param {Function} iterator function called per each item founded in obj
 	* @param {Object} memo is the initial state of the reduction
@@ -372,7 +372,7 @@ k.utils.obj = (function ()
 
 	var Ctor = function(){};
 
-	/* @func Bind a function to an object, meaning that whenever the function is called, the value of this will be the object.
+	/* @function Bind a function to an object, meaning that whenever the function is called, the value of this will be the object.
 	* Optionally, pass arguments to the function to pre-fill them, also known as partial application
 	* @param {Function} func Function to wrap up
 	* @param {Object} context Object used as a context in the execution of func
@@ -404,7 +404,7 @@ k.utils.obj = (function ()
 		return bound;
 	};
 
-	/* @func Iterate over the passed in first parameter and filter them based on the result of the predicate parameter
+	/* @function Iterate over the passed in first parameter and filter them based on the result of the predicate parameter
 	* @param {Object} obj object to traverse
 	* @param {Function} predicate function called per each item founded in obj to determine if the item is or no in the final result
 	* @param {Object} context object used to call the iterator
@@ -428,7 +428,7 @@ k.utils.obj = (function ()
 		return results;
 	};
 
-	/* @func Keep the identity function around for default iterators.
+	/* @function Keep the identity function around for default iterators.
 	* @param {Object} value Value that will returned
 	* @returns {Object} The same value that passed in
 	*/
@@ -436,7 +436,7 @@ k.utils.obj = (function ()
 		return value;
 	};
 
-	/* @func Determine if at least one element in the object matches a truth test
+	/* @function Determine if at least one element in the object matches a truth test
 	* @param {Object} obj object to traverse
 	* @param {Function} predicate function called per each item founded in obj to determine if the item fullfil the requirements
 	* @param {Object} context object used to call the iterator
@@ -460,7 +460,7 @@ k.utils.obj = (function ()
 		return !!result;
 	};
 
-	/* @func Convenience version of a common use case of map: fetching a property.
+	/* @function Convenience version of a common use case of map: fetching a property.
 	* @param {Object} obj Object to be traverse
 	* @param {String} key Name of the property to extract from eacj item in obje
 	* @returns {Array} List of each property value from each item in obj
@@ -469,7 +469,7 @@ k.utils.obj = (function ()
 		return __map(obj, __property(key));
 	};
 
-	/* @func Auxiliar and Internal function used to return an object's propert by settings using a closure the property name.
+	/* @function Auxiliar and Internal function used to return an object's propert by settings using a closure the property name.
 	* Returns a function that will itself return the key property of any passed-in object
 	* @param {String} key Name of the property name to 'lock'
 	* @returns {Function} A function that accepts an object and returns the value of its property set before
@@ -480,11 +480,11 @@ k.utils.obj = (function ()
 		};
 	};
 
-	/* @func An internal function to generate lookup iterators
+	/* @function An internal function to generate lookup iterators
 	* @param {Object} value Lookup
 	* @returns {Object} Object lookup
 	*/
-	var lookupIterator = function(value) {
+	var lookupIterator = function (value) {
 		if (value === null || value === undefined) {
 			return __identity;
 		}
@@ -494,7 +494,62 @@ k.utils.obj = (function ()
 		return __property(value);
 	};
 
-	/* @func Sort the object’s values by a criterion produced by an iterator.
+	var createCallback = function (func, context, argCount) {
+		if (context === void 0)
+		{
+			return func;
+		}
+		switch (argCount === null ? 3 : argCount)
+		{
+			case 1:
+				return function (value) {
+					return func.call(context, value);
+				};
+			case 2:
+				return function (value, other) {
+					return func.call(context, value, other);
+				};
+			case 3:
+				return function (value, index, collection) {
+					return func.call(context, value, index, collection);
+				};
+			case 4:
+				return function (accumulator, value, index, collection) {
+					return func.call(context, accumulator, value, index, collection);
+				};
+		}
+
+		return function() {
+			return func.apply(context, arguments);
+		};
+	};
+
+	/* @funciton A mostly-internal function to generate callbacks that can be applied to each element in a collection, returning the desired result — either identity, an arbitrary callback, a property matcher, or a property accessor.
+	* @param {Any} value Value to inspect so a matching function ca be created
+	* @param {Object} context In the c value parameter is a function, this param will be the context in wich that function will execute
+	* @param {Number} argCount Count off argument the function value param will acept assuming it is a function
+	* @return {Function} A function that can be used to iterate and match over a collection
+	*/
+	var __iteratee = function (value, context, argCount) {
+		if (value === null || value === undefined)
+		{
+			return __identity;
+		}
+
+		if (__isFunction(value))
+		{
+			return createCallback(value, context, argCount);
+		}
+
+		if (__isObject(value))
+		{
+			return __matches(value);
+		}
+
+		return __property(value);
+	};
+
+	/* @function Sort the object’s values by a criterion produced by an iterator.
 	* @param {Object} obj object to traverse
 	* @param {Function} iterator function called per each item founded in obj. Called with value, index, list
 	* @param {Object} context object from which extract keys
@@ -525,7 +580,7 @@ k.utils.obj = (function ()
 		}), 'value');
 	};
 
-	/* @func Return the first value which passes a truth test
+	/* @function Return the first value which passes a truth test
 	* @param {Object} obj object to traverse
 	* @param {Function} predicate function called per each item founded in obj
 	* @param {Object} context object from which extract keys
@@ -542,7 +597,7 @@ k.utils.obj = (function ()
 		return result;
 	};
 
-	/* @func An internal function used for aggregate “group by” operations.
+	/* @function An internal function used for aggregate “group by” operations.
 	* @param {Array} obj object to traverse
 	* @param {Function} iterator function called per each item founded in obj
 	* @param {Object} context object from which extract keys
@@ -560,7 +615,7 @@ k.utils.obj = (function ()
 		};
 	};
 
-	/* @func Determine whether all of the elements match a truth test.
+	/* @function Determine whether all of the elements match a truth test.
 	* @param {Array} obj object to traverse
 	* @param {Function} predicate function called per each item founded in obj to determine if fulfill the requirements
 	* @param {Object} context object from which extract keys
@@ -584,7 +639,7 @@ k.utils.obj = (function ()
 		return !!result;
 	};
 
-	/* @func Internal implementation of a recursive flatten function.
+	/* @function Internal implementation of a recursive flatten function.
 	* @param {Array} input object to traverse
 	* @param {Boolean} shallow Indicate if the flattening should NOT be made recusrively (true: DO NOT make it recursively)
 	* @param {Array} output Output parameter wheere the final list is saved
@@ -608,7 +663,7 @@ k.utils.obj = (function ()
 		return output;
 	};
 
-	/* @func Flatten out an array, either recursively (by default), or just one level.
+	/* @function Flatten out an array, either recursively (by default), or just one level.
 	* @param {Array} array object to traverse
 	* @param {Boolean} shallow Indicate if the flattening should NOT be made recusrively (true: DO NOT make it recursively)
 	* @returns {Array} Array where each item if flattened
@@ -617,13 +672,13 @@ k.utils.obj = (function ()
 		return flatten(array, shallow, []);
 	};
 
-	/* @func Determine if the array or object contains a given value (using ===).
+	/* @function Determine if the array or object contains a given value (using ===).
 	* @param {Array} obj object to traverse
 	* @param {Object} target Object looked for
 	* @returns {Boolean} True if the obj contains the value pass in
 	*/
 	var __contains = function(obj, target) {
-		if (obj === null) {
+		if (obj === null || obj === undefined) {
 			return false;
 		}
 		if (nativeIndexOf && obj.indexOf === nativeIndexOf) {
@@ -634,7 +689,7 @@ k.utils.obj = (function ()
 		});
 	};
 
-	/* @func Produce a duplicate-free version of the array. If the array has already been sorted, you have the option of using a faster algorithm.
+	/* @function Produce a duplicate-free version of the array. If the array has already been sorted, you have the option of using a faster algorithm.
 	* @param {Array} array object to traverse
 	* @param {Boolean} isSorted indicate if the array is osrted or not
 	* @param {Function} iterator If you want to compute unique items based on a transformation, pass an iterator function
@@ -661,7 +716,7 @@ k.utils.obj = (function ()
 		return results;
 	};
 
-	/* @func Groups the object’s values by a criterion. Pass either a string attribute to group by, or a function that returns the criterion
+	/* @function Groups the object’s values by a criterion. Pass either a string attribute to group by, or a function that returns the criterion
 	* @param {Array} obj object to traverse
 	* @param {Function} iterator function called per each item founded in obj
 	* @param {Object} context object from which extract keys
@@ -676,7 +731,7 @@ k.utils.obj = (function ()
 		}
 	});
 
-	/* @func Uses a binary search to determine the index at which the value should be inserted into the list in order to maintain the list's sorted order.
+	/* @function Uses a binary search to determine the index at which the value should be inserted into the list in order to maintain the list's sorted order.
 	* @param {Array} array List of items to traverse
 	* @param {Object} obj object to traverse
 	* @param {Function} iterator Optional function that will be used to compute the sort ranking of each value, including the value (obj param) you pass.
@@ -704,10 +759,10 @@ k.utils.obj = (function ()
 		return low;
 	};
 
-	/* @func Returns the index at which value can be found in the array, or -1 if value is not present in the array.
+	/* @function Returns the index at which value can be found in the array, or -1 if value is not present in the array.
 	* @param {Array} array List of items to traverse
 	* @param {Object} item Object to find into the array
-	* @param {Booelan} isSorted When the array is sorted pass true and the algorithm will perform a faster approach
+	* @param {Booelan} isSorted When the array is Byed pass true and the algorithm will perform a faster approach
 	* @returns {Integer} The location/index at which the pass value is present, and -1 if the value is not present
 	*/
 	var __indexOf = function (array, item, isSorted) {
@@ -737,7 +792,7 @@ k.utils.obj = (function ()
 	};
 
 	var idCounter = 0;
-	/* @func Generate a unique integer id (unique within the entire client session).
+	/* @function Generate a unique integer id (unique within the entire client session).
 	* @param {String} prefix Optional prefix name
 	* @returns {String} Unique identifier
 	*/
@@ -746,7 +801,7 @@ k.utils.obj = (function ()
 		return prefix ? prefix + id : id;
 	};
 
-	/* @func Returns the last element of an array. Passing n will return the last n elements of the array..
+	/* @function Returns the last element of an array. Passing n will return the last n elements of the array..
 	* @param {Integer} n Count of elements to return
 	* @returns {[Object] || Object} Array with the last n values if n is specified or just the object of the array
 	*/
@@ -763,7 +818,7 @@ k.utils.obj = (function ()
 	};
 
 	/*
-	* @func Util function to shallow clone any kind of object
+	* @function Util function to shallow clone any kind of object
 	* @param {Object} obj object to clone
 	* @returns {Object} Shadow copy of the passed in object
 	*/
@@ -775,6 +830,121 @@ k.utils.obj = (function ()
 		}
 
     	return __isArray(obj) ? obj.slice() : __extend({}, obj);
+	};
+
+	/*
+	* @function Returns the maximum value in list. If an iteratee function is provided, it will be used on each value to generate the criterion by which the value is ranked. -Infinity is returned if list is empty.
+	* @param {Array<Object>|Object} obj Source of iteration to find the maximun value
+	* @param {Function|String} iteratee Function that will be passed in each object in obj parameter, or a string indicate the property name to use to detect the max value of each object in the obj parray parameter
+	* @param {Object} context Obhect used as a context when executing the iterator function.
+	* @returns {Object} The element in the obj param with te maximun value as specified by the iteratee parameter
+	*/
+	var __max = function (obj, iteratee, context)
+	{
+		var result = -Infinity,
+			lastComputed = -Infinity,
+			value,
+			computed;
+
+		if ((iteratee === null || iteratee === undefined) && obj !== null)
+		{
+			obj = obj.length === +obj.length ? obj : __values(obj);
+
+			for (var i = 0, length = obj.length; i < length; i++)
+			{
+				value = obj[i];
+				if (value > result)
+				{
+					result = value;
+				}
+			}
+		}
+		else
+		{
+			iteratee = __iteratee(iteratee, context);
+
+			__each(obj, function (value, index, list)
+			{
+				computed = iteratee(value, index, list);
+
+				if (computed > lastComputed || computed === -Infinity && result === -Infinity)
+				{
+					result = value;
+					lastComputed = computed;
+				}
+			});
+		}
+		return result;
+	};
+
+	/*
+	* @function Convert an object into a list of [key, value] pairs.
+	* @param {Object} obj Object to convert.
+	* @param {Object} context Obhect used as a context when executing the iterator function.
+	* @returns {Array<Array<Object>>} Returns an array where each items is a two values array; the first value is the string name of the property and the second if its value.
+	*/
+	var __pairs = function(obj)
+	{
+		var keys = __keys(obj),
+			length = keys.length,
+			pairs = new Array(length);
+
+		for (var i = 0; i < length; i++)
+		{
+			pairs[i] = [keys[i], obj[keys[i]]];
+		}
+		return pairs;
+	};
+
+	/*
+	* @function Returns a predicate function that will tell you if a passed in object contains all of the key/value properties present in attrs.
+	* e.g.
+	*		var ready = k.utils.obj.matches({selected: true, visible: true});
+	*		var readyToGoList = _.filter(list, ready);
+	* @param {Object} attrs Object containing the properties and values to match
+	* @return {Function} A predicate that return true or false when the passed in parameter match with the original attrs
+	*/
+	var __matches = function (attrs)
+	{
+		var pairs = __pairs(attrs),
+			length = pairs.length;
+
+		return function(obj)
+		{
+			if (obj === null)
+			{
+				return !length;
+			}
+
+			obj = new Object(obj);
+			for (var i = 0; i < length; i++)
+			{
+				var pair = pairs[i], key = pair[0];
+				if (pair[1] !== obj[key] || !(key in obj))
+				{
+					return false;
+				}
+			}
+			return true;
+		};
+	};
+
+	/*
+	* @function Return all of the values of the object's properties.
+	* @param {Object} obj Object to extract properties' value
+	* @return {Array<Object>} Array property values
+	*/
+	var __values = function(obj)
+	{
+		var keys = __keys(obj),
+			length = keys.length,
+			values = new Array(length);
+
+		for (var i = 0; i < length; i++)
+		{
+			values[i] = obj[keys[i]];
+		}
+		return values;
 	};
 
 	return {
@@ -813,13 +983,27 @@ k.utils.obj = (function ()
 		indexOf: __indexOf,
 		uniqueId: __uniqueId,
 		last: __last,
-		shallowClone: __shallowClone
+		shallowClone: __shallowClone,
+		max: __max,
+		pairs: __pairs,
+		matches: __matches,
+		values: __values
 	};
 })();
 
 k.utils.str = (function()
 {
 	'use strict';
+
+	/*
+	* @function Util function to determine if an object is or not a String
+	* @param {Object} s object to check its type
+	* @returns {Boolean} True if the object passed in is a String or false otherwise
+	*/
+	var __isString = function (s)
+	{
+		return Object.prototype.toString.call(s) === '[object String]';
+	};
 
 	/*
 	* @func Util function used to determine if a string starts with anotherone
@@ -895,18 +1079,51 @@ k.utils.str = (function()
 	};
 
 	/*
-	* @func Generates a stirng that is composed by various tabs
+	* @func Generates a string that is composed by various tabs
 	*
 	* @param {String} counter Number of tabs to add
 	* @returns {String} string composed by counter tabs
 	*/
-	var __tabs = function (counter)
-	{
+	var __tabs = function (counter) {
 		var result = '';
 		for (var i = counter; i--; ) {
 			result += '\t';
 		}
 		return result;
+	};
+
+	/*
+	* @func Returns an array with all the location of the string searchStr found into str.
+	* IMPORTANT: This code is extracted from: http://stackoverflow.com/a/3410557/1000146
+	*
+	* @param {String} searchStr Pattern to look for
+	* @param {String} str String where to search
+	* @param {Boolean} caseSensitive Indicate if the search should take into account the characters case or not
+	* @returns {[Number]} Array of numbers containng each of the found locations
+	*/
+	var __getIndicesOf = function (searchStr, str, caseSensitive) {
+		var startIndex = 0,
+			searchStrLen = searchStr.length,
+			index,
+			indices = [];
+
+		if (searchStr === '' || !__isString(searchStr) || !__isString(str))
+		{
+			return [];
+		}
+
+		if (!caseSensitive)
+		{
+			str = str.toLowerCase();
+			searchStr = searchStr.toLowerCase();
+		}
+
+		while ((index = str.indexOf(searchStr, startIndex)) > -1) {
+			indices.push(index);
+			startIndex = index + searchStrLen;
+		}
+
+		return indices;
 	};
 
 	return {
@@ -917,7 +1134,8 @@ k.utils.str = (function()
 		fullLtrim: __fullLtrim,
 		rtrim: __rtrim,
 		fulltrim: __fulltrim,
-		tabs: __tabs
+		tabs: __tabs,
+		getIndicesOf: __getIndicesOf
 	};
 
 })();
@@ -950,7 +1168,7 @@ k.data.Node = (function () {
 		this.nodes = options.nodes || [];
 	};
 	
-	/* @function Returns the string ID of the current state
+	/* @method Returns the string ID of the current state
 	 * @returns {String} ID  */
 	node.prototype.getIdentity = function()
 	{
@@ -960,14 +1178,14 @@ k.data.Node = (function () {
 		return this._id;
 	};
 	
-	/* @function Generates an ID that identify this node from any other state
+	/* @method Generates an ID that identify this node from any other state
 	 * @returns {String} Generated ID  */
 	node.prototype._generateIdentity = function()
 	{
 		return this.name || k.utils.obj.uniqueId('node_');
 	};
 	
-	/* @function Add a new transaction into the list of transactions of the current state
+	/* @method Add a new transaction into the list of transactions of the current state
 	 * @param {Object} transitionValue Object use to make the transition (i.e. symbol), description of the arista (like the name of the transition)
 	 * @param {Node} node Destination node (or state) arrived when moving with the specified tranisiotn
 	 * @returns {Void}  */
@@ -977,7 +1195,7 @@ k.data.Node = (function () {
 		this.nodes.push(node);
 	};
 	
-	/* @function Function responsible the creation of new transition objects
+	/* @method Function responsible the creation of new transition objects
 	 * @param {Object} transitionValue Object use to make the transition, description of the arista (like the name of the transition)
 	 * @param {Node} node Destination node (or state) arrived when moving with the specified tranisiotn
 	 * @returns {Object} Transition object  */
@@ -989,7 +1207,7 @@ k.data.Node = (function () {
 		};
 	};
 	
-	/* @function Gets the node identity
+	/* @method Gets the node identity
 	* @returns {String} A formatted string id of the node */
 	node.prototype.toString = function ()
 	{
@@ -1022,7 +1240,7 @@ var associativity = k.data.associativity = {
 * @classdesc This class represent any simbol in the entire system */
 var Symbol = k.data.Symbol = (function () {
 	'use strict';
-	
+
 	/*
 	* Creates an instance of a Symbol (This class represent non Terminals, Terminals and Special symbols)
 	*
@@ -1046,8 +1264,8 @@ var Symbol = k.data.Symbol = (function () {
 			throw new Error('Invalid initialization values for a symbol, please provide a string name a symbol');
 		}
 	};
-	
-	/* @function Shows the symbol's name
+
+	/* @method Shows the symbol's name
 	* @returns {String} this.name */
 	symbol.prototype.toString = function() {
 		return this.name.toString();
@@ -1061,7 +1279,7 @@ var Symbol = k.data.Symbol = (function () {
 * @classdesc Use this class to create new instance of non Termianls */
 var NonTerminal = k.data.NonTerminal = (function(_super) {
 	'use strict';
-	
+
 	/* jshint latedef:false */
 	k.utils.obj.inherit(nonTerminal, _super);
 
@@ -1074,14 +1292,14 @@ var NonTerminal = k.data.NonTerminal = (function(_super) {
 	function nonTerminal (options)
 	{
 		_super.apply(this, arguments);
-		
+
 		k.utils.obj.defineProperty(this, 'isNullable'); // Control if the current non-terminal is nullable or not, This valus is calculate by the grammar's constructor
-		
+
 		this.isNullable = false;
 		this.isSpecial = false;
 	}
 
-	/* @function Creates an array os non terminals from a string that represen them
+	/* @method Creates an array os non terminals from a string that represen them
 	 * @param {[Array]} arr Array of string used to create new non terminals
 	 * @returns {[NonTerminal]} An array of new nonterminals  */
 	nonTerminal.fromArray = function (arr)
@@ -1106,7 +1324,7 @@ var NonTerminal = k.data.NonTerminal = (function(_super) {
 * @classdesc Use this class to repsent Termianls (like 'a', 'B', 'Hola', etc.) */
 var Terminal = k.data.Terminal = (function(_super) {
 	'use strict';
-	
+
 	/* jshint latedef:false */
 	k.utils.obj.inherit(terminal, _super);
 
@@ -1116,6 +1334,7 @@ var Terminal = k.data.Terminal = (function(_super) {
 	* @constructor
 	* @param {String} options.name The name or denatation of the terminal
 	* @param {String|RegExp} options.body The string or regexp used to match the input tokens
+	* @param {Number} options.priority Number used by the lexer when more than one terminal fulfill the input-stream, to determine which should be choose. Higher priority are choosen over low priority Defualt Value: 0
 	*/
 	function terminal (options)
 	{
@@ -1129,12 +1348,14 @@ var Terminal = k.data.Terminal = (function(_super) {
 		k.utils.obj.defineProperty(this, 'body');
 		k.utils.obj.defineProperty(this, 'isTerminal');
 		k.utils.obj.defineProperty(this, 'assoc');
+		k.utils.obj.defineProperty(this, 'priority');
 
+		this.priority = this.priority || 0;
 		this.isSpecial = false;
 		this.isTerminal = true;
 	}
 
-	/* @function Shows the terminal's name between < and >
+	/* @method Shows the terminal's name between < and >
 	* @returns {String} Fromatted string */
 	terminal.prototype.toString = function()
 	{
@@ -1149,7 +1370,7 @@ var Terminal = k.data.Terminal = (function(_super) {
 * @classdesc Use this class to create new instance of non Termianls */
 var Rule = k.data.Rule = (function() {
 	'use strict';
-	
+
 	/*
 	* Initialize a new Grammatical Rule
 	*
@@ -1200,11 +1421,11 @@ var Rule = k.data.Rule = (function() {
 			{
 				this.terminalsCount++;
 			}
-			symbol.rule = this;
+			// symbol.rule = this;
 		}, this);
 	};
 
-	/* @function Convert a Rule to its pritty string representation
+	/* @method Convert a Rule to its pritty string representation
 	* @returns {String} Formatted string */
 	rule.prototype.toString = function()
 	{
@@ -1219,7 +1440,7 @@ var Rule = k.data.Rule = (function() {
 * @classdesc This class is used to represent grammars */
 var Grammar = k.data.Grammar = (function () {
 	'use strict';
-	
+
 	var defaultOptions = {
 		name: ''
 	};
@@ -1263,8 +1484,8 @@ var Grammar = k.data.Grammar = (function () {
 	grammar.constants = {
 		AugmentedRuleName: 'AUGMENTRULE'
 	};
-	
-	/* @function Determines if a rule is productive or not based on the CURRENT state of all the rest of the rules in the grammar
+
+	/* @method Determines if a rule is productive or not based on the CURRENT state of all the rest of the rules in the grammar
 	* @param {Rule} rule Rule that will be analized
 	* @returns {Boolean} True if the rule is productive, false otherwise */
 	grammar.prototype._isRuleProductive = function (rule)
@@ -1286,7 +1507,7 @@ var Grammar = k.data.Grammar = (function () {
 		}, this);
 	};
 
-	/* @function Generate require state for a grammar.
+	/* @method Generate require state for a grammar.
 	* Set rule index
 	* Augment the grammar to detect when a string is accepts by adding S' --> S#
 	* Calculate rules by head
@@ -1304,35 +1525,35 @@ var Grammar = k.data.Grammar = (function () {
 
 		// index rule by its rule's head name
 		this._indexRulesByHead();
-		
-		
+
+
 		// determine which rules are productive and remove unproductive ones
 		augmentedRule = this._cleanUnProductiveRules() || augmentedRule;
 		this._indexRulesByHead();
-		
-		
+
+
 		//Remove unreachabel rules
 		this._cleanUnReachableRules(augmentedRule);
 		this._indexRulesByHead();
-		
-		
+
+
 		// remove middle tail epsilons
 		this._removeMiddleTailEpsilons();
 
 
 		//Determines nullable non-terminals
 		this._determineNullableNonTerminals();
-		
-		
+
+
 		// get all terminals & determine if it has empty rules
 		this.terminals = this._generateListOfTerminals();
-		
-		
+
+
 		//Pre-Calculate First Sets
 		this.firstSetsByHeader = this._precalculateFirstTerminals();
 	};
-	
-	/* @function Index all the current rules in the rulesByHeader local property 
+
+	/* @method Index all the current rules in the rulesByHeader local property
 	* @returns {Void} It does not return anything as the values are stored in this.rulesByHeader. */
 	grammar.prototype._indexRulesByHead = function ()
 	{
@@ -1341,22 +1562,22 @@ var Grammar = k.data.Grammar = (function () {
 			return rule.head.name;
 		});
 	};
-	
-	/* @function Calculate the first set for all non-terminals of the current grammar
+
+	/* @method Calculate the first set for all non-terminals of the current grammar
 	* @returns {Object} Object when each property is a non-terminal name and its values are the first sets. */
 	grammar.prototype._precalculateFirstTerminals = function ()
 	{
 		var result = {};
-		
+
 		k.utils.obj.each(k.utils.obj.keys(this.rulesByHeader), function (ruleHead)
 		{
 			result[ruleHead] = this._calculateFirstSetForHead(ruleHead);
 		}, this);
-		
+
 		return result;
 	};
-	
-	/* @function Calculate the first set for specific non-terminal symbol
+
+	/* @method Calculate the first set for specific non-terminal symbol
 	* @param {String} head Name of the head rule to which the First Set will be determined
 	* @param {[String]} recursionStack Internal recursion array used to control infinite loops
 	* @returns {[Terminals]} Array of terminals (possibly plus EMPTY - the special symbol) FIRST SET */
@@ -1369,13 +1590,13 @@ var Grammar = k.data.Grammar = (function () {
 		-Nullable non terminals detected
 		-The rulesByHeader object
 		*/
-		
+
 		var result = [];
-			
+
 		recursionStack = recursionStack || {};
-		
+
 		k.utils.obj.each(this.rulesByHeader[head], function(rule) {
-			
+
 			k.utils.obj.find(rule.tail, function (symbol)
 			{
 				if (symbol instanceof NonTerminal)
@@ -1386,14 +1607,14 @@ var Grammar = k.data.Grammar = (function () {
 						//otherwise if it is NOT NULLABLE we STOP our SEARCH of first item as the current rule will not generate the desire first items (because we are in a recursive case)
 						return !symbol.isNullable;
 					}
-					
+
 					recursionStack[symbol.name] = true;
 				}
 				else if (symbol.isSpecial && symbol.name === specialSymbol.EOF)
 				{
 					return true; //finish the search of terminal first symbols for the current rule
 				}
-				
+
 				if (symbol instanceof Terminal || (symbol.name === specialSymbol.EMPTY && symbol.isSpecial))
 				{
 					result.push(symbol);
@@ -1406,21 +1627,21 @@ var Grammar = k.data.Grammar = (function () {
 				{
 					throw new Error('Impossible to calculate FIRST Set, some rules have invalid tail symbols');
 				}
-				
+
 				//Continue adding items to the FIRST Set if the current result contains EMPTY
 				return !k.utils.obj.find(result, function (possible_empty_symbol)
 				{
 					return possible_empty_symbol.name === specialSymbol.EMPTY;
 				});
-				
+
 			}, this);
-			
+
 		}, this);
-		
+
 		return k.utils.obj.uniq(result, false, function (item) {return item.name;});
 	};
-	
-	/* @function Augments the current grammar by adding a new initial production of the form S' -> S #
+
+	/* @method Augments the current grammar by adding a new initial production of the form S' -> S #
 	* @returns {Rule} The new generated rule */
 	grammar.prototype._augmentGrammar = function (newSubStartSymbol, oldStartSymbol)
 	{
@@ -1433,11 +1654,11 @@ var Grammar = k.data.Grammar = (function () {
 
 		this.rules.unshift(augmentedRule);
 		this.startSymbol = augmentedRule.head;
-		
+
 		return augmentedRule;
 	};
-	
-	/* @function Determiens which rules are non-productive and remove them based on the current options
+
+	/* @method Determiens which rules are non-productive and remove them based on the current options
 	* @returns {Rule} In case the affter applying this cleaning process all rule are removed, a new augmented rule is generated and returned */
 	grammar.prototype._cleanUnProductiveRules = function ()
 	{
@@ -1446,7 +1667,7 @@ var Grammar = k.data.Grammar = (function () {
 		var areChanges = false,
 			ruleIndex = 0,
 			augmentedRule;
-		
+
 		do {
 			areChanges = false;
 			k.utils.obj.each(this.rules, function (rule)
@@ -1458,7 +1679,7 @@ var Grammar = k.data.Grammar = (function () {
 				}
 			}, this);
 		} while (areChanges);
-		
+
 		if (!this.preserveNonProductiveRules)
 		{
 			while (ruleIndex < this.rules.length)
@@ -1469,7 +1690,7 @@ var Grammar = k.data.Grammar = (function () {
 					ruleIndex++;
 				}
 			}
-			
+
 			if (this.rules.length === 0)
 			{
 				//In this case the augmentation rule does not have a tail! S' --> <EMPTY> EOF
@@ -1477,11 +1698,11 @@ var Grammar = k.data.Grammar = (function () {
 				augmentedRule.index = 0;
 			}
 		}
-		
+
 		return augmentedRule;
 	};
-	
-	/* @function Removes each epsilon located in the middle of a rule's tail, as they no add any value but make more complicated the rest of the parser
+
+	/* @method Removes each epsilon located in the middle of a rule's tail, as they no add any value but make more complicated the rest of the parser
 	* @returns {Void} */
 	grammar.prototype._removeMiddleTailEpsilons = function ()
 	{
@@ -1489,14 +1710,14 @@ var Grammar = k.data.Grammar = (function () {
 		k.utils.obj.each(this.rules, function (rule)
 		{
 			tailIndex = 0;
-			
+
 			while (tailIndex < rule.tail.length)
 			{
 				// if the current tail symbol is an empty one
 				if (rule.tail[tailIndex].isSpecial && rule.tail[tailIndex].name === k.data.specialSymbol.EMPTY)
 				{
 					//if it is not the last one or the previous one is not empty
-					if ( ((tailIndex + 1) < rule.tail.length && (!rule.tail[tailIndex + 1].isSpecial || rule.tail[tailIndex + 1].name !== specialSymbol.EOF)) || 
+					if ( ((tailIndex + 1) < rule.tail.length && (!rule.tail[tailIndex + 1].isSpecial || rule.tail[tailIndex + 1].name !== specialSymbol.EOF)) ||
 						(tailIndex === (rule.tail.length -1) && tailIndex > 0 && !rule.tail[tailIndex-1].isSpecial) )
 					{
 						rule.tail.splice(tailIndex, 1);
@@ -1507,8 +1728,8 @@ var Grammar = k.data.Grammar = (function () {
 			}
 		});
 	};
-	
-	/* @function Determine which rules are unreachable and based on the current options remove this rules
+
+	/* @method Determine which rules are unreachable and based on the current options remove this rules
 	* @param {Rule} augmentedRule The extra added new initial rule
 	* @returns {Void} */
 	grammar.prototype._cleanUnReachableRules = function (augmentedRule)
@@ -1517,7 +1738,7 @@ var Grammar = k.data.Grammar = (function () {
 		/*jshint -W083 */
 		var areChanges = false,
 			ruleIndex = 0;
-		
+
 		augmentedRule.isReachable = true;
 		do
 		{
@@ -1543,7 +1764,7 @@ var Grammar = k.data.Grammar = (function () {
 				}
 			}, this);
 		} while (areChanges);
-		
+
 		if (!this.preserveUnReachableRules)
 		{
 			ruleIndex = 0;
@@ -1557,8 +1778,8 @@ var Grammar = k.data.Grammar = (function () {
 			}
 		}
 	};
-	
-	/* @function Generate a list of all the terminals the current grammar has. This list is used by the Lexer
+
+	/* @method Generate a list of all the terminals the current grammar has. This list is used by the Lexer
 	* @returns {[Terminal]} An array of all uniq terminals in the current grammar  */
 	grammar.prototype._generateListOfTerminals = function ()
 	{
@@ -1581,7 +1802,7 @@ var Grammar = k.data.Grammar = (function () {
 			});
 	};
 
-	/* @function Mark all non-terminales that are nullable with a flag isNullable set in true
+	/* @method Mark all non-terminales that are nullable with a flag isNullable set in true
 	* @returns {Void} */
 	grammar.prototype._determineNullableNonTerminals = function ()
 	{
@@ -1589,10 +1810,10 @@ var Grammar = k.data.Grammar = (function () {
 		/*jshint -W083 */
 		var allNonTerminalAreNullablesInRule = false,
 			areChanges = false;
-			
+
 		do {
 			areChanges = false;
-			
+
 			k.utils.obj.each(this.rules, function (rule)
 			{
 				if (rule.tail.length === 1 && rule.tail[0].name === k.data.specialSymbol.EMPTY && !rule.head.isNullable)
@@ -1607,7 +1828,7 @@ var Grammar = k.data.Grammar = (function () {
 					{
 						return this.nullableNonTerminals.indexOf(nonTerminal.name) >= 0;
 					}, this);
-					
+
 					if (allNonTerminalAreNullablesInRule && !rule.head.isNullable)
 					{
 						rule.head.isNullable = true;
@@ -1617,25 +1838,25 @@ var Grammar = k.data.Grammar = (function () {
 				}
 			}, this);
 		} while (areChanges);
-		
+
 		var allRulesSymbols = k.utils.obj.flatten(
 				k.utils.obj.map(this.rules, function (rule)
 				{
 					return rule.tail.concat(rule.head);
 				}),
 				false);
-				
+
 		// Mark all non terminals that were determined in the previous step, as nullables. This is require because besides share the same name, each non-temrinal in diferentes rules are different isntances
 		var allNullablesNonTerminals = k.utils.obj.filter(allRulesSymbols, function (symbol) {
 		   return symbol instanceof NonTerminal && this.nullableNonTerminals.indexOf(symbol.name) >= 0;
 		}, this);
-		
+
 		k.utils.obj.each(allNullablesNonTerminals, function(nonTerminal) {
 			nonTerminal.isNullable = true;
 		});
 	};
 
-	/* @function Returns the list of rules that start with the specified symbols as the head
+	/* @method Returns the list of rules that start with the specified symbols as the head
 	* @param {Symbol} symbol Symbol used as the head of the requested rules
 	* @returns {[Rules]} Array of rules */
 	grammar.prototype.getRulesFromNonTerminal = function(symbol)
@@ -1643,7 +1864,7 @@ var Grammar = k.data.Grammar = (function () {
 		return this.rulesByHeader[symbol.name];
 	};
 
-	/* @function Convert a Grammar to its pritty string representation
+	/* @method Convert a Grammar to its pritty string representation
 	* @returns {String} Formatted string */
 	grammar.prototype.toString = function()
 	{
@@ -1688,7 +1909,7 @@ k.data.ASTNode = (function(_super) {
 		k.utils.obj.defineProperty(this, 'symbol');
 	}
 
-	/* @function Generates a string representation of the current AST Node
+	/* @method Generates a string representation of the current AST Node
 	 * @param {Boolean} options.deep True in case to print the entire node and its children
 	 * @returns {String} formatted string */
 	astNode.prototype.toString = function(options)
@@ -1707,7 +1928,7 @@ k.data.ASTNode = (function(_super) {
 		return this._toCurrentString();
 	};
 	
-	/* @function Generates a string representation of the current AST Node
+	/* @method Generates a string representation of the current AST Node
 	 * @returns {String} formatted string */
 	astNode.prototype._toCurrentString = function ()
 	{
@@ -1755,7 +1976,7 @@ var ItemRule = k.data.ItemRule = (function() {
 		}
 	};
 
-	/* @function Convert the current item rule to its string representation
+	/* @method Convert the current item rule to its string representation
 	* @returns {String} formatted string */
 	itemRule.prototype.toString = function()
 	{
@@ -1771,7 +1992,7 @@ var ItemRule = k.data.ItemRule = (function() {
 		return aux;
 	};
 
-	/* @function Clone the current item, altering its state by the params specified in cloneUpdateOptions
+	/* @method Clone the current item, altering its state by the params specified in cloneUpdateOptions
 	* @param {Integer} cloneUpdateOptions.dotLocationIncrement Increment that will be applied into the dot location of the new item. Default: 0
 	* @param {Object} creationOptions Optional object use to expand current option used to create the returned clone
 	* @returns {ItemRule} A clean new item */
@@ -1787,7 +2008,7 @@ var ItemRule = k.data.ItemRule = (function() {
 		return result;
 	};
 
-	/* @function Clone the current item's options
+	/* @method Clone the current item's options
 	* @param {Object} cloneUpdateOptions Optional object use to control the way the options are being cloned
 	* @param {Object} extendedOptions Optional object use to expand current options and create the returned clone
 	* @returns {Object} A copy of the current options (The referenced rule is not copied, hte same rule instance is used) */
@@ -1807,7 +2028,7 @@ var ItemRule = k.data.ItemRule = (function() {
 		return result;
 	};
 
-	/* @function Increase the dot location by the number specified by parameter
+	/* @method Increase the dot location by the number specified by parameter
 	* @param {Integer} increment Increment that will be applied into the dot location of the new item. Default: 1
 	* @returns {Void} */
 	itemRule.prototype._incrementDotLocation = function(increment)
@@ -1818,7 +2039,7 @@ var ItemRule = k.data.ItemRule = (function() {
 		this.dotLocation = optionsValue + incrementValue;
 	};
 	
-	/* @function Gets a string id that uniquely identity the current item rule
+	/* @method Gets a string id that uniquely identity the current item rule
 	* @returns {String} Id */
 	itemRule.prototype.getIdentity = function ()
 	{
@@ -1829,14 +2050,14 @@ var ItemRule = k.data.ItemRule = (function() {
 		return this._id;
 	};
 	
-	/* @function Internal method to generate a unique Id
+	/* @method Internal method to generate a unique Id
 	* @returns {String} Id */
 	itemRule.prototype._generateIdentity = function ()
 	{
 		return this.rule.index + '(' + this.dotLocation + ')';
 	};
 
-	/* @function Returns the right next symbol to the dot location
+	/* @method Returns the right next symbol to the dot location
 	* @returns {Symbol} Next symbol or null if there is not next symbol */
 	itemRule.prototype.getCurrentSymbol = function ()
 	{
@@ -1845,14 +2066,14 @@ var ItemRule = k.data.ItemRule = (function() {
 		return this.dotLocation < (this.rule.tail.length + 1) ? this.rule.tail[this.dotLocation] : null;
 	};
 	
-	/* @function Determines if the current item rule is a reduce one or not
+	/* @method Determines if the current item rule is a reduce one or not
 	* @returns {Boolean} True if the current item is a reduce item, false otherwise */
 	itemRule.prototype.isReduce = function ()
 	{
 		return this.dotLocation === this.rule.tail.length;
 	};
 
-	/* @function Create an array of item rules from an array of rules
+	/* @method Create an array of item rules from an array of rules
 	* @param {[Rule]} rules Array of rules used to create the item rules. Each new item rule will have 0 as dot location
 	* @param {[Symbol]} lookAhead Array of symbols that will be set to each of the item rules created as its lookahead array
 	* @returns {[ItemRule]} Array of new Item Rules */
@@ -1943,7 +2164,7 @@ k.data.State = (function(_super)
 		this._registerItemRules();
 	}
 
-	/* @function REgister the list of item rules of the current stateso they are assesible by its id
+	/* @method REgister the list of item rules of the current stateso they are assesible by its id
 	 * @returns {Void} */
 	state.prototype._registerItemRules = function ()
 	{
@@ -1957,13 +2178,13 @@ k.data.State = (function(_super)
 		AcceptanceStateName: 'AcceptanceState'
 	};
 
-	/* @function Get the next unprocessed item rule
+	/* @method Get the next unprocessed item rule
 	 * @returns {ItemRule} Next Item Rule */
 	state.prototype.getNextItem = function() {
 		return this._unprocessedItems.splice(0,1)[0];
 	};
 
-	/* @function Adds an array of item rule into the state. Only the rules that are not already present in the state will be added
+	/* @method Adds an array of item rule into the state. Only the rules that are not already present in the state will be added
 	 * @param {[ItemRule]} itemRules Array of item rules to add into the state
 	 * @param {Boolean} options.notMergeLookAhead If specified as true does not marge the lookAhead of the already existing items. Default: falsy
 	 * @returns {void} Nothing */
@@ -2010,7 +2231,7 @@ k.data.State = (function(_super)
 		}, this);
 	};
 
-	/* @function Convert the current state to its string representation
+	/* @method Convert the current state to its string representation
 	 * @returns {String} formatted string */
 	state.prototype.toString = function() {
 		var strResult = 'ID: ' + this.getIdentity() + '\n' +
@@ -2024,7 +2245,7 @@ k.data.State = (function(_super)
 		return strResult;
 	};
 
-	/* @function Returns the condenced (one line) string that reprenset the current 'state' of the current state
+	/* @method Returns the condenced (one line) string that reprenset the current 'state' of the current state
 	 * @returns {String} State Representation in one line  */
 	state.prototype.getCondencedString = function() {
 		if(!this._condencedView)
@@ -2034,7 +2255,7 @@ k.data.State = (function(_super)
 		return this._condencedView;
 	};
 
-	/* @function Internal method to generate a condenced (one line) string that reprenset the current 'state' of the current state
+	/* @method Internal method to generate a condenced (one line) string that reprenset the current 'state' of the current state
 	 * @returns {String} State Representation in one line  */
 	state.prototype._generateCondencedString = function() {
 		return  k.utils.obj.map(
@@ -2047,7 +2268,7 @@ k.data.State = (function(_super)
 			}).join('-');
 	};
 
-	/* @function Generates an ID that identify this state from any other state
+	/* @method Generates an ID that identify this state from any other state
 	 * @returns {String} Generated ID  */
 	state.prototype._generateIdentity = function() {
 
@@ -2070,7 +2291,7 @@ k.data.State = (function(_super)
 			}, '');
 	};
 
-	/* @function Returns a copy the items contained in the current state
+	/* @method Returns a copy the items contained in the current state
 	 * @returns {[ItemRule]} Array of cloned item rules  */
 	state.prototype.getItems = function() {
 		return k.utils.obj.map(this._items, function(item) {
@@ -2078,21 +2299,21 @@ k.data.State = (function(_super)
 		});
 	};
 
-	/* @function Returns an orignal item rule based on its id.
+	/* @method Returns an orignal item rule based on its id.
 		This method is intended to be use as READ-ONLY, editing the returned items will affect the state and the rest of the automata at with this state belongs to.
 	 * @returns {[ItemRule]} Array of current item rules  */
 	state.prototype.getOriginalItems = function() {
 		return this._items;
 	};
 
-	/* @function Returns an orignal item rule based on its id.
+	/* @method Returns an orignal item rule based on its id.
 		This method is intended to be use as READ-ONLY, editing the returned items will affect the state and the rest of the automata at with this state belongs to.
 	 * @returns {ItemRule} Item rule corresponding to the id passed in if present or null otherwise  */
 	state.prototype.getOriginalItemById = function(id) {
 		return this._registerItems[id];
 	};
 
-	/** @function Get the list of all supported symbol which are valid to generata transition from the current state.
+	/** @method Get the list of all supported symbol which are valid to generata transition from the current state.
 	 * @returns {[Object]} Array of object of the form: {symbol, items} where items have an array of item rules  */
 	state.prototype.getSupportedTransitionSymbols = function() {
 		var itemsAux = {},
@@ -2121,7 +2342,7 @@ k.data.State = (function(_super)
 		return result;
 	};
 
-	/* @function Responsible of new transitions. We override this method to use the correct variable names and be more meanful
+	/* @method Responsible of new transitions. We override this method to use the correct variable names and be more meanful
 	 * @param {Symbol} symbol Symbol use to make the transition, like the name of the transition
 	 * @param {State} state Destination state arrived when moving with the specified tranisiotn
 	 * @returns {Object} Transition object  */
@@ -2132,7 +2353,7 @@ k.data.State = (function(_super)
 		};
 	};
 
-	/* @function Returns the list of item rules contained in the current state that are reduce item rules.
+	/* @method Returns the list of item rules contained in the current state that are reduce item rules.
 	 * @returns {[ItemRule]} Recude Item Rules  */
 	state.prototype.getRecudeItems = function () {
 		return k.utils.obj.filter(this._items, function (item) {
@@ -2180,21 +2401,21 @@ k.data.Automata = (function() {
 		}
 	};
 
-	/* @function Convert the current automata to its string representation
+	/* @method Convert the current automata to its string representation
 	* @returns {String} formatted string */
 	automata.prototype.toString = function ()
 	{
 		return this.states.join('\n');
 	};
 
-	/* @function Get the next unprocessed state
+	/* @method Get the next unprocessed state
 	* @returns {State} A State not processed yet if any or null otherwise */
 	automata.prototype.getNextState = function()
 	{
 		return this._unprocessedStates.splice(0,1)[0];
 	};
 
-	/* @function Set or get the initial state.
+	/* @method Set or get the initial state.
 	* @param {State} state If specified, set the initial state of the automata
 	* @returns {State} In case that none state is specifed returnes the initial state previously set */
 	automata.prototype.initialStateAccessor = function(state)
@@ -2205,7 +2426,7 @@ k.data.Automata = (function() {
 		this.initialState = state;
 	};
 
-	/* @function Add a new state into the automata controlling if it is duplicated or not. If the new state is duplicated we merge its look-ahead
+	/* @method Add a new state into the automata controlling if it is duplicated or not. If the new state is duplicated we merge its look-ahead
 	* @param {State} newState State to add
 	* @returns {State} The added state, if the state is duplicated returns the already created state */
 	automata.prototype.addState = function(newState)
@@ -2277,6 +2498,9 @@ k.lexer.Lexer = (function() {
 	*	IMPORTANT: If the grammar has empty rules (A --> <EMPTY>) ignoring spaces will make that the lexer returns EOF instead of EMPTY at the end of the string ('').
 	* @param {Boolean} options.notIgnoreNewLines If true enters are not ignored. False by default.
 	*	IMPORTANT: If the grammar has empty rules (A --> <EMPTY>) ignoring new lines will make that the lexer returns EOF instead of EMPTY at the end of the string ('').
+	* @param {Boolean} options.usePriorities Indicate that the lexer should select the token based on the priority of each terminal. Default value: false
+	* @param {Boolean} options.useMultipleMatching Indicate that the lexer should; first accept a list of valid token from the parser and second, from that list return the first that match. It is recommended to use this feature with Priorities feature enabled too. Default value: false
+	*   IMPORTANT: It is recommended to use priorities feature when using multi-matching, otherwise the returning token will be defined based on the order in which they were defined in the grammar!
 	*/
 	var lexer = function (options)
 	{
@@ -2287,20 +2511,29 @@ k.lexer.Lexer = (function() {
 		k.utils.obj.defineProperty(this, 'inputStream'); // Post-Processed input stream
 		k.utils.obj.defineProperty(this, 'notIgnoreSpaces');
 		k.utils.obj.defineProperty(this, 'notIgnoreNewLines');
+		k.utils.obj.defineProperty(this, 'usePriorities');
+		k.utils.obj.defineProperty(this, 'useMultipleMatching');
+
+		k.utils.obj.defineProperty(this, '_line');
+		k.utils.obj.defineProperty(this, '_character');
 
 		this.setStream(this.stream);
 	};
 
-	/* @function Set the input string stream
+	/* @method Set the input string stream and set to 0 the line and the character position
 	* @param {String} stream Input string to be processed
 	* @returns {Void} */
 	lexer.prototype.setStream = function (stream)
 	{
 		this.inputStream = this.stream = stream;
+
+		this._line = 0;
+		this._character = 0;
+
 		this._clearStream();
 	};
 
-	/* @function Process the current string stream to clear ignored spaced and enters, leaving the resulted string in the same inputStream
+	/* @method Process the current string stream to clear ignored spaced and enters, leaving the resulted string in the same inputStream
 	* @returns {Void} */
 	lexer.prototype._clearStream = function ()
 	{
@@ -2312,6 +2545,9 @@ k.lexer.Lexer = (function() {
 		{
 			if (!this.notIgnoreSpaces || !this.notIgnoreNewLines)
 			{
+				var original_inputString = this.inputStream,
+					difference_string;
+
 				if (!this.notIgnoreSpaces && !this.notIgnoreNewLines)
 				{
 					this.inputStream = k.utils.str.fullLtrim(this.inputStream);
@@ -2325,6 +2561,9 @@ k.lexer.Lexer = (function() {
 					this.inputStream = k.utils.str.ltrimBreaks(this.inputStream);
 				}
 
+				difference_string = original_inputString.substr(0, original_inputString.indexOf(this.inputStream));
+				this._updatePosition(difference_string);
+
 				// if ignoring spaces and the input string is empty, set the input as finished
 				if (this.inputStream === '')
 				{
@@ -2334,18 +2573,149 @@ k.lexer.Lexer = (function() {
 		}
 	};
 
-	/* @function Get a generic result in case of error, when the lexer cannnot match any terminal in the input
-	* @returns {Object} An object representing the the mis of any match (error)  */
-	lexer.prototype._getErrorResult = function()
+	/* @method Get a generic result in case of error, when the lexer cannnot match any terminal in the input
+	* @returns {Object} An object representing the error */
+	lexer.prototype._getErrorResult = function ()
 	{
 		return {
-				length: -1,
-				string: this.inputStream,
-				ERROR: 'NOT MATCHING FOUND'
-			};
+			length: -1,
+			string: this.inputStream,
+			error: 'NOT MATCHING FOUND',
+			line: this._line,
+			character: this._character
+		};
 	};
 
-	/* @function Searh for the next token the in the current inputStream.
+	/* @method Update the current instalce line and position values to track where the reading cursor of the lexer is.
+	* This information is used to easily found errors.
+	* @param {String} processed_string Last processed string (string chunk removes from the input stream), used to update the line and the character values.
+	* @returns {Void} */
+	lexer.prototype._updatePosition = function (processed_string)
+	{
+		if (!processed_string)
+		{
+			return;
+		}
+
+		var indices_location = k.utils.str.getIndicesOf('\n', processed_string);
+
+		if (indices_location.length)
+		{
+			this._line += indices_location.length;
+			this._character = processed_string.substr(k.utils.obj.max(indices_location) + 1).length;
+		}
+		else
+		{
+			this._character += processed_string.length;
+		}
+	};
+
+	/* @method Process the result based on the current lexer instance setting. If using multi-matching the new mathc will be added into the list of result otherwise the more specified will be selected*
+	* @param {Object|Array<Objects>} last_result Last matching token if NOT using multi matching or an array of matching tokens if DO using multi-matching. In the case there were no previous found token, this object should have a property length with -1 as a value or be an empty array.
+	* @param {String} matching_string The new found string that match the input stream
+	* @param {Terminal} terminal Terminal used to match the matching_string string
+	* @returns {Object|Array<Objects>} A token object or an array of token objects
+	* {Number} result.length Length of the matched string
+	* {Number} result.line Line number where token was found or expected
+	* {Number} result.character Position where the token was found or expected
+	* {String} result.string String matched
+	* {Terminal} result.terminal matching terminal*/
+	lexer.prototype._chooseMoreSpecifcToken = function (last_result, matching_string, terminal)
+	{
+		if (this.useMultipleMatching)
+		{
+			return this._chooseMoreSpecificArrayTokens(last_result, matching_string, terminal);
+		}
+		else
+		{
+			return this._chooseMoreSpecifcSingleToken(last_result, matching_string, terminal);
+		}
+	};
+
+	/* @method When using multi-matching return the list of valid matches. This method takes into account if usign priorities and sort the result based on that.
+	* @param {Object} last_result Last matching token. In the case there were no previous found token, this values shoudl be an empty arary.
+	* @param {String} matching_string The new found string that match the input stream
+	* @param {Terminal} terminal Terminal used to match the matching_string string
+	* @returns {Array<Object>} Array of  token objects, each of them is compose by:
+	* {Number} result.length Length of the matched string
+	* {Number} result.line Line number where token was found or expected
+	* {Number} result.character Position where the token was found or expected
+	* {String} result.string String matched
+	* {Terminal} result.terminal matching terminal*/
+	lexer.prototype._chooseMoreSpecificArrayTokens =  function (last_results, matching_string, terminal)
+	{
+		var result = k.utils.obj.isArray(last_results) ? last_results : [];
+
+		result.push({
+			length: matching_string.length,
+			string: matching_string,
+			line: this._line,
+			character: this._character,
+			terminal: terminal
+		});
+
+		if (this.usePriorities)
+		{
+			result = k.utils.obj.sortBy(result, function (token)
+			{
+				return token.terminal.priority || 0;
+			});
+		}
+
+		return result;
+	};
+
+	/* @method Select the more specific token, between the last found one and the new found match. The behaviour of this method is determined by the use of priorities (this.usePriorities) or not.
+	* @param {Object} last_result Last matching token. In the case there were no previous found token, this object should have a property length with -1 as a value
+	* @param {String} matching_string The new found string that match the input stream
+	* @param {Terminal} terminal Terminal used to match the matching_string string
+	* @returns {Object} A token object
+	* {Number} result.length Length of the matched string
+	* {Number} result.line Line number where token was found or expected
+	* {Number} result.character Position where the token was found or expected
+	* {String} result.string String matched
+	* {Terminal} result.terminal matching terminal*/
+	lexer.prototype._chooseMoreSpecifcSingleToken = function (last_result, matching_string, terminal)
+	{
+		if (last_result.length < 0 || !last_result.terminal)
+		{
+			//if there are no previous result, the new found string is the new one.
+			return {
+				length: matching_string.length,
+				string: matching_string,
+				line: this._line,
+				character: this._character,
+				terminal: terminal
+			};
+		}
+
+		if (this.usePriorities && terminal.priority > last_result.terminal.priority)
+		{
+			return {
+				length: matching_string.length,
+				string: matching_string,
+				line: this._line,
+				character: this._character,
+				terminal: terminal
+			};
+		}
+		else
+		{
+			if (last_result.length < matching_string.length)
+			{
+				return {
+					length: matching_string.length,
+					string: matching_string,
+					line: this._line,
+					character: this._character,
+					terminal: terminal
+				};
+			}
+			return last_result;
+		}
+	};
+
+	/* @method Searh for the next token the in the current inputStream.
 	* IMPORTANT: In order to call this function the inputStream should not be null neither the empty string.
 	* @returns {Object} An object representing the current finded token.
 	* {Number} result.length Length of the matched string
@@ -2353,49 +2723,117 @@ k.lexer.Lexer = (function() {
 	* {Terminal} result.terminal matching terminal */
 	lexer.prototype._searchNextToken = function ()
 	{
-		var result = {
+		var result = this.useMultipleMatching ?
+			[] :
+			{
 				length: -1
 			},
-			terminals = this.grammar.terminals,
 			body;
 
-		for (var i = 0; i < terminals.length; i++)
+		k.utils.obj.each(this.grammar.terminals, function (terminal)
 		{
-			body = terminals[i].body;
+			body = terminal.body;
 			//If it's reg exp and match (this.inputStream.search(body) returns the index of matching which evals to false so !)
 			if (body instanceof RegExp && !this.inputStream.search(body))
 			{
 				var match = body.exec(this.inputStream)[0];
-				if (result.length < match.length)
-				{
-					result = {
-						length: match.length,
-						string: match,
-						terminal: terminals[i]
-					};
-				}
+				result = this._chooseMoreSpecifcToken(result, match, terminal);
 			}
 
 			//if it is a string check if they are the same
-			else if (k.utils.obj.isString(body) && k.utils.str.startsWith(this.inputStream, body) && result.length < body.length)
+			else if (k.utils.obj.isString(body) && k.utils.str.startsWith(this.inputStream, body) )
 			{
-				result = {
-					length: body.length,
-					string: body,
-					terminal: terminals[i]
-				};
+				result = this._chooseMoreSpecifcToken(result, body, terminal);
 			}
+		}, this);
+
+		return result;
+	};
+
+	/* @method Filter found token/s and update the inputStream
+	* @param {Object|Array<Object>} result Found token in the case of not usign multi-matching or an array of found tokens.
+	* @param {Array<String>} validNextTerminals Array of valid next terminal NAMES. This value is used when the lexer is configure to use multi-matching
+	* @returns {Object} An object representing the current finded token.
+	* {Number} result.length Length of the matched string
+	* {String} result.string String matched
+	* {Terminal} result.terminal matching terminal */
+	lexer.prototype._filterAndCleanResult = function (result, validNextTerminals)
+	{
+		var filter_result = {};
+		if (this.useMultipleMatching)
+		{
+			filter_result = this._filterAndCleanMultiMatchingResults(result, validNextTerminals);
+		}
+		else
+		{
+			filter_result =  this._filterAndCleanSingleResult(result);
+		}
+
+
+		if (filter_result.length === -1)
+		{
+			//if there is no valid match, we return the current input stream as an error
+			filter_result = this._getErrorResult();
+		}
+		else
+		{
+			//If there is a match
+			this.inputStream = this.inputStream.substr(filter_result.length);
+			this._clearStream();
+		}
+
+		return filter_result;
+	};
+
+	/* @method In case the found token, result param, is a valid match update the line and catacter positions and set those values in the result
+	* @param {Object} result Found token.
+	* @returns {Object} An object representing the current finded token.
+	* {Number} result.length Length of the matched string
+	* {String} result.string String matched
+	* {Terminal} result.terminal matching terminal */
+	lexer.prototype._filterAndCleanSingleResult = function (result)
+	{
+		if (result.length > 0)
+		{
+			this._updatePosition(result.string);
+
+			result.line = this._line;
+			result.character = this._character;
 		}
 
 		return result;
 	};
 
-	/* @function Get next input token
+	/* @method Filter list of found tokens and return the most appropriate one
+	* @param {Array<Object>} result Array of found tokens.
+	* @param {Array<String>} validNextTerminals Array of valid next terminal NAMES.
 	* @returns {Object} An object representing the current finded token.
 	* {Number} result.length Length of the matched string
 	* {String} result.string String matched
 	* {Terminal} result.terminal matching terminal */
-	lexer.prototype.getNext = function ()
+	lexer.prototype._filterAndCleanMultiMatchingResults = function (results, validNextTerminals)
+	{
+		//If using priorities feature the array of result should already be sorted!
+		//IMPORTANT: It is recommended to use priorities feature when using multi-matching, otherwise the returning
+		//token will be defined based on the order in which they were defined in the grammar!
+		var final_result = k.utils.obj.find(results, function (token)
+		{
+			return k.utils.obj.contains(validNextTerminals, token.terminal.name);
+		});
+
+		return final_result || {length:-1};
+	};
+
+	/* @method Get next input token
+	* @param {Array<String>} validNextTerminals Array of valid next terminal NAMES. This value is used when the lexer is configure to use multi-matching
+	* @returns {Object} An object representing the current found token.
+	* {Number} result.length Length of the matched string, -1 if there is not matching
+	* {String} result.error Error description in case of error, undefiend otherwise
+	* {Number} result.line Line number where token was found or expected
+	* {Number} result.character Position where the token was found or expected
+	* {String} result.string String matched
+	* {Terminal} result.terminal matching terminal */
+	lexer.prototype.getNext = function (validNextTerminals)
 	{
 		var result = {
 				length: -1
@@ -2404,8 +2842,11 @@ k.lexer.Lexer = (function() {
 
 		if (this.inputStream === null)
 		{
+			//finished input stream
 			result = {
 				length: -1,
+				line: this._line,
+				character: this._character,
 				terminal: new k.data.Symbol({name: k.data.specialSymbol.EOF})
 			};
 		}
@@ -2421,6 +2862,8 @@ k.lexer.Lexer = (function() {
 				result = {
 					length: 0,
 					string: '',
+					line: this._line,
+					character: this._character,
 					terminal: new k.data.Symbol({name: k.data.specialSymbol.EMPTY})
 				};
 				this.inputStream = null;
@@ -2433,18 +2876,19 @@ k.lexer.Lexer = (function() {
 		else
 		{
 			result = this._searchNextToken();
+			result = this._filterAndCleanResult(result, validNextTerminals);
 
-			if (result.length === -1)
-			{
-				//if there is no valid match, we return the current input stream as an error
-				result = this._getErrorResult();
-			}
-			else
-			{
-				//If there is a match
-				this.inputStream = this.inputStream.substr(result.length);
-				this._clearStream();
-			}
+			// if (result.length === -1)
+			// {
+			// 	//if there is no valid match, we return the current input stream as an error
+			// 	result = this._getErrorResult();
+			// }
+			// else
+			// {
+			// 	//If there is a match
+			// 	this.inputStream = this.inputStream.substr(result.length);
+			// 	this._clearStream();
+			// }
 		}
 
 		return result;
@@ -2488,7 +2932,7 @@ k.parser.AutomataLRGeneratorBase = (function() {
 		}
 	};
 
-	/* @function Expands a state adding in it the full list of require items (item rules)
+	/* @method Expands a state adding in it the full list of require items (item rules)
 	* @param {State} currentState State that will be expanded
 	* @returns {State} The full state with all its require items */
 	automataLRGeneratorBase.prototype.expandItem = function (currentState)
@@ -2511,25 +2955,25 @@ k.parser.AutomataLRGeneratorBase = (function() {
 		return currentState;
 	};
 
-	/* @function Generate the options used to add item rules into the states when thy are being expanded
+	/* @method Generate the options used to add item rules into the states when thy are being expanded
 	* @returns {Object} An object specifying the options used by the state.addItems method to include methods */
 	automataLRGeneratorBase.prototype._getExpansionItemNewItemsOptions = function ()
 	{
 		return {};
 	};
 
-	/* @function Generate the list of item rules that can be getted from a state when expanding it in the automata creation prcoess.
+	/* @method Generate the list of item rules that can be getted from a state when expanding it in the automata creation prcoess.
 	* This method is intended to be overwritten!.
 	* @param {ItemRule} currentItem The current item rule from which the new item rule are being generated.
 	* @param {Symbol} currentSymbol Is the symbol used to find new item rules.
-	* @returns {[ItemRule]} Array of item rule ready to be part of the current processing state */
+	* @returns {Array<ItemRule>} Array of item rule ready to be part of the current processing state */
 	automataLRGeneratorBase.prototype._newItemRulesForStateExpansion = function (currentItem, currentSymbol)
 	{};
 
-	/* @function Generate the requested automata
+	/* @method Generate the requested automata
 	* This method allows that sub-clases override it and have already almost all the implementation done in the method _generateAutomata()
 	* @param {Boolean} options.notValidate Indicate if the resulting automata should be validated for the current lookAhead or not. False by default (DO validate the automata).
-	* @param {[ConflicResolver]} options.conflictResolvers ORDERED List of conflicts resolvers used in case of conflicts in the state.
+	* @param {Array<ConflicResolver>} options.conflictResolvers ORDERED List of conflicts resolvers used in case of conflicts in the state.
 	* @returns {Automata} The corresponding automata for the specified grammar */
 	automataLRGeneratorBase.prototype.generateAutomata = function (options)
 	{
@@ -2550,9 +2994,9 @@ k.parser.AutomataLRGeneratorBase = (function() {
 		return automata;
 	};
 
-	/* @function Validates an automata based on the current generator type (consider or not look-ahead)
+	/* @method Validates an automata based on the current generator type (consider or not look-ahead)
 	* @param {Autamata} automata Automata instances to be validated
-	* @param {[ConflicResolver]} options.conflictResolvers ORDERED List of conflicts resolvers used in case of conflicts in the state.
+	* @param {Array<ConflicResolver>} options.conflictResolvers ORDERED List of conflicts resolvers used in case of conflicts in the state.
 	* @returns {Boolean} true in case the automata is valid, false otherwise */
 	automataLRGeneratorBase.prototype.isAutomataValid = function (automata, options)
 	{
@@ -2568,7 +3012,7 @@ k.parser.AutomataLRGeneratorBase = (function() {
 		}, this);
 	};
 
-	/* @function Determine if the indicated state is valid or not.
+	/* @method Determine if the indicated state is valid or not.
 	* This method is intended to be overwritten!.
 	* @param {State} state State to validate
 	* @param {Boolean} options.considerLookAhead Indicate if the state should take into account look ahead to validate. Default: false
@@ -2578,13 +3022,13 @@ k.parser.AutomataLRGeneratorBase = (function() {
 	{
 	};
 
-	/* @function Generate the conflict resolvers list use to solve any possible conflict when validating the automata and when creating the Action table.
+	/* @method Generate the conflict resolvers list use to solve any possible conflict when validating the automata and when creating the Action table.
 	* @returns {Automata} The corresponding automata for the specified grammar */
 	automataLRGeneratorBase.prototype._getConflictResolvers = function ()
 	{
 	};
 
-	/* @function Actually Generate an automata
+	/* @method Actually Generate an automata
 	* @returns {Automata} The corresponding automata for the specified grammar */
 	automataLRGeneratorBase.prototype._generateAutomata = function()
 	{
@@ -2598,7 +3042,7 @@ k.parser.AutomataLRGeneratorBase = (function() {
 		return automata;
 	};
 
-	/* @function Generate the construction object used to initialize the new automata
+	/* @method Generate the construction object used to initialize the new automata
 	* @param {State} initialState State that only contains the items rules from the start symbol of the grammar. This is the initial state before being expanded.
 	* @returns {Object} Object containing all the options used to create the new automata */
 	automataLRGeneratorBase.prototype._getNewAutomataOptions = function (initialState)
@@ -2608,12 +3052,12 @@ k.parser.AutomataLRGeneratorBase = (function() {
 		};
 	};
 
-	/* @function Returns the initial list of item rules that will take part in the initial state of the automata. This can differ if the automata has or not lookahead
-	* @returns {[ItemRule]} The initial list of item rule. */
+	/* @method Returns the initial list of item rules that will take part in the initial state of the automata. This can differ if the automata has or not lookahead
+	* @returns {Array<ItemRule>} The initial list of item rule. */
 	automataLRGeneratorBase.prototype._getInitialStateItemRules = function ()
 	{};
 
-	/* @function Internal method which resive an inital automata with only it inital state and generate a full automata
+	/* @method Internal method which resive an inital automata with only it inital state and generate a full automata
 	* @param {Automata} automata Automatma to be expanded
 	* @returns {Automata} A full automata */
 	automataLRGeneratorBase.prototype._expandAutomata = function(automata)
@@ -2662,7 +3106,7 @@ k.parser.AutomataLRGeneratorBase = (function() {
 		}
 	};
 
-	/* @function Given an automata returnes its GOTO Table. The table is represented by an object where each state is a property (row) and each possible symbol is a property of the previous object (column)
+	/* @method Given an automata returnes its GOTO Table. The table is represented by an object where each state is a property (row) and each possible symbol is a property of the previous object (column)
 	* Sample: table[<state>][<symbol>] = [undefined = error|<state id - string>]
 	* @param {Automata} automata Automatma used as a base of the calculation
 	* @returns {Object} A GOTO Table */
@@ -2682,12 +3126,12 @@ k.parser.AutomataLRGeneratorBase = (function() {
 		return table;
 	};
 
-	/* @function Given an automata returnes its ACTION Table.
+	/* @method Given an automata returnes its ACTION Table.
 	* The intend of this method is to be overwriten by each son class
 	* @param {Automata} automata Automatma used as a base of the calculation.
 	* @param {Boolean} options.ignoreErrors Indicate that when a state is in an error that cannot be resolver, continue the execution anyway.
 	* @param {Boolean} options.conflictResolvers List of resolver in case of conflic in any state.
-	* @returns {Function} Function that given the a state id and a lookAhead returns the action to take */
+	* @returns {Object} An object that represent the table, the first keys are the row and the second (in case there exist) are the columns */
 	automataLRGeneratorBase.prototype.generateACTIONTable = function (automata, options)
 	{};
 
@@ -2713,16 +3157,16 @@ k.parser.AutomataLR0Generator = (function(_super) {
 		_super.apply(this, arguments);
 	}
 
-	/* @function Override super method to return the list of item rules that has as its head the current symbol, without taking into account the lookAhead
+	/* @method Override super method to return the list of item rules that has as its head the current symbol, without taking into account the lookAhead
 	* @param {ItemRule} currentItem The current item rule from which the new item rule are being generated.
 	* @param {Symbol} currentSymbol Is the symbol used to find new item rules.
-	* @returns {[ItemRule]} Array of item rule ready to be part of the current processing state */
+	* @returns {Array<ItemRule>} Array of item rule ready to be part of the current processing state */
 	automataLR0Generator.prototype._newItemRulesForStateExpansion = function (currentItem, currentSymbol)
 	{
 		return k.data.ItemRule.newFromRules(this.grammar.getRulesFromNonTerminal(currentSymbol));
 	};
 
-	/* @function Generate the construction object used to initialize the new automata. Override the super method to indicate that te automata should NOT use lookahead
+	/* @method Generate the construction object used to initialize the new automata. Override the super method to indicate that te automata should NOT use lookahead
 	* @param {State} initialState State that only contains the items rules from the start symbol of the grammar. This is the initial state before being expanded.
 	* @returns {Object} Object containing all the options used to create the new automata */
 	automataLR0Generator.prototype._getNewAutomataOptions = function ()
@@ -2733,8 +3177,8 @@ k.parser.AutomataLR0Generator = (function(_super) {
 		return result;
 	};
 
-	/* @function Override super method to return the list of item rules that has as its head the start symbol of the grammar
-	* @returns {[ItemRule]} The initial list of item rule. */
+	/* @method Override super method to return the list of item rules that has as its head the start symbol of the grammar
+	* @returns {Array<ItemRule>} The initial list of item rule. */
 	automataLR0Generator.prototype._getInitialStateItemRules = function ()
 	{
 		return 	[new k.data.ItemRule({
@@ -2743,7 +3187,7 @@ k.parser.AutomataLR0Generator = (function(_super) {
 				})];
 	};
 
-	/* @function Given an automata returnes its ACTION Table.
+	/* @method Given an automata returnes its ACTION Table.
 	* @param {Automata} automata Automatma used as a base of the calculation
 	* @returns {Function} Function that given the a state id and a lookAhead returns the action to take */
 	automataLR0Generator.prototype.generateACTIONTable = function (automata)
@@ -2790,7 +3234,7 @@ k.parser.AutomataLR0Generator = (function(_super) {
 		})(table);
 	};
 
-	/* @function  Override super method to determine if the indicated state is valid or not.
+	/* @method  Override super method to determine if the indicated state is valid or not.
 	* @param {State} state State to validate
 	* @param {Boolean} options.considerLookAhead Indicate if the state should take into account look ahead to validate. Default: false
 	* @param {Automata} options.automata Optional automata instance used to pass to the conflict resolver in case there are conflict and resolvers.
@@ -2830,7 +3274,7 @@ k.parser.AutomataLALR1Generator = (function(_super)
 		_super.apply(this, arguments);
 	}
 
-	/* @function Override super method to return the list of item rules that has as its head the current symbol, TAKING into account the lookAhead
+	/* @method Override super method to return the list of item rules that has as its head the current symbol, TAKING into account the lookAhead
 	* @param {ItemRule} currentItem The current item rule from which the new item rule are being generated.
 	* @param {Symbol} currentSymbol Is the symbol used to find new item rules.
 	* @returns {[ItemRule]} Array of item rule ready to be part of the current processing state */
@@ -2840,45 +3284,52 @@ k.parser.AutomataLALR1Generator = (function(_super)
 		return k.data.ItemRule.newFromRules(this.grammar.getRulesFromNonTerminal(currentSymbol), lookAhead);
 	};
 
-	/* @function Gets the array of look-ahead for the particular item rule taking into account the dot location fo the specified item rule.
+	/* @method Gets the array of look-ahead for the particular item rule taking into account the dot location fo the specified item rule.
 	* @param {ItemRule} itemRule Item rule to find FIRST Set
-	* @returns {[Terminals]} First set for specified look ahead */
+	* @returns {Array<Terminals>} First set for specified look ahead */
 	automataLALR1Generator.prototype._getFirstSet = function (itemRule)
 	{
 		var symbolsToTraverse = itemRule.rule.tail.slice(itemRule.dotLocation + 1),
 			requestedFirstSet = [];
 
-		symbolsToTraverse = symbolsToTraverse.concat(itemRule.lookAhead);
+		//symbolsToTraverse = symbolsToTraverse.concat(itemRule.lookAhead);
 
-		k.utils.obj.find(symbolsToTraverse, function (symbolTraversed)
+		if (symbolsToTraverse.length)
 		{
-			if (symbolTraversed instanceof k.data.NonTerminal)
+			k.utils.obj.find(symbolsToTraverse, function (symbolTraversed)
 			{
-				requestedFirstSet = requestedFirstSet.concat(this.grammar.firstSetsByHeader[symbolTraversed.name]);
-				requestedFirstSet = k.utils.obj.uniq(requestedFirstSet, false, function (item) {return item.name;});
-				return !symbolTraversed.isNullable;
-			}
-			else if (symbolTraversed instanceof k.data.Terminal)
-			{
-				requestedFirstSet.push(symbolTraversed);
-				return true;
-			}
-			else if (symbolTraversed.isSpecial && symbolTraversed.name === k.data.specialSymbol.EOF)
-			{
-				requestedFirstSet.push(symbolTraversed);
-				return true;
-			}
-			else
-			{
-				throw new Error('Invalid Item Rule. Impossible calculate first set. Item Rule: ' + itemRule.toString());
-			}
+				if (symbolTraversed instanceof k.data.NonTerminal)
+				{
+					requestedFirstSet = requestedFirstSet.concat(this.grammar.firstSetsByHeader[symbolTraversed.name]);
+					requestedFirstSet = k.utils.obj.uniq(requestedFirstSet, false, function (item) {return item.name;});
+					return !symbolTraversed.isNullable;
+				}
+				else if (symbolTraversed instanceof k.data.Terminal)
+				{
+					requestedFirstSet.push(symbolTraversed);
+					return true;
+				}
+				else if (symbolTraversed.isSpecial && symbolTraversed.name === k.data.specialSymbol.EOF)
+				{
+					requestedFirstSet.push(symbolTraversed);
+					return true;
+				}
+				else
+				{
+					throw new Error('Invalid Item Rule. Impossible calculate first set. Item Rule: ' + itemRule.toString());
+				}
 
-		}, this);
+			}, this);
+		}
+		else
+		{
+			requestedFirstSet = itemRule.lookAhead;
+		}
 
 		return requestedFirstSet;
 	};
 
-	/* @function Generate the construction object used to initialize the new automata. Override the super method to indicate that te automata should DO use lookahead
+	/* @method Generate the construction object used to initialize the new automata. Override the super method to indicate that te automata should DO use lookahead
 	* @param {State} initialState State that only contains the items rules from the start symbol of the grammar. This is the initial state before being expanded.
 	* @returns {Object} Object containing all the options used to create the new automata */
 	automataLALR1Generator.prototype._getNewAutomataOptions = function ()
@@ -2889,8 +3340,8 @@ k.parser.AutomataLALR1Generator = (function(_super)
 		return result;
 	};
 
-	/* @function Override super method to return the list of item rules that has as its head the start symbol of the grammar, TAKING into account the lookAhead
-	* @returns {[ItemRule]} The initial list of item rule. */
+	/* @method Override super method to return the list of item rules that has as its head the start symbol of the grammar, TAKING into account the lookAhead
+	* @returns {Array<ItemRule>} The initial list of item rule. */
 	automataLALR1Generator.prototype._getInitialStateItemRules = function ()
 	{
 		return [new k.data.ItemRule({
@@ -2899,7 +3350,7 @@ k.parser.AutomataLALR1Generator = (function(_super)
 				})];
 	};
 
-	/* @function Given an automata returnes its ACTION Table.
+	/* @method Given an automata returnes its ACTION Table.
 	* @param {Automata} automata Automatma used as a base of the calculation
 	* @returns {Function} Function that given the a state id and a lookAhead returns the action to take */
 	automataLALR1Generator.prototype.generateACTIONTable = function (automata, options)
@@ -2932,7 +3383,6 @@ k.parser.AutomataLALR1Generator = (function(_super)
 					throw new Error('Impossible to generate Action Table. The following state is invalid. State: ' + state.getIdentity());
 				}
 
-
 				//Shift Items
 				k.utils.obj.each(stateItems.shiftItems, function (shiftItem)
 				{
@@ -2956,21 +3406,10 @@ k.parser.AutomataLALR1Generator = (function(_super)
 			}
 		}, this);
 
-
-		return (function (actionTable)
-		{
-			return function (currentStateId, look_ahead)
-			{
-				return (actionTable[currentStateId] && look_ahead && look_ahead.name && actionTable[currentStateId][look_ahead.name] ) ||
-					{
-						action: k.parser.tableAction.ERROR
-					};
-
-			};
-		})(table);
+		return table;
 	};
 
-	/* @function  Override super method to determine if the current state is valid or not.
+	/* @method  Override super method to determine if the current state is valid or not.
 	 * @param {Boolean} options.considerLookAhead Indicate if the state should take into account look ahead to validate. Default: false
 	 * @param {Automata} options.automata Optional automata instance used to pass to the conflict resolver in case there are conflict and resolvers.
 	 * @param {[ConflictResolver]} options.conflictResolvers List of conflict resolvers used to resolve possible conflict at the current state.
@@ -3081,7 +3520,7 @@ k.parser.AutomataLALR1Generator = (function(_super)
 		return true;
 	};
 
-	/* @function Generates the list of shift and reduce items that take part from the passed in state. Validating at the same time that none of these items are in conflict
+	/* @method Generates the list of shift and reduce items that take part from the passed in state. Validating at the same time that none of these items are in conflict
 		or that the conflicts are solvable.
 	 * @param {State} state State to extract form each of the reduce/shift item rules
 	 * @param {Boolean} options.considerLookAhead Indicate if the state should take into account look ahead to validate. If not the state will validate and generate the result as in a LR(0). Default: false
@@ -3271,7 +3710,7 @@ var ConflictResolver = k.parser.ConflictResolver = (function () {
 		this.order = this.order || 9999;
 	};
 
-	/* @function Resolve a conflict
+	/* @method Resolve a conflict
 	* This method main idea is that sub-clases override it and implement the real logic. By defaukt it should return false.
 	* @param {Automata} automata Automata containing the state tothat is being validated.
 	* @param {State} state State that contains the conflict.
@@ -3284,10 +3723,10 @@ var ConflictResolver = k.parser.ConflictResolver = (function () {
 		return  k.utils.obj.isFunction(this.resolveFnc) ? this.resolveFnc(automata, state, itemRule1, itemRule2) : false;
 	};
 
-	/* @function Generate the default list of resolvers. These are:
+	/* @method Generate the default list of resolvers. These are:
 		Shift/Reduce Resolver: Precendence
 		Shift/Reduce Resolver: Associativity
-	* @returns {[ConflictResolver]} List of the default (wide-app) Conflict Resolvers. */
+	* @returns {Array<ConflictResolver>} List of the default (wide-app) Conflict Resolvers. */
 	conflictResolver.getDefaultResolvers = function ()
 	{
 		return [
@@ -3354,6 +3793,19 @@ var ConflictResolver = k.parser.ConflictResolver = (function () {
 	return conflictResolver;
 })();
 
+/*Enum for error types reported by the parser
+* @readonly
+* @enum {String}
+*/
+var parserErrorType = k.parser.errorType = {
+	//When the lexer returns error,
+	LEXER_NOTOKEN: 'LEXER_NOTOKEN',
+	//When the lookAhead does not allow any valid action (Action table error)
+	PARSER_NOCONTINUATION: 'PARSE_NOCONTINUATION',
+	//When from the current state there is not valid next state (GoTo tabe error)
+	PARSER_NOMOVEMENT: 'PARSER_NOMOVEMENT'
+};
+
 /* Parser
 * @class
 * @classdesc Parser engine reponsible for parse an entire string */
@@ -3364,18 +3816,18 @@ var Parser = k.parser.Parser = (function() {
 	*
 	* @constructor
 	* @param {Object} options.gotoTable The GOTO Table of the current grammar
-	* @param {Grammar} options.grammar The grammar used to generate all the parser
 	* @param {Function} options.actionTable Action table used to control the parsing process
 	* @param {State} options.initialState Initial state of the automata the describe the current grammar
 	*/
-	var parser = function (options) {
+	var parser = function (options)
+	{
 		this.options = options;
 
 		k.utils.obj.defineProperty(this, 'gotoTable');
-		k.utils.obj.defineProperty(this, 'grammar');
 		k.utils.obj.defineProperty(this, 'actionTable');
 		k.utils.obj.defineProperty(this, 'initialState');
 
+		k.utils.obj.defineProperty(this, 'actionTableFn');
 		k.utils.obj.defineProperty(this, 'stack');
 		k.utils.obj.defineProperty(this, 'currentInput');
 
@@ -3383,12 +3835,13 @@ var Parser = k.parser.Parser = (function() {
 			throw new Error('Invalid initialization values for a Parser, please provide a GOTO Table');
 		}
 
-		if (!this.actionTable) {
+		if (!this.actionTable)
+		{
 			throw new Error('Invalid initialization values for a Parser, please provide a Action Table');
 		}
-
-		if (!this.grammar) {
-			throw new Error('Invalid initialization values for a Parser, please provide a Grammar');
+		else
+		{
+			this.actionTableFn = this._getActionTableFunction(this.actionTable);
 		}
 
 		if (!this.initialState) {
@@ -3398,36 +3851,59 @@ var Parser = k.parser.Parser = (function() {
 		this.stack = this.stack || [];
 	};
 
-	/* @function Parse an input
+	parser.prototype._getActionTableFunction = function (table)
+	{
+		return (function (actionTable)
+		{
+			return function (currentStateId, look_ahead)
+			{
+				return (actionTable[currentStateId] && look_ahead && look_ahead.name && actionTable[currentStateId][look_ahead.name] ) ||
+					{
+						action: k.parser.tableAction.ERROR
+					};
+
+			};
+		})(table);
+	};
+
+	/* @method Parse an input
 	* @param {Lexer} lexer The lexer which will lexically analize the input
-	* @returns {ASTNode|false} The generated AST in case of sucess or false otherwise */
-	parser.prototype.parse = function(lexer) {
+	* @returns {ASTNode|Error} The generated AST in case of sucess or an error object otherwise */
+	parser.prototype.parse = function (lexer) {
 		//TODO TEST THIS!!!
+		//TODO DESCRIBE ERROR FORMAT!
 
 		var initialStackItem = new k.data.StackItem({
 				state: this.initialState
 			});
 		this.currentInput = lexer.getNext();
-		
-		if (this.currentInput.ERROR)
+
+		if (this.currentInput.error)
 		{
-			return false;
+			return {
+				error: true,
+				type: k.parser.errorType.LEXER_NOTOKEN,
+				description: 'Invalid string to token. There were no valid next token',
+				line: this.currentInput.line,
+				character: this.currentInput.character,
+				extra: this.currentInput
+			};
 		}
 		this.stack.push(initialStackItem);
 
 		return this._parse(lexer);
 	};
 
-	/* @function Internal method to Parse an input. This method will loop through input analizyng the Goto and Action tables
+	/* @method Internal method to Parse an input. This method will loop through input analizyng the Goto and Action tables
 	* @param {Lexer} lexer The lexer which will lexically analize the input
-	* @returns {ASTNode|false} The generated AST in case of success or false otherwise */
+	* @returns {ASTNode|Error} The generated AST in case of success or an error object otherwise */
 	parser.prototype._parse = function(lexer) {
 		var stateToGo,
 			actionToDo,
 			lastItem = this.stack[this.stack.length-1];
-			
+
 		/*
-		Basic Functionality: 
+		Basic Functionality:
 		Create an state, ask for an action todo based on the symbol lookAhead an the current state
 			if SHIFT, as we have already created the state we just update our current state
 			if ERROR, finish execution
@@ -3437,19 +3913,42 @@ var Parser = k.parser.Parser = (function() {
 
 		do {
 			//Action
-			actionToDo = this.actionTable(lastItem.state.getIdentity(), this.currentInput.terminal);
-			
+			actionToDo = this.actionTableFn(lastItem.state.getIdentity(), this.currentInput.terminal);
+
 			if (actionToDo.action === k.parser.tableAction.ERROR)
 			{
-				//TODO Think how to express an error o description or give some details about what happend
-				return false;
-			} 
+				return {
+					error: true,
+					type: k.parser.errorType.PARSER_NOCONTINUATION,
+					description: 'Invalid lookAhead. The current state does not allow the current lookAhead',
+					line: this.currentInput.line,
+					character: this.currentInput.character,
+					extra: {
+						terminal: this.currentInput.terminal,
+						string: this.currentInput.string,
+						validLookAhead: this._getExpectedLookAhead(lastItem.state.getIdentity())
+					}
+				};
+			}
 			else if (actionToDo.action === k.parser.tableAction.SHIFT)
 			{
 				lastItem.symbol = this.currentInput.terminal;
 				lastItem.currentValue = this.currentInput.string;
 				lastItem.stringValue = this.currentInput.string;
 				this.currentInput = lexer.getNext();
+
+				if (this.currentInput.error)
+				{
+					return {
+						error: true,
+						type: k.parser.errorType.LEXER_NOTOKEN,
+						description: 'Invalid string to token. There were no valid next token',
+						line: this.currentInput.line,
+						character: this.currentInput.character,
+						extra: this.currentInput
+					};
+				}
+
 			}
 			else if (actionToDo.action === k.parser.tableAction.REDUCE)
 			{
@@ -3467,7 +3966,18 @@ var Parser = k.parser.Parser = (function() {
 			stateToGo = this.gotoTable[lastItem.state.getIdentity()][lastItem.symbol];
 			if (!stateToGo)
 			{
-				return false; //The input string is not valid!
+				//The input string is not valid!, there are not valid movement in the goto table
+				return {
+					error: true,
+					type: k.parser.errorType.PARSER_NOMOVEMENT,
+					description: 'Invalid state to go. The is no valid next state',
+					line: this.currentInput.line,
+					character: this.currentInput.character,
+					extra: {
+						lastState: lastItem.state.getIdentity(),
+						lastSymbol: lastItem.symbol
+					}
+				};
 			}
 
 			this.stack.push(new k.data.StackItem({
@@ -3479,7 +3989,15 @@ var Parser = k.parser.Parser = (function() {
 		} while(true);
 	};
 
-	/* @function Internal method to apply a reduce action.
+	/* @method Internal method to return the list of valid token given certain state id. This is used to report errors when the look Ahead is not valid.
+	* @param {String} state_id Id the of state (row of the action table) to consult to
+	* @returns {Array<String>} List of valid look Ahead names, in this case terminal token names  */
+	parser.prototype._getExpectedLookAhead = function (state_id)
+	{
+		return k.utils.obj.keys(this.actionTable[state_id]);
+	};
+
+	/* @method Internal method to apply a reduce action.
 	* @param {Rule} actionToDo.rule The by which the reduce aciton will take place
 	* @returns {Object} The last item in the stack already updated */
 	parser.prototype._reduce = function (actionToDo)
@@ -3491,10 +4009,10 @@ var Parser = k.parser.Parser = (function() {
 			rule = actionToDo.rule,
 			isEMPTYRule = rule.tail.length === 1 && rule.tail[0].name === k.data.specialSymbol.EMPTY,
 			lastItem = this.stack[this.stack.length - 1];
-			
-		stackRange = isEMPTYRule ? 
+
+		stackRange = isEMPTYRule ?
 						//If the reduce rule is the empty one, there is no values to collect
-						[] : 
+						[] :
 						// Get the last n (rule length) elements of the stack ignoring the last one, which is just there for the previous GoTo Action.
 						this.stack.slice(-1 * (rule.tail.length + 1), this.stack.length - 1);
 		reduceFunctionParameters.values = k.utils.obj.map(stackRange, function (stackItem)
@@ -3504,22 +4022,22 @@ var Parser = k.parser.Parser = (function() {
 		reduceFunctionParameters.rule = rule;
 
 		//Shrink stack based on the reduce rule
-		this.stack = isEMPTYRule ? 
-						//Based on the Basic Functionality the last stack item used by the empty rule is already there and no item is require to be removed 
+		this.stack = isEMPTYRule ?
+						//Based on the Basic Functionality the last stack item used by the empty rule is already there and no item is require to be removed
 						this.stack :
 						this.stack.slice(0, -1 * rule.tail.length);
 		//Update last stack item
 		lastItem = this.stack[this.stack.length - 1];
 		lastItem.symbol = rule.head;
 		lastItem.currentValue = k.utils.obj.isFunction(rule.reduceFunc) ? rule.reduceFunc.call(this, reduceFunctionParameters) : lastItem.symbol;
-		
-		
+
+
 		// Update/Generate AST
 		subASTNodes = k.utils.obj.map(stackRange, function (stackItem)
 		{
 			return stackItem.AST || stackItem.stringValue;
 		});
-		
+
 		newASTNode = new k.data.ASTNode({
 			nodes: subASTNodes,
 			rule: rule,
@@ -3550,17 +4068,19 @@ var parserCreator = k.parser.parserCreator = (function () {
 	{
 	};
 
-	/* @function Helper method to instanciate a new parser and a lexer
+	/* @method Helper method to instanciate a new parser and a lexer
 	* @param {Grammar} options.grammar The grammar used to generate the parser
 	* @param {AutomataLRGeneratorBase} options.automataGenerator Optional class used to generate the automata. If not specified LR0 will be used
 	* @param {String} options.strInput Optional String to be processed
-	* @returns {Object} An object with two properties, parser and lexer */
+	* @returns {Object} An object with two properties, parser and lexer.
+	* {Parser} result.parser Parser instance
+	* {Lexer} result.lexer Lexer instance */
 	creator.create = function (options)
 	{
 		options = k.utils.obj.extend({}, {
 			automataGenerator: k.parser.AutomataLALR1Generator
 		}, options || {});
-		
+
 		var	grammar = options.grammar,
 			automataGenerator = new options.automataGenerator({
 				grammar: grammar
@@ -3573,11 +4093,12 @@ var parserCreator = k.parser.parserCreator = (function () {
 			}),
 			lexer = new k.lexer.Lexer({
 				grammar: grammar,
-				stream: options.strInput
+				stream: options.strInput,
+				usePriorities: options.lexer && options.lexer.usePriorities,
+				useMultipleMatching: options.lexer && options.lexer.useMultipleMatching
 			}),
 			parser = new k.parser.Parser({
 				gotoTable: gotoTable,
-				grammar: grammar,
 				actionTable: actionTable,
 				initialState: automata.initialStateAccessor()
 			});

@@ -3,7 +3,7 @@ $(document).ready(function()
 {
     'use strict';
 
-    var grammar = jsGrammar(kappa),//sampleGrammarsFunction(kappa).arithmetic.g, //aPlusb.g,
+    var grammar = /*jsGrammar(kappa),*/ sampleGrammars.aPlusb.g, //aPlusb.g,
             automataGenerator = new kappa.parser.AutomataLALR1Generator({
                 grammar: grammar
             }),
@@ -57,6 +57,7 @@ $(document).ready(function()
 
         // var gotoTable = automataGenerator.generateGOTOTable(automata);
         // var foo = gotoTable.toString();
-        jQuery('#grammarShower').html(escapeHtml(grammar.toString()).replace(/\n/g,'<br/>'));
+        var stats = grammar.toString() + '\n\n\n'+ automata.toString();
+        jQuery('#grammarShower').html(escapeHtml(stats).replace(/\n/g,'<br/>'));
 
 });

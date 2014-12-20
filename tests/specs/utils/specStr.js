@@ -182,4 +182,46 @@ describe('String Utils', function()
 			expect(k.utils.str.tabs(true)).toEqual('	');
 		});
 	});
+
+	describe('getIndicesOf', function ()
+	{
+		it('should return an empty array if there is not matches', function ()
+		{
+			var result = k.utils.str.getIndicesOf('Hi elevator, and elegant elephant, how are you?', 'wrong');
+
+			expect(result).toEqual([]);
+
+			result = k.utils.str.getIndicesOf('', 'wrong');
+
+			expect(result).toEqual([]);
+		});
+
+		it('should return the index of all maches', function ()
+		{
+			var result = k.utils.str.getIndicesOf('el', 'Hi elevator, and elegant elephant, how are you?');
+
+			expect(result).toEqual([3, 17, 25]);
+		});
+
+		it('should return all matches ignoring caseSensitive by default', function ()
+		{
+			var result = k.utils.str.getIndicesOf('el', 'Hi elevator, and eLegant Elephant, how are you?');
+
+			expect(result).toEqual([3, 17, 25]);
+		});
+
+		it('should take into accoiunt case sensitive if specified', function ()
+		{
+			var result = k.utils.str.getIndicesOf('el', 'Hi elevator, and eLegant Elephant, how are you?', true);
+
+			expect(result).toEqual([3]);
+		});
+
+		it('should return an empty array if the string to search in if not valid', function ()
+		{
+			var result = k.utils.str.getIndicesOf(false, 'wrong');
+
+			expect(result).toEqual([]);
+		});
+	});
 });

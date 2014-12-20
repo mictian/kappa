@@ -36,7 +36,7 @@ var ConflictResolver = k.parser.ConflictResolver = (function () {
 		this.order = this.order || 9999;
 	};
 
-	/* @function Resolve a conflict
+	/* @method Resolve a conflict
 	* This method main idea is that sub-clases override it and implement the real logic. By defaukt it should return false.
 	* @param {Automata} automata Automata containing the state tothat is being validated.
 	* @param {State} state State that contains the conflict.
@@ -49,10 +49,10 @@ var ConflictResolver = k.parser.ConflictResolver = (function () {
 		return  k.utils.obj.isFunction(this.resolveFnc) ? this.resolveFnc(automata, state, itemRule1, itemRule2) : false;
 	};
 
-	/* @function Generate the default list of resolvers. These are:
+	/* @method Generate the default list of resolvers. These are:
 		Shift/Reduce Resolver: Precendence
 		Shift/Reduce Resolver: Associativity
-	* @returns {[ConflictResolver]} List of the default (wide-app) Conflict Resolvers. */
+	* @returns {Array<ConflictResolver>} List of the default (wide-app) Conflict Resolvers. */
 	conflictResolver.getDefaultResolvers = function ()
 	{
 		return [

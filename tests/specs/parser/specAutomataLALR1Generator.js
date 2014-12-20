@@ -331,7 +331,7 @@ describe('Automata LALR(1) Generator', function ()
 				'1(0)':['EOF'],
 				'2(0)':['EOF','DIV'],
 				'3(0)':['EOF','DIV'],
-				'5(0)':['EOF']
+				'5(0)':['EOF','DIV']
 			});
 			validateState(states, '1(1)2(1)4(0)', 3,
 			{
@@ -342,7 +342,7 @@ describe('Automata LALR(1) Generator', function ()
 			validateState(states, '2(2)5(0)', 2,
 			{
 				'2(2)':['EOF', 'DIV'],
-				'5(0)':['EOF']
+				'5(0)':['EOF', 'DIV']
 			});
 			validateState(states, '2(3)', 1,
 			{
@@ -358,7 +358,7 @@ describe('Automata LALR(1) Generator', function ()
 			});
 			validateState(states, '5(1)', 1,
 			{
-				'5(1)':['EOF']
+				'5(1)':['EOF','DIV']
 			});
 			validateState(states, '0(1)', 1,
 			{
@@ -389,34 +389,34 @@ describe('Automata LALR(1) Generator', function ()
 				'1(0)':['EOF'],
 				'2(0)':['EOF','DIFF'],
 				'3(0)':['EOF','DIFF'],
-				'4(0)':['EOF'],
-				'5(0)':['EOF'],
+				'4(0)':['EOF','DIFF'],
+				'5(0)':['EOF','DIFF'],
 				'6(0)':['NUMBER','OPAREN'],
 			});
 			validateState(states, '2(0)3(0)4(0)5(1)5(0)6(1)6(0)', 7,
 			{
 				'2(0)':['CPAREN', 'DIFF'],
 				'3(0)':['CPAREN', 'DIFF'],
-				'4(0)':['CPAREN'],
-				'5(0)':['CPAREN'],
-				'5(1)':['CPAREN', 'EOF'],
+				'4(0)':['CPAREN', 'DIFF'],
+				'5(0)':['CPAREN', 'DIFF'],
+				'5(1)':['CPAREN', 'EOF', 'DIFF'],
 				'6(1)':['NUMBER', 'OPAREN'],
 				'6(0)':['NUMBER', 'OPAREN']
 			});
 			validateState(states, '2(2)4(0)5(0)6(0)', 4,
 			{
 				'2(2)':['EOF','DIFF','CPAREN'],
-				'4(0)':['EOF','CPAREN'],
-				'5(0)':['EOF','CPAREN'],
+				'4(0)':['EOF','DIFF','CPAREN'],
+				'5(0)':['EOF','DIFF','CPAREN'],
 				'6(0)':['NUMBER','OPAREN']
 			});
 
 			validateState(states, '2(1)5(2)7(0)8(0)', 4,
 			{
 				'2(1)':['CPAREN','DIFF'],
-				'5(2)':['EOF', 'CPAREN'],
+				'5(2)':['EOF', 'DIFF', 'CPAREN'],
 				'8(0)':['NUMBER', 'OPAREN'],
-				'7(0)':['EOF']
+				'7(0)':['EOF','DIFF','CPAREN']
 			});
 			validateState(states, '1(1)2(1)8(0)', 3,
 			{
@@ -426,8 +426,8 @@ describe('Automata LALR(1) Generator', function ()
 			});
 			validateState(states, '5(3)7(1)', 2,
 			{
-				'5(3)':['EOF', 'CPAREN'],
-				'7(1)':['EOF']
+				'5(3)':['EOF', 'DIFF', 'CPAREN'],
+				'7(1)':['EOF', 'DIFF', 'CPAREN']
 			});
 			validateState(states, '2(3)', 1,
 			{
@@ -439,7 +439,7 @@ describe('Automata LALR(1) Generator', function ()
 			});
 			validateState(states, '4(1)', 1,
 			{
-				'4(1)':['EOF','CPAREN']
+				'4(1)':['EOF','CPAREN','DIFF']
 			});
 			validateState(states, '8(1)', 1,
 			{
@@ -571,8 +571,8 @@ describe('Automata LALR(1) Generator', function ()
 				'1(0)':['EOF'],
 				'2(0)':['EOF', 'DIFF'],
 				'3(0)':['EOF', 'DIFF'],
-				'4(0)':['EOF'],
-				'5(0)':['EOF']
+				'4(0)':['EOF', 'DIFF'],
+				'5(0)':['EOF', 'DIFF']
 			});
 			validateState(states, '0(1)', 1,
 			{
@@ -589,26 +589,26 @@ describe('Automata LALR(1) Generator', function ()
 			});
 			validateState(states, '4(1)', 1,
 			{
-				'4(1)': ['EOF', 'CPAREN']
+				'4(1)': ['EOF', 'DIFF', 'CPAREN']
 			});
 			validateState(states, '2(0)3(0)4(0)5(1)5(0)', 5,
 			{
-				'5(1)': ['EOF', 'CPAREN'],
+				'5(1)': ['EOF', 'DIFF', 'CPAREN'],
 				'2(0)': ['CPAREN', 'DIFF'],
 				'3(0)': ['CPAREN', 'DIFF'],
-				'4(0)': ['CPAREN'],
-				'5(0)': ['CPAREN']
+				'4(0)': ['CPAREN', 'DIFF'],
+				'5(0)': ['CPAREN', 'DIFF']
 			});
 			validateState(states, '2(2)4(0)5(0)', 3,
 			{
 				'2(2)': ['EOF', 'CPAREN', 'DIFF'],
-				'4(0)': ['EOF', 'CPAREN'],
-				'5(0)': ['EOF', 'CPAREN']
+				'4(0)': ['EOF', 'CPAREN', 'DIFF'],
+				'5(0)': ['EOF', 'CPAREN', 'DIFF']
 			});
 			validateState(states, '2(1)5(2)', 2,
 			{
 				'2(1)': ['CPAREN', 'DIFF'],
-				'5(2)': ['EOF', 'CPAREN']
+				'5(2)': ['EOF', 'DIFF', 'CPAREN']
 			});
 			validateState(states, '2(3)', 1,
 			{
@@ -616,7 +616,7 @@ describe('Automata LALR(1) Generator', function ()
 			});
 			validateState(states, '5(3)', 1,
 			{
-				'5(3)': ['EOF', 'CPAREN']
+				'5(3)': ['EOF','DIFF', 'CPAREN']
 			});
 			validateState(states, 'AcceptanceState', 1,
 			{
@@ -635,28 +635,28 @@ describe('Automata LALR(1) Generator', function ()
 				automata = ag.generateAutomata(),
 				actionTable = ag.generateACTIONTable(automata);
 
-			expect(actionTable).toEqual(jasmine.any(Function));
+			expect(actionTable).toEqual(jasmine.any(Object));
 
-			expect(actionTable('0(0)1(0)2(0)', {name:'A_LET'})).toEqual({action: k.parser.tableAction.SHIFT});
+			expect(actionTable['0(0)1(0)2(0)']['A_LET']).toEqual({action: k.parser.tableAction.SHIFT});
 
-			expect(actionTable('0(0)1(0)2(0)', {name:''})).toEqual({action: k.parser.tableAction.ERROR});
-			expect(actionTable('0(0)1(0)2(0)', {name:'fake_value'})).toEqual({action: k.parser.tableAction.ERROR});
-			expect(actionTable('0(0)1(0)2(0)', {name:'_A_LET'})).toEqual({action: k.parser.tableAction.ERROR});
+			expect(actionTable['0(0)1(0)2(0)']['']).toBeUndefined();
+			expect(actionTable['0(0)1(0)2(0)']['fake_value']).toBeUndefined();
+			expect(actionTable['0(0)1(0)2(0)']['_A_LET']).toBeUndefined();
 
-			expect(actionTable('1(1)1(0)2(0)', {name:'A_LET'})).toEqual({action: k.parser.tableAction.SHIFT});
-			expect(actionTable('1(1)1(0)2(0)', {name:'A_LET'})).toEqual({action: k.parser.tableAction.SHIFT});
+			expect(actionTable['1(1)1(0)2(0)']['A_LET']).toEqual({action: k.parser.tableAction.SHIFT});
+			expect(actionTable['1(1)1(0)2(0)']['A_LET']).toEqual({action: k.parser.tableAction.SHIFT});
 
-			expect(actionTable('0(1)', {name:'EOF'})).toEqual({action: k.parser.tableAction.SHIFT});
+			expect(actionTable['0(1)']['EOF']).toEqual({action: k.parser.tableAction.SHIFT});
 
-			expect(actionTable('2(1)', {name:'EOF'}).action).toEqual(k.parser.tableAction.REDUCE);
-			expect(actionTable('2(1)', {name:'EOF'}).rule.name).toEqual(sampleGrammars.aPlusb.A2.name);
+			expect(actionTable['2(1)']['EOF'].action).toEqual(k.parser.tableAction.REDUCE);
+			expect(actionTable['2(1)']['EOF'].rule.name).toEqual(sampleGrammars.aPlusb.A2.name);
 
-			expect(actionTable('2(1)', {name:'A_LET'}).action).toEqual(k.parser.tableAction.ERROR);
+			expect(actionTable['2(1)']['A_LET']).toBeUndefined();
 
-			expect(actionTable('1(2)', {name:'EOF'}).action).toEqual(k.parser.tableAction.REDUCE);
-			expect(actionTable('1(2)', {name:'EOF'}).rule.name).toEqual(sampleGrammars.aPlusb.A1.name);
+			expect(actionTable['1(2)']['EOF'].action).toEqual(k.parser.tableAction.REDUCE);
+			expect(actionTable['1(2)']['EOF'].rule.name).toEqual(sampleGrammars.aPlusb.A1.name);
 
-			expect(actionTable('AcceptanceState', {name:'EOF'}).action).toEqual('ACCEPT');
+			expect(actionTable['AcceptanceState']['EOF'].action).toEqual('ACCEPT');
 		});
 
 		it('should return the expected action function (table) for the simple LR1 grammar num Diff Condenced', function ()
@@ -667,106 +667,106 @@ describe('Automata LALR(1) Generator', function ()
 				automata = ag.generateAutomata(),
 				actionTable = ag.generateACTIONTable(automata);
 
-			expect(actionTable).toEqual(jasmine.any(Function));
+			expect(actionTable).toEqual(jasmine.any(Object));
 
-			expect(actionTable('0(0)1(0)2(0)3(0)4(0)5(0)', {name:'NUMBER'}).action).toEqual(k.parser.tableAction.SHIFT);
-			expect(actionTable('0(0)1(0)2(0)3(0)4(0)5(0)', {name:'OPAREN'}).action).toEqual(k.parser.tableAction.SHIFT);
+			expect(actionTable['0(0)1(0)2(0)3(0)4(0)5(0)']['NUMBER'].action).toEqual(k.parser.tableAction.SHIFT);
+			expect(actionTable['0(0)1(0)2(0)3(0)4(0)5(0)']['OPAREN'].action).toEqual(k.parser.tableAction.SHIFT);
 
-			expect(actionTable('0(0)1(0)2(0)3(0)4(0)5(0)', {name:'CPAREN'}).action).toEqual(k.parser.tableAction.ERROR);
-			expect(actionTable('0(0)1(0)2(0)3(0)4(0)5(0)', {name:'EOF'}).action).toEqual(k.parser.tableAction.ERROR);
-			expect(actionTable('0(0)1(0)2(0)3(0)4(0)5(0)', {name:'DIFF'}).action).toEqual(k.parser.tableAction.ERROR);
-
-
-			expect(actionTable('0(1)', {name:'EOF'}).action).toEqual(k.parser.tableAction.SHIFT);
-
-			expect(actionTable('0(1)', {name:'CPAREN'}).action).toEqual( k.parser.tableAction.ERROR);
-			expect(actionTable('0(1)', {name:'OPAREN'}).action).toEqual( k.parser.tableAction.ERROR);
-			expect(actionTable('0(1)', {name:'DIFF'}).action).toEqual(k.parser.tableAction.ERROR);
-			expect(actionTable('0(1)', {name:'NUMBER'}).action).toEqual(k.parser.tableAction.ERROR);
+			expect(actionTable['0(0)1(0)2(0)3(0)4(0)5(0)']['CPAREN']).toBeUndefined();
+			expect(actionTable['0(0)1(0)2(0)3(0)4(0)5(0)']['EOF']).toBeUndefined();
+			expect(actionTable['0(0)1(0)2(0)3(0)4(0)5(0)']['DIFF']).toBeUndefined();
 
 
-			expect(actionTable('1(1)2(1)', {name:'DIFF'}).action).toEqual(k.parser.tableAction.SHIFT);
-			expect(actionTable('1(1)2(1)', {name:'EOF'}).action).toEqual(k.parser.tableAction.REDUCE);
-			expect(actionTable('1(1)2(1)', {name:'EOF'}).rule.name).toEqual(sampleGrammars.numDiffCondenced.S.name);
+			expect(actionTable['0(1)']['EOF'].action).toEqual(k.parser.tableAction.SHIFT);
 
-			expect(actionTable('1(1)2(1)', {name:'OPAREN'}).action).toEqual(k.parser.tableAction.ERROR);
-			expect(actionTable('1(1)2(1)', {name:'CPAREN'}).action).toEqual(k.parser.tableAction.ERROR);
-			expect(actionTable('1(1)2(1)', {name:'NUMBER'}).action).toEqual(k.parser.tableAction.ERROR);
-
-
-			expect(actionTable('2(0)3(0)4(0)5(1)5(0)', {name:'NUMBER'}).action).toEqual(k.parser.tableAction.SHIFT);
-			expect(actionTable('2(0)3(0)4(0)5(1)5(0)', {name:'OPAREN'}).action).toEqual(k.parser.tableAction.SHIFT);
-
-			expect(actionTable('2(0)3(0)4(0)5(1)5(0)', {name:'EOF'}).action).toEqual(k.parser.tableAction.ERROR);
-			expect(actionTable('2(0)3(0)4(0)5(1)5(0)', {name:'DIFF'}).action).toEqual(k.parser.tableAction.ERROR);
-			expect(actionTable('2(0)3(0)4(0)5(1)5(0)', {name:'CPAREN'}).action).toEqual(k.parser.tableAction.ERROR);
+			expect(actionTable['0(1)']['CPAREN']).toBeUndefined();
+			expect(actionTable['0(1)']['OPAREN']).toBeUndefined();
+			expect(actionTable['0(1)']['DIFF']).toBeUndefined();
+			expect(actionTable['0(1)']['NUMBER']).toBeUndefined();
 
 
-			expect(actionTable('2(1)5(2)', {name:'CPAREN'}).action).toEqual(k.parser.tableAction.SHIFT);
-			expect(actionTable('2(1)5(2)', {name:'DIFF'}).action).toEqual(k.parser.tableAction.SHIFT);
+			expect(actionTable['1(1)2(1)']['DIFF'].action).toEqual(k.parser.tableAction.SHIFT);
+			expect(actionTable['1(1)2(1)']['EOF'].action).toEqual(k.parser.tableAction.REDUCE);
+			expect(actionTable['1(1)2(1)']['EOF'].rule.name).toEqual(sampleGrammars.numDiffCondenced.S.name);
 
-			expect(actionTable('2(1)5(2)', {name:'EOF'}).action).toEqual(k.parser.tableAction.ERROR);
-			expect(actionTable('2(1)5(2)', {name:'OPAREN'}).action).toEqual(k.parser.tableAction.ERROR);
-			expect(actionTable('2(1)5(2)', {name:'NUMBER'}).action).toEqual(k.parser.tableAction.ERROR);
-
-
-			expect(actionTable('2(2)4(0)5(0)', {name:'NUMBER'}).action).toEqual(k.parser.tableAction.SHIFT);
-			expect(actionTable('2(2)4(0)5(0)', {name:'OPAREN'}).action).toEqual(k.parser.tableAction.SHIFT);
-
-			expect(actionTable('2(2)4(0)5(0)', {name:'CPAREN'}).action).toEqual(k.parser.tableAction.ERROR);
-			expect(actionTable('2(2)4(0)5(0)', {name:'EOF'}).action).toEqual(k.parser.tableAction.ERROR);
-			expect(actionTable('2(2)4(0)5(0)', {name:'DIFF'}).action).toEqual(k.parser.tableAction.ERROR);
+			expect(actionTable['1(1)2(1)']['OPAREN']).toBeUndefined();
+			expect(actionTable['1(1)2(1)']['CPAREN']).toBeUndefined();
+			expect(actionTable['1(1)2(1)']['NUMBER']).toBeUndefined();
 
 
-			expect(actionTable('2(3)', {name:'DIFF'}).action).toEqual(k.parser.tableAction.REDUCE);
-			expect(actionTable('2(3)', {name:'DIFF'}).rule.name).toEqual(sampleGrammars.numDiffCondenced.E1.name);
-			expect(actionTable('2(3)', {name:'EOF'}).action).toEqual(k.parser.tableAction.REDUCE);
-			expect(actionTable('2(3)', {name:'EOF'}).rule.name).toEqual(sampleGrammars.numDiffCondenced.E1.name);
-			expect(actionTable('2(3)', {name:'CPAREN'}).action).toEqual(k.parser.tableAction.REDUCE);
-			expect(actionTable('2(3)', {name:'CPAREN'}).rule.name).toEqual(sampleGrammars.numDiffCondenced.E1.name);
+			expect(actionTable['2(0)3(0)4(0)5(1)5(0)']['NUMBER'].action).toEqual(k.parser.tableAction.SHIFT);
+			expect(actionTable['2(0)3(0)4(0)5(1)5(0)']['OPAREN'].action).toEqual(k.parser.tableAction.SHIFT);
 
-			expect(actionTable('2(3)', {name:'OPAREN'}).action).toEqual(k.parser.tableAction.ERROR);
-			expect(actionTable('2(3)', {name:'NUMBER'}).action).toEqual(k.parser.tableAction.ERROR);
+			expect(actionTable['2(0)3(0)4(0)5(1)5(0)']['EOF']).toBeUndefined();
+			expect(actionTable['2(0)3(0)4(0)5(1)5(0)']['DIFF']).toBeUndefined();
+			expect(actionTable['2(0)3(0)4(0)5(1)5(0)']['CPAREN']).toBeUndefined();
 
 
-			expect(actionTable('3(1)', {name:'CPAREN'}).action).toEqual(k.parser.tableAction.REDUCE);
-			expect(actionTable('3(1)', {name:'CPAREN'}).rule.name).toEqual(sampleGrammars.numDiffCondenced.E2.name);
-			expect(actionTable('3(1)', {name:'DIFF'}).action).toEqual(k.parser.tableAction.REDUCE);
-			expect(actionTable('3(1)', {name:'DIFF'}).rule.name).toEqual(sampleGrammars.numDiffCondenced.E2.name);
-			expect(actionTable('3(1)', {name:'EOF'}).action).toEqual(k.parser.tableAction.REDUCE);
-			expect(actionTable('3(1)', {name:'EOF'}).rule.name).toEqual(sampleGrammars.numDiffCondenced.E2.name);
+			expect(actionTable['2(1)5(2)']['CPAREN'].action).toEqual(k.parser.tableAction.SHIFT);
+			expect(actionTable['2(1)5(2)']['DIFF'].action).toEqual(k.parser.tableAction.SHIFT);
 
-			expect(actionTable('3(1)', {name:'NUMBER'}).action).toEqual(k.parser.tableAction.ERROR);
-			expect(actionTable('3(1)', {name:'OPAREN'}).action).toEqual(k.parser.tableAction.ERROR);
+			expect(actionTable['2(1)5(2)']['EOF']).toBeUndefined();
+			expect(actionTable['2(1)5(2)']['OPAREN']).toBeUndefined();
+			expect(actionTable['2(1)5(2)']['NUMBER']).toBeUndefined();
 
 
-			expect(actionTable('4(1)', {name:'CPAREN'}).action).toEqual(k.parser.tableAction.REDUCE);
-			expect(actionTable('4(1)', {name:'CPAREN'}).rule.name).toEqual(sampleGrammars.numDiffCondenced.T1.name);
-			expect(actionTable('4(1)', {name:'EOF'}).action).toEqual(k.parser.tableAction.REDUCE);
-			expect(actionTable('4(1)', {name:'EOF'}).rule.name).toEqual(sampleGrammars.numDiffCondenced.T1.name);
+			expect(actionTable['2(2)4(0)5(0)']['NUMBER'].action).toEqual(k.parser.tableAction.SHIFT);
+			expect(actionTable['2(2)4(0)5(0)']['OPAREN'].action).toEqual(k.parser.tableAction.SHIFT);
 
-			expect(actionTable('4(1)', {name:'OPAREN'}).action).toEqual(k.parser.tableAction.ERROR);
-			expect(actionTable('4(1)', {name:'DIFF'}).action).toEqual(k.parser.tableAction.ERROR);
-			expect(actionTable('4(1)', {name:'NUM'}).action).toEqual(k.parser.tableAction.ERROR);
+			expect(actionTable['2(2)4(0)5(0)']['CPAREN']).toBeUndefined();
+			expect(actionTable['2(2)4(0)5(0)']['EOF']).toBeUndefined();
+			expect(actionTable['2(2)4(0)5(0)']['DIFF']).toBeUndefined();
 
 
-			expect(actionTable('5(3)', {name:'EOF'}).action).toEqual(k.parser.tableAction.REDUCE);
-			expect(actionTable('5(3)', {name:'EOF'}).rule.name).toEqual(sampleGrammars.numDiffCondenced.T2.name);
-			expect(actionTable('5(3)', {name:'CPAREN'}).action).toEqual(k.parser.tableAction.REDUCE);
-			expect(actionTable('5(3)', {name:'CPAREN'}).rule.name).toEqual(sampleGrammars.numDiffCondenced.T2.name);
+			expect(actionTable['2(3)']['DIFF'].action).toEqual(k.parser.tableAction.REDUCE);
+			expect(actionTable['2(3)']['DIFF'].rule.name).toEqual(sampleGrammars.numDiffCondenced.E1.name);
+			expect(actionTable['2(3)']['EOF'].action).toEqual(k.parser.tableAction.REDUCE);
+			expect(actionTable['2(3)']['EOF'].rule.name).toEqual(sampleGrammars.numDiffCondenced.E1.name);
+			expect(actionTable['2(3)']['CPAREN'].action).toEqual(k.parser.tableAction.REDUCE);
+			expect(actionTable['2(3)']['CPAREN'].rule.name).toEqual(sampleGrammars.numDiffCondenced.E1.name);
 
-			expect(actionTable('5(3)', {name:'NUM'}).action).toEqual(k.parser.tableAction.ERROR);
-			expect(actionTable('5(3)', {name:'OPAREN'}).action).toEqual(k.parser.tableAction.ERROR);
-			expect(actionTable('5(3)', {name:'DIFF'}).action).toEqual(k.parser.tableAction.ERROR);
+			expect(actionTable['2(3)']['OPAREN']).toBeUndefined();
+			expect(actionTable['2(3)']['NUMBER']).toBeUndefined();
 
 
-			expect(actionTable(k.data.State.constants.AcceptanceStateName, {name:'EOF'}).action).toEqual(k.parser.tableAction.ACCEPT);
-			expect(actionTable(k.data.State.constants.AcceptanceStateName, {name:'EOF'}).rule.name).toEqual(k.data.Grammar.constants.AugmentedRuleName);
+			expect(actionTable['3(1)']['CPAREN'].action).toEqual(k.parser.tableAction.REDUCE);
+			expect(actionTable['3(1)']['CPAREN'].rule.name).toEqual(sampleGrammars.numDiffCondenced.E2.name);
+			expect(actionTable['3(1)']['DIFF'].action).toEqual(k.parser.tableAction.REDUCE);
+			expect(actionTable['3(1)']['DIFF'].rule.name).toEqual(sampleGrammars.numDiffCondenced.E2.name);
+			expect(actionTable['3(1)']['EOF'].action).toEqual(k.parser.tableAction.REDUCE);
+			expect(actionTable['3(1)']['EOF'].rule.name).toEqual(sampleGrammars.numDiffCondenced.E2.name);
 
-			expect(actionTable(k.data.State.constants.AcceptanceStateName, {name:'OPAREN'}).action).toEqual(k.parser.tableAction.ERROR);
-			expect(actionTable(k.data.State.constants.AcceptanceStateName, {name:'CPAREN'}).action).toEqual(k.parser.tableAction.ERROR);
-			expect(actionTable(k.data.State.constants.AcceptanceStateName, {name:'NUMBER'}).action).toEqual(k.parser.tableAction.ERROR);
-			expect(actionTable(k.data.State.constants.AcceptanceStateName, {name:'DIFF'}).action).toEqual(k.parser.tableAction.ERROR);
+			expect(actionTable['3(1)']['NUMBER']).toBeUndefined();
+			expect(actionTable['3(1)']['OPAREN']).toBeUndefined();
+
+
+			expect(actionTable['4(1)']['CPAREN'].action).toEqual(k.parser.tableAction.REDUCE);
+			expect(actionTable['4(1)']['CPAREN'].rule.name).toEqual(sampleGrammars.numDiffCondenced.T1.name);
+			expect(actionTable['4(1)']['EOF'].action).toEqual(k.parser.tableAction.REDUCE);
+			expect(actionTable['4(1)']['EOF'].rule.name).toEqual(sampleGrammars.numDiffCondenced.T1.name);
+
+			expect(actionTable['4(1)']['OPAREN']).toBeUndefined();
+			expect(actionTable['4(1)']['DIFF'].action).toEqual(k.parser.tableAction.REDUCE);
+			expect(actionTable['4(1)']['NUM']).toBeUndefined();
+
+
+			expect(actionTable['5(3)']['EOF'].action).toEqual(k.parser.tableAction.REDUCE);
+			expect(actionTable['5(3)']['EOF'].rule.name).toEqual(sampleGrammars.numDiffCondenced.T2.name);
+			expect(actionTable['5(3)']['CPAREN'].action).toEqual(k.parser.tableAction.REDUCE);
+			expect(actionTable['5(3)']['CPAREN'].rule.name).toEqual(sampleGrammars.numDiffCondenced.T2.name);
+
+			expect(actionTable['5(3)']['NUM']).toBeUndefined();
+			expect(actionTable['5(3)']['OPAREN']).toBeUndefined();
+			expect(actionTable['5(3)']['DIFF'].action).toEqual(k.parser.tableAction.REDUCE);
+
+
+			expect(actionTable[k.data.State.constants.AcceptanceStateName]['EOF'].action).toEqual(k.parser.tableAction.ACCEPT);
+			expect(actionTable[k.data.State.constants.AcceptanceStateName]['EOF'].rule.name).toEqual(k.data.Grammar.constants.AugmentedRuleName);
+
+			expect(actionTable[k.data.State.constants.AcceptanceStateName]['OPAREN']).toBeUndefined();
+			expect(actionTable[k.data.State.constants.AcceptanceStateName]['CPAREN']).toBeUndefined();
+			expect(actionTable[k.data.State.constants.AcceptanceStateName]['NUMBER']).toBeUndefined();
+			expect(actionTable[k.data.State.constants.AcceptanceStateName]['DIFF']).toBeUndefined();
 		});
 
 	});

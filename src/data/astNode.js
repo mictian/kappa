@@ -27,7 +27,7 @@ k.data.ASTNode = (function(_super) {
 		k.utils.obj.defineProperty(this, 'symbol');
 	}
 
-	/* @function Generates a string representation of the current AST Node
+	/* @method Generates a string representation of the current AST Node
 	 * @param {Boolean} options.deep True in case to print the entire node and its children
 	 * @returns {String} formatted string */
 	astNode.prototype.toString = function(options)
@@ -46,7 +46,7 @@ k.data.ASTNode = (function(_super) {
 		return this._toCurrentString();
 	};
 	
-	/* @function Generates a string representation of the current AST Node
+	/* @method Generates a string representation of the current AST Node
 	 * @returns {String} formatted string */
 	astNode.prototype._toCurrentString = function ()
 	{

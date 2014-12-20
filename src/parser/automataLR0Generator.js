@@ -17,16 +17,16 @@ k.parser.AutomataLR0Generator = (function(_super) {
 		_super.apply(this, arguments);
 	}
 
-	/* @function Override super method to return the list of item rules that has as its head the current symbol, without taking into account the lookAhead
+	/* @method Override super method to return the list of item rules that has as its head the current symbol, without taking into account the lookAhead
 	* @param {ItemRule} currentItem The current item rule from which the new item rule are being generated.
 	* @param {Symbol} currentSymbol Is the symbol used to find new item rules.
-	* @returns {[ItemRule]} Array of item rule ready to be part of the current processing state */
+	* @returns {Array<ItemRule>} Array of item rule ready to be part of the current processing state */
 	automataLR0Generator.prototype._newItemRulesForStateExpansion = function (currentItem, currentSymbol)
 	{
 		return k.data.ItemRule.newFromRules(this.grammar.getRulesFromNonTerminal(currentSymbol));
 	};
 
-	/* @function Generate the construction object used to initialize the new automata. Override the super method to indicate that te automata should NOT use lookahead
+	/* @method Generate the construction object used to initialize the new automata. Override the super method to indicate that te automata should NOT use lookahead
 	* @param {State} initialState State that only contains the items rules from the start symbol of the grammar. This is the initial state before being expanded.
 	* @returns {Object} Object containing all the options used to create the new automata */
 	automataLR0Generator.prototype._getNewAutomataOptions = function ()
@@ -37,8 +37,8 @@ k.parser.AutomataLR0Generator = (function(_super) {
 		return result;
 	};
 
-	/* @function Override super method to return the list of item rules that has as its head the start symbol of the grammar
-	* @returns {[ItemRule]} The initial list of item rule. */
+	/* @method Override super method to return the list of item rules that has as its head the start symbol of the grammar
+	* @returns {Array<ItemRule>} The initial list of item rule. */
 	automataLR0Generator.prototype._getInitialStateItemRules = function ()
 	{
 		return 	[new k.data.ItemRule({
@@ -47,7 +47,7 @@ k.parser.AutomataLR0Generator = (function(_super) {
 				})];
 	};
 
-	/* @function Given an automata returnes its ACTION Table.
+	/* @method Given an automata returnes its ACTION Table.
 	* @param {Automata} automata Automatma used as a base of the calculation
 	* @returns {Function} Function that given the a state id and a lookAhead returns the action to take */
 	automataLR0Generator.prototype.generateACTIONTable = function (automata)
@@ -94,7 +94,7 @@ k.parser.AutomataLR0Generator = (function(_super) {
 		})(table);
 	};
 
-	/* @function  Override super method to determine if the indicated state is valid or not.
+	/* @method  Override super method to determine if the indicated state is valid or not.
 	* @param {State} state State to validate
 	* @param {Boolean} options.considerLookAhead Indicate if the state should take into account look ahead to validate. Default: false
 	* @param {Automata} options.automata Optional automata instance used to pass to the conflict resolver in case there are conflict and resolvers.

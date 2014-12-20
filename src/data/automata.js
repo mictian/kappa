@@ -36,21 +36,21 @@ k.data.Automata = (function() {
 		}
 	};
 
-	/* @function Convert the current automata to its string representation
+	/* @method Convert the current automata to its string representation
 	* @returns {String} formatted string */
 	automata.prototype.toString = function ()
 	{
 		return this.states.join('\n');
 	};
 
-	/* @function Get the next unprocessed state
+	/* @method Get the next unprocessed state
 	* @returns {State} A State not processed yet if any or null otherwise */
 	automata.prototype.getNextState = function()
 	{
 		return this._unprocessedStates.splice(0,1)[0];
 	};
 
-	/* @function Set or get the initial state.
+	/* @method Set or get the initial state.
 	* @param {State} state If specified, set the initial state of the automata
 	* @returns {State} In case that none state is specifed returnes the initial state previously set */
 	automata.prototype.initialStateAccessor = function(state)
@@ -61,7 +61,7 @@ k.data.Automata = (function() {
 		this.initialState = state;
 	};
 
-	/* @function Add a new state into the automata controlling if it is duplicated or not. If the new state is duplicated we merge its look-ahead
+	/* @method Add a new state into the automata controlling if it is duplicated or not. If the new state is duplicated we merge its look-ahead
 	* @param {State} newState State to add
 	* @returns {State} The added state, if the state is duplicated returns the already created state */
 	automata.prototype.addState = function(newState)

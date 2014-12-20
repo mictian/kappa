@@ -18,7 +18,7 @@ k.parser.AutomataLALR1Generator = (function(_super)
 		_super.apply(this, arguments);
 	}
 
-	/* @function Override super method to return the list of item rules that has as its head the current symbol, TAKING into account the lookAhead
+	/* @method Override super method to return the list of item rules that has as its head the current symbol, TAKING into account the lookAhead
 	* @param {ItemRule} currentItem The current item rule from which the new item rule are being generated.
 	* @param {Symbol} currentSymbol Is the symbol used to find new item rules.
 	* @returns {[ItemRule]} Array of item rule ready to be part of the current processing state */
@@ -28,45 +28,52 @@ k.parser.AutomataLALR1Generator = (function(_super)
 		return k.data.ItemRule.newFromRules(this.grammar.getRulesFromNonTerminal(currentSymbol), lookAhead);
 	};
 
-	/* @function Gets the array of look-ahead for the particular item rule taking into account the dot location fo the specified item rule.
+	/* @method Gets the array of look-ahead for the particular item rule taking into account the dot location fo the specified item rule.
 	* @param {ItemRule} itemRule Item rule to find FIRST Set
-	* @returns {[Terminals]} First set for specified look ahead */
+	* @returns {Array<Terminals>} First set for specified look ahead */
 	automataLALR1Generator.prototype._getFirstSet = function (itemRule)
 	{
 		var symbolsToTraverse = itemRule.rule.tail.slice(itemRule.dotLocation + 1),
 			requestedFirstSet = [];
 
-		symbolsToTraverse = symbolsToTraverse.concat(itemRule.lookAhead);
+		//symbolsToTraverse = symbolsToTraverse.concat(itemRule.lookAhead);
 
-		k.utils.obj.find(symbolsToTraverse, function (symbolTraversed)
+		if (symbolsToTraverse.length)
 		{
-			if (symbolTraversed instanceof k.data.NonTerminal)
+			k.utils.obj.find(symbolsToTraverse, function (symbolTraversed)
 			{
-				requestedFirstSet = requestedFirstSet.concat(this.grammar.firstSetsByHeader[symbolTraversed.name]);
-				requestedFirstSet = k.utils.obj.uniq(requestedFirstSet, false, function (item) {return item.name;});
-				return !symbolTraversed.isNullable;
-			}
-			else if (symbolTraversed instanceof k.data.Terminal)
-			{
-				requestedFirstSet.push(symbolTraversed);
-				return true;
-			}
-			else if (symbolTraversed.isSpecial && symbolTraversed.name === k.data.specialSymbol.EOF)
-			{
-				requestedFirstSet.push(symbolTraversed);
-				return true;
-			}
-			else
-			{
-				throw new Error('Invalid Item Rule. Impossible calculate first set. Item Rule: ' + itemRule.toString());
-			}
+				if (symbolTraversed instanceof k.data.NonTerminal)
+				{
+					requestedFirstSet = requestedFirstSet.concat(this.grammar.firstSetsByHeader[symbolTraversed.name]);
+					requestedFirstSet = k.utils.obj.uniq(requestedFirstSet, false, function (item) {return item.name;});
+					return !symbolTraversed.isNullable;
+				}
+				else if (symbolTraversed instanceof k.data.Terminal)
+				{
+					requestedFirstSet.push(symbolTraversed);
+					return true;
+				}
+				else if (symbolTraversed.isSpecial && symbolTraversed.name === k.data.specialSymbol.EOF)
+				{
+					requestedFirstSet.push(symbolTraversed);
+					return true;
+				}
+				else
+				{
+					throw new Error('Invalid Item Rule. Impossible calculate first set. Item Rule: ' + itemRule.toString());
+				}
 
-		}, this);
+			}, this);
+		}
+		else
+		{
+			requestedFirstSet = itemRule.lookAhead;
+		}
 
 		return requestedFirstSet;
 	};
 
-	/* @function Generate the construction object used to initialize the new automata. Override the super method to indicate that te automata should DO use lookahead
+	/* @method Generate the construction object used to initialize the new automata. Override the super method to indicate that te automata should DO use lookahead
 	* @param {State} initialState State that only contains the items rules from the start symbol of the grammar. This is the initial state before being expanded.
 	* @returns {Object} Object containing all the options used to create the new automata */
 	automataLALR1Generator.prototype._getNewAutomataOptions = function ()
@@ -77,8 +84,8 @@ k.parser.AutomataLALR1Generator = (function(_super)
 		return result;
 	};
 
-	/* @function Override super method to return the list of item rules that has as its head the start symbol of the grammar, TAKING into account the lookAhead
-	* @returns {[ItemRule]} The initial list of item rule. */
+	/* @method Override super method to return the list of item rules that has as its head the start symbol of the grammar, TAKING into account the lookAhead
+	* @returns {Array<ItemRule>} The initial list of item rule. */
 	automataLALR1Generator.prototype._getInitialStateItemRules = function ()
 	{
 		return [new k.data.ItemRule({
@@ -87,7 +94,7 @@ k.parser.AutomataLALR1Generator = (function(_super)
 				})];
 	};
 
-	/* @function Given an automata returnes its ACTION Table.
+	/* @method Given an automata returnes its ACTION Table.
 	* @param {Automata} automata Automatma used as a base of the calculation
 	* @returns {Function} Function that given the a state id and a lookAhead returns the action to take */
 	automataLALR1Generator.prototype.generateACTIONTable = function (automata, options)
@@ -120,7 +127,6 @@ k.parser.AutomataLALR1Generator = (function(_super)
 					throw new Error('Impossible to generate Action Table. The following state is invalid. State: ' + state.getIdentity());
 				}
 
-
 				//Shift Items
 				k.utils.obj.each(stateItems.shiftItems, function (shiftItem)
 				{
@@ -144,21 +150,10 @@ k.parser.AutomataLALR1Generator = (function(_super)
 			}
 		}, this);
 
-
-		return (function (actionTable)
-		{
-			return function (currentStateId, look_ahead)
-			{
-				return (actionTable[currentStateId] && look_ahead && look_ahead.name && actionTable[currentStateId][look_ahead.name] ) ||
-					{
-						action: k.parser.tableAction.ERROR
-					};
-
-			};
-		})(table);
+		return table;
 	};
 
-	/* @function  Override super method to determine if the current state is valid or not.
+	/* @method  Override super method to determine if the current state is valid or not.
 	 * @param {Boolean} options.considerLookAhead Indicate if the state should take into account look ahead to validate. Default: false
 	 * @param {Automata} options.automata Optional automata instance used to pass to the conflict resolver in case there are conflict and resolvers.
 	 * @param {[ConflictResolver]} options.conflictResolvers List of conflict resolvers used to resolve possible conflict at the current state.
@@ -269,7 +264,7 @@ k.parser.AutomataLALR1Generator = (function(_super)
 		return true;
 	};
 
-	/* @function Generates the list of shift and reduce items that take part from the passed in state. Validating at the same time that none of these items are in conflict
+	/* @method Generates the list of shift and reduce items that take part from the passed in state. Validating at the same time that none of these items are in conflict
 		or that the conflicts are solvable.
 	 * @param {State} state State to extract form each of the reduce/shift item rules
 	 * @param {Boolean} options.considerLookAhead Indicate if the state should take into account look ahead to validate. If not the state will validate and generate the result as in a LR(0). Default: false

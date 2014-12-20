@@ -3,7 +3,7 @@ k.utils.obj = (function ()
 {
 	'use strict';
 	/*
-	* @func Util function used to apply "Inheritance"
+	* @function Util function used to apply "Inheritance"
 	*
 	* @param {Object} superType Object to inherit from
 	* @param {Object} subType Enhanced Object
@@ -26,7 +26,7 @@ k.utils.obj = (function ()
 	};
 
 	/*
-	* @func Util function used to define properties in objects, Common to define alias, insteas od using instance.options.property, used instance.property
+	* @function Util function used to define properties in objects, Common to define alias, insteas od using instance.options.property, used instance.property
 	* It is VERY IMPORTANT to notice that all propoerties are set and get from a property called options in the context object, unless getter and setter functions are specified
 	*
 	* @param {Object} ctx Object containing the options. Father object
@@ -57,7 +57,7 @@ k.utils.obj = (function ()
 	};
 
 	/*
-	* @func Util function to extend an object. This function accepts n arguments and the first one will be the same as the retuned one (the extended)
+	* @function Util function to extend an object. This function accepts n arguments and the first one will be the same as the retuned one (the extended)
 	* @param {Object} obj object to extend form
 	* @returns {Object} The initial object with the added properties form next arguments
 	*/
@@ -75,7 +75,7 @@ k.utils.obj = (function ()
 	};
 
 	/*
-	* @func Util function to clone OBJECTS by using JSON.parser/stringify (a deep clone)
+	* @function Util function to clone OBJECTS by using JSON.parser/stringify (a deep clone)
 	* @param {Object} obj object to clone
 	* @returns {Object} A copy of the passed in object
 	*/
@@ -85,7 +85,7 @@ k.utils.obj = (function ()
 	};
 
 	/*
-	* @func Util function to extend an object. This function accepts n arguments and the first one will be the same as the retuned one (the extended)
+	* @function Util function to extend an object. This function accepts n arguments and the first one will be the same as the retuned one (the extended)
 	* @param {Object} obj object to extend form
 	* @returns {Object} A new object with the added properties form next arguments
 	*/
@@ -104,7 +104,7 @@ k.utils.obj = (function ()
 	};
 
 	/*
-	* @func Util function to determine if an object is or not an array
+	* @function Util function to determine if an object is or not an array
 	* @param {Object} o object to check its type
 	* @returns {Boolean} True if the object passed in is an Array or false otherwise
 	*/
@@ -114,7 +114,7 @@ k.utils.obj = (function ()
 	};
 
 	/*
-	* @func Util function to determine if an object is or not a String
+	* @function Util function to determine if an object is or not a String
 	* @param {Object} s object to check its type
 	* @returns {Boolean} True if the object passed in is a String or false otherwise
 	*/
@@ -124,7 +124,7 @@ k.utils.obj = (function ()
 	};
 
 	/*
-	* @func Util function to determine if an object is or not a Regular Expression
+	* @function Util function to determine if an object is or not a Regular Expression
 	* @param {Object} s object to check its type
 	* @returns {Boolean} True if the object passed in is a Regular Expresion, false otherwise
 	*/
@@ -134,7 +134,7 @@ k.utils.obj = (function ()
 	};
 
 	/*
-	* @func Util function to determine if an object is or not a Number
+	* @function Util function to determine if an object is or not a Number
 	* @param {Object} n object to check its type
 	* @returns {Boolean} True if the object passed in is a Number, false otherwise
 	*/
@@ -144,7 +144,7 @@ k.utils.obj = (function ()
 	};
 
 	/*
-	* @func Util function to determine if an object is or not a Function
+	* @function Util function to determine if an object is or not a Function
 	* @param {Object} f object to check its type
 	* @returns {Boolean} True if the object passed in is a Function, false otherwise
 	*/
@@ -154,7 +154,7 @@ k.utils.obj = (function ()
 	};
 
 	/*
-	* @func Util function to determine if an object is or not Boolean
+	* @function Util function to determine if an object is or not Boolean
 	* @param {Object} b object to check its type
 	* @returns {Boolean} True if the object passed in is Boolean, false otherwise
 	*/
@@ -163,7 +163,7 @@ k.utils.obj = (function ()
 	};
 
 	/*
-	* @func Util function to determine if an object is the JS Arguments array, which is of a particular type
+	* @function Util function to determine if an object is the JS Arguments array, which is of a particular type
 	* @param {Object} a object to check its type
 	* @returns {Boolean} True if the object passed in is an Arguments Array, false otherwise
 	*/
@@ -179,7 +179,7 @@ k.utils.obj = (function ()
 	}
 
 	/*
-	* @func Util function to determine if an thing is or not a Object
+	* @function Util function to determine if an thing is or not a Object
 	* @param {Thing} n object to check its type
 	* @returns {Boolean} True if the thing passed in is a Object, false otherwise
 	*/
@@ -188,7 +188,7 @@ k.utils.obj = (function ()
 	};
 
 	/*
-	* @func Util function to determine if a thing is or not defined
+	* @function Util function to determine if a thing is or not defined
 	* @param {Thing} obj object to check its state
 	* @returns {Boolean} True if the thing passed in is Undefined, false otherwise
 	*/
@@ -219,7 +219,7 @@ k.utils.obj = (function ()
 		nativeIndexOf		= ArrayProto.indexOf,
 		slice				= ArrayProto.slice;
 
-	/* @func Alias of hasOwnProperty just for brevety
+	/* @function Alias of hasOwnProperty just for brevety
 	* @param {Object} obj object to check ownership of property
 	* @param {String} key Property name to verify
 	* @returns {Boolean} True if the object posses that property
@@ -228,7 +228,7 @@ k.utils.obj = (function ()
 		return hasOwnProperty.call(obj, key);
 	};
 
-	/* @func Returns the list of own properties of an object
+	/* @function Returns the list of own properties of an object
 	* @param {Object} obj object from which extract keys
 	* @returns {Array} List of string keys of property names of the object passed in
 	*/
@@ -251,7 +251,7 @@ k.utils.obj = (function ()
 		return keys;
 	};
 
-	/* @func Iterate over the passed in first parameter calling the iterator with the specified context
+	/* @function Iterate over the passed in first parameter calling the iterator with the specified context
 	* @param {Object} obj object to traverse
 	* @param {Function} iterator function called per each item founded in obj
 	* @param {Object} context object from which extract keys
@@ -290,7 +290,7 @@ k.utils.obj = (function ()
 		return obj;
 	};
 
-	/* @func Iterate over the passed in first parameter and mapping each of its valur according the iteration logic
+	/* @function Iterate over the passed in first parameter and mapping each of its valur according the iteration logic
 	* @param {Object} obj object to traverse
 	* @param {Function} iterator function called per each item founded in obj
 	* @param {Object} context object from which extract keys
@@ -310,7 +310,7 @@ k.utils.obj = (function ()
 
 	var reduceError = 'Reduce of empty array with no initial value';
 
-	/* @func Iterate over the passed in first parameter and group them all into the result by applying the iteralot logic
+	/* @function Iterate over the passed in first parameter and group them all into the result by applying the iteralot logic
 	* @param {Object} obj object to traverse
 	* @param {Function} iterator function called per each item founded in obj
 	* @param {Object} memo is the initial state of the reduction
@@ -346,7 +346,7 @@ k.utils.obj = (function ()
 
 	var Ctor = function(){};
 
-	/* @func Bind a function to an object, meaning that whenever the function is called, the value of this will be the object.
+	/* @function Bind a function to an object, meaning that whenever the function is called, the value of this will be the object.
 	* Optionally, pass arguments to the function to pre-fill them, also known as partial application
 	* @param {Function} func Function to wrap up
 	* @param {Object} context Object used as a context in the execution of func
@@ -378,7 +378,7 @@ k.utils.obj = (function ()
 		return bound;
 	};
 
-	/* @func Iterate over the passed in first parameter and filter them based on the result of the predicate parameter
+	/* @function Iterate over the passed in first parameter and filter them based on the result of the predicate parameter
 	* @param {Object} obj object to traverse
 	* @param {Function} predicate function called per each item founded in obj to determine if the item is or no in the final result
 	* @param {Object} context object used to call the iterator
@@ -402,7 +402,7 @@ k.utils.obj = (function ()
 		return results;
 	};
 
-	/* @func Keep the identity function around for default iterators.
+	/* @function Keep the identity function around for default iterators.
 	* @param {Object} value Value that will returned
 	* @returns {Object} The same value that passed in
 	*/
@@ -410,7 +410,7 @@ k.utils.obj = (function ()
 		return value;
 	};
 
-	/* @func Determine if at least one element in the object matches a truth test
+	/* @function Determine if at least one element in the object matches a truth test
 	* @param {Object} obj object to traverse
 	* @param {Function} predicate function called per each item founded in obj to determine if the item fullfil the requirements
 	* @param {Object} context object used to call the iterator
@@ -434,7 +434,7 @@ k.utils.obj = (function ()
 		return !!result;
 	};
 
-	/* @func Convenience version of a common use case of map: fetching a property.
+	/* @function Convenience version of a common use case of map: fetching a property.
 	* @param {Object} obj Object to be traverse
 	* @param {String} key Name of the property to extract from eacj item in obje
 	* @returns {Array} List of each property value from each item in obj
@@ -443,7 +443,7 @@ k.utils.obj = (function ()
 		return __map(obj, __property(key));
 	};
 
-	/* @func Auxiliar and Internal function used to return an object's propert by settings using a closure the property name.
+	/* @function Auxiliar and Internal function used to return an object's propert by settings using a closure the property name.
 	* Returns a function that will itself return the key property of any passed-in object
 	* @param {String} key Name of the property name to 'lock'
 	* @returns {Function} A function that accepts an object and returns the value of its property set before
@@ -454,11 +454,11 @@ k.utils.obj = (function ()
 		};
 	};
 
-	/* @func An internal function to generate lookup iterators
+	/* @function An internal function to generate lookup iterators
 	* @param {Object} value Lookup
 	* @returns {Object} Object lookup
 	*/
-	var lookupIterator = function(value) {
+	var lookupIterator = function (value) {
 		if (value === null || value === undefined) {
 			return __identity;
 		}
@@ -468,7 +468,62 @@ k.utils.obj = (function ()
 		return __property(value);
 	};
 
-	/* @func Sort the object’s values by a criterion produced by an iterator.
+	var createCallback = function (func, context, argCount) {
+		if (context === void 0)
+		{
+			return func;
+		}
+		switch (argCount === null ? 3 : argCount)
+		{
+			case 1:
+				return function (value) {
+					return func.call(context, value);
+				};
+			case 2:
+				return function (value, other) {
+					return func.call(context, value, other);
+				};
+			case 3:
+				return function (value, index, collection) {
+					return func.call(context, value, index, collection);
+				};
+			case 4:
+				return function (accumulator, value, index, collection) {
+					return func.call(context, accumulator, value, index, collection);
+				};
+		}
+
+		return function() {
+			return func.apply(context, arguments);
+		};
+	};
+
+	/* @funciton A mostly-internal function to generate callbacks that can be applied to each element in a collection, returning the desired result — either identity, an arbitrary callback, a property matcher, or a property accessor.
+	* @param {Any} value Value to inspect so a matching function ca be created
+	* @param {Object} context In the c value parameter is a function, this param will be the context in wich that function will execute
+	* @param {Number} argCount Count off argument the function value param will acept assuming it is a function
+	* @return {Function} A function that can be used to iterate and match over a collection
+	*/
+	var __iteratee = function (value, context, argCount) {
+		if (value === null || value === undefined)
+		{
+			return __identity;
+		}
+
+		if (__isFunction(value))
+		{
+			return createCallback(value, context, argCount);
+		}
+
+		if (__isObject(value))
+		{
+			return __matches(value);
+		}
+
+		return __property(value);
+	};
+
+	/* @function Sort the object’s values by a criterion produced by an iterator.
 	* @param {Object} obj object to traverse
 	* @param {Function} iterator function called per each item founded in obj. Called with value, index, list
 	* @param {Object} context object from which extract keys
@@ -499,7 +554,7 @@ k.utils.obj = (function ()
 		}), 'value');
 	};
 
-	/* @func Return the first value which passes a truth test
+	/* @function Return the first value which passes a truth test
 	* @param {Object} obj object to traverse
 	* @param {Function} predicate function called per each item founded in obj
 	* @param {Object} context object from which extract keys
@@ -516,7 +571,7 @@ k.utils.obj = (function ()
 		return result;
 	};
 
-	/* @func An internal function used for aggregate “group by” operations.
+	/* @function An internal function used for aggregate “group by” operations.
 	* @param {Array} obj object to traverse
 	* @param {Function} iterator function called per each item founded in obj
 	* @param {Object} context object from which extract keys
@@ -534,7 +589,7 @@ k.utils.obj = (function ()
 		};
 	};
 
-	/* @func Determine whether all of the elements match a truth test.
+	/* @function Determine whether all of the elements match a truth test.
 	* @param {Array} obj object to traverse
 	* @param {Function} predicate function called per each item founded in obj to determine if fulfill the requirements
 	* @param {Object} context object from which extract keys
@@ -558,7 +613,7 @@ k.utils.obj = (function ()
 		return !!result;
 	};
 
-	/* @func Internal implementation of a recursive flatten function.
+	/* @function Internal implementation of a recursive flatten function.
 	* @param {Array} input object to traverse
 	* @param {Boolean} shallow Indicate if the flattening should NOT be made recusrively (true: DO NOT make it recursively)
 	* @param {Array} output Output parameter wheere the final list is saved
@@ -582,7 +637,7 @@ k.utils.obj = (function ()
 		return output;
 	};
 
-	/* @func Flatten out an array, either recursively (by default), or just one level.
+	/* @function Flatten out an array, either recursively (by default), or just one level.
 	* @param {Array} array object to traverse
 	* @param {Boolean} shallow Indicate if the flattening should NOT be made recusrively (true: DO NOT make it recursively)
 	* @returns {Array} Array where each item if flattened
@@ -591,13 +646,13 @@ k.utils.obj = (function ()
 		return flatten(array, shallow, []);
 	};
 
-	/* @func Determine if the array or object contains a given value (using ===).
+	/* @function Determine if the array or object contains a given value (using ===).
 	* @param {Array} obj object to traverse
 	* @param {Object} target Object looked for
 	* @returns {Boolean} True if the obj contains the value pass in
 	*/
 	var __contains = function(obj, target) {
-		if (obj === null) {
+		if (obj === null || obj === undefined) {
 			return false;
 		}
 		if (nativeIndexOf && obj.indexOf === nativeIndexOf) {
@@ -608,7 +663,7 @@ k.utils.obj = (function ()
 		});
 	};
 
-	/* @func Produce a duplicate-free version of the array. If the array has already been sorted, you have the option of using a faster algorithm.
+	/* @function Produce a duplicate-free version of the array. If the array has already been sorted, you have the option of using a faster algorithm.
 	* @param {Array} array object to traverse
 	* @param {Boolean} isSorted indicate if the array is osrted or not
 	* @param {Function} iterator If you want to compute unique items based on a transformation, pass an iterator function
@@ -635,7 +690,7 @@ k.utils.obj = (function ()
 		return results;
 	};
 
-	/* @func Groups the object’s values by a criterion. Pass either a string attribute to group by, or a function that returns the criterion
+	/* @function Groups the object’s values by a criterion. Pass either a string attribute to group by, or a function that returns the criterion
 	* @param {Array} obj object to traverse
 	* @param {Function} iterator function called per each item founded in obj
 	* @param {Object} context object from which extract keys
@@ -650,7 +705,7 @@ k.utils.obj = (function ()
 		}
 	});
 
-	/* @func Uses a binary search to determine the index at which the value should be inserted into the list in order to maintain the list's sorted order.
+	/* @function Uses a binary search to determine the index at which the value should be inserted into the list in order to maintain the list's sorted order.
 	* @param {Array} array List of items to traverse
 	* @param {Object} obj object to traverse
 	* @param {Function} iterator Optional function that will be used to compute the sort ranking of each value, including the value (obj param) you pass.
@@ -678,10 +733,10 @@ k.utils.obj = (function ()
 		return low;
 	};
 
-	/* @func Returns the index at which value can be found in the array, or -1 if value is not present in the array.
+	/* @function Returns the index at which value can be found in the array, or -1 if value is not present in the array.
 	* @param {Array} array List of items to traverse
 	* @param {Object} item Object to find into the array
-	* @param {Booelan} isSorted When the array is sorted pass true and the algorithm will perform a faster approach
+	* @param {Booelan} isSorted When the array is Byed pass true and the algorithm will perform a faster approach
 	* @returns {Integer} The location/index at which the pass value is present, and -1 if the value is not present
 	*/
 	var __indexOf = function (array, item, isSorted) {
@@ -711,7 +766,7 @@ k.utils.obj = (function ()
 	};
 
 	var idCounter = 0;
-	/* @func Generate a unique integer id (unique within the entire client session).
+	/* @function Generate a unique integer id (unique within the entire client session).
 	* @param {String} prefix Optional prefix name
 	* @returns {String} Unique identifier
 	*/
@@ -720,7 +775,7 @@ k.utils.obj = (function ()
 		return prefix ? prefix + id : id;
 	};
 
-	/* @func Returns the last element of an array. Passing n will return the last n elements of the array..
+	/* @function Returns the last element of an array. Passing n will return the last n elements of the array..
 	* @param {Integer} n Count of elements to return
 	* @returns {[Object] || Object} Array with the last n values if n is specified or just the object of the array
 	*/
@@ -737,7 +792,7 @@ k.utils.obj = (function ()
 	};
 
 	/*
-	* @func Util function to shallow clone any kind of object
+	* @function Util function to shallow clone any kind of object
 	* @param {Object} obj object to clone
 	* @returns {Object} Shadow copy of the passed in object
 	*/
@@ -749,6 +804,121 @@ k.utils.obj = (function ()
 		}
 
     	return __isArray(obj) ? obj.slice() : __extend({}, obj);
+	};
+
+	/*
+	* @function Returns the maximum value in list. If an iteratee function is provided, it will be used on each value to generate the criterion by which the value is ranked. -Infinity is returned if list is empty.
+	* @param {Array<Object>|Object} obj Source of iteration to find the maximun value
+	* @param {Function|String} iteratee Function that will be passed in each object in obj parameter, or a string indicate the property name to use to detect the max value of each object in the obj parray parameter
+	* @param {Object} context Obhect used as a context when executing the iterator function.
+	* @returns {Object} The element in the obj param with te maximun value as specified by the iteratee parameter
+	*/
+	var __max = function (obj, iteratee, context)
+	{
+		var result = -Infinity,
+			lastComputed = -Infinity,
+			value,
+			computed;
+
+		if ((iteratee === null || iteratee === undefined) && obj !== null)
+		{
+			obj = obj.length === +obj.length ? obj : __values(obj);
+
+			for (var i = 0, length = obj.length; i < length; i++)
+			{
+				value = obj[i];
+				if (value > result)
+				{
+					result = value;
+				}
+			}
+		}
+		else
+		{
+			iteratee = __iteratee(iteratee, context);
+
+			__each(obj, function (value, index, list)
+			{
+				computed = iteratee(value, index, list);
+
+				if (computed > lastComputed || computed === -Infinity && result === -Infinity)
+				{
+					result = value;
+					lastComputed = computed;
+				}
+			});
+		}
+		return result;
+	};
+
+	/*
+	* @function Convert an object into a list of [key, value] pairs.
+	* @param {Object} obj Object to convert.
+	* @param {Object} context Obhect used as a context when executing the iterator function.
+	* @returns {Array<Array<Object>>} Returns an array where each items is a two values array; the first value is the string name of the property and the second if its value.
+	*/
+	var __pairs = function(obj)
+	{
+		var keys = __keys(obj),
+			length = keys.length,
+			pairs = new Array(length);
+
+		for (var i = 0; i < length; i++)
+		{
+			pairs[i] = [keys[i], obj[keys[i]]];
+		}
+		return pairs;
+	};
+
+	/*
+	* @function Returns a predicate function that will tell you if a passed in object contains all of the key/value properties present in attrs.
+	* e.g.
+	*		var ready = k.utils.obj.matches({selected: true, visible: true});
+	*		var readyToGoList = _.filter(list, ready);
+	* @param {Object} attrs Object containing the properties and values to match
+	* @return {Function} A predicate that return true or false when the passed in parameter match with the original attrs
+	*/
+	var __matches = function (attrs)
+	{
+		var pairs = __pairs(attrs),
+			length = pairs.length;
+
+		return function(obj)
+		{
+			if (obj === null)
+			{
+				return !length;
+			}
+
+			obj = new Object(obj);
+			for (var i = 0; i < length; i++)
+			{
+				var pair = pairs[i], key = pair[0];
+				if (pair[1] !== obj[key] || !(key in obj))
+				{
+					return false;
+				}
+			}
+			return true;
+		};
+	};
+
+	/*
+	* @function Return all of the values of the object's properties.
+	* @param {Object} obj Object to extract properties' value
+	* @return {Array<Object>} Array property values
+	*/
+	var __values = function(obj)
+	{
+		var keys = __keys(obj),
+			length = keys.length,
+			values = new Array(length);
+
+		for (var i = 0; i < length; i++)
+		{
+			values[i] = obj[keys[i]];
+		}
+		return values;
 	};
 
 	return {
@@ -787,6 +957,10 @@ k.utils.obj = (function ()
 		indexOf: __indexOf,
 		uniqueId: __uniqueId,
 		last: __last,
-		shallowClone: __shallowClone
+		shallowClone: __shallowClone,
+		max: __max,
+		pairs: __pairs,
+		matches: __matches,
+		values: __values
 	};
 })();

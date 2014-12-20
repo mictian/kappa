@@ -44,7 +44,7 @@ var javascript_files = ['__prologue__.js',
 ,   package_file_name_min = package_name + '.min.js'
 ,   output_path = './build';
 
-spec_files.unshift('tests/sampleGrammars.js');
+spec_files.unshift('examples/sampleGrammars.js');
 spec_files.unshift('tests/specRunner.js');
 
 all_files = spec_files.concat(javascript_files);

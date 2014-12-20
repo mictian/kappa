@@ -1472,8 +1472,138 @@ describe('Object Utils', function()
 				expect(result).not.toBe(input);
 				expect(result).toEqual(input);
 				expect(result.obj).toBe(propObj);
+			});
+
+		});
+
+		describe('max', function ()
+		{
+			it('should return the maximun integer value in an array of numbers', function ()
+			{
+				expect(k.utils.obj.max([1,55,7,3,9])).toBe(55);
+			});
+
+			it('should project the property to filter the maximun value from the passed in string parameter', function ()
+			{
+				expect(k.utils.obj.max([{age:0}, {age:-1},{age:33},{age:11}],'age')).toEqual({age:33});
+			});
+
+			it('should accepts a function that returns the value of each object used to find the maximun final result', function ()
+			{
+				expect(k.utils.obj.max([{age:0}, {age:-1},{age:33},{age:11}],function (item)
+				{
+					return 10 - item.age;
+				})).toEqual({age:-1});
+			});
+
+			it('should accepts a context object', function ()
+			{
+				var context = {
+					searchValue: 11
+				};
+
+				expect(k.utils.obj.max([{age:0}, {age:-1},{age:33},{age:11}],function (item)
+				{
+					return this.searchValue === item.age ? 1 : 0;
+				}, context)).toEqual({age:11});
 
 			});
 
+			it('should throw and excpetion if called with no parameters', function ()
+			{
+				expect(k.utils.obj.max).toThrow();
+			});
+
+			it('should return -infinity when the obj to iterate over is empty', function ()
+			{
+				expect(k.utils.obj.max({})).toBe(-Infinity);
+				expect(k.utils.obj.max([])).toBe(-Infinity);
+				expect(k.utils.obj.max(false)).toBe(-Infinity);
+				expect(k.utils.obj.max(true)).toBe(-Infinity);
+			});
+
+			it('should return -infinity when the obj to iterate over is the only specifed parameter and it is an array of objects', function ()
+			{
+				expect(k.utils.obj.max([{name:'John'}, {name: 'Mictian'}])).toBe(-Infinity);
+			});
+
+			it('should return the last letter in the alfaber if a string is passed', function ()
+			{
+				expect(k.utils.obj.max('hi therez this is a test')).toEqual('z');
+			});
+		});
+
+		describe('pairs', function ()
+		{
+			it('should return an array with the values of the assed in object', function ()
+			{
+				var result = k.utils.obj.pairs({one: 1, two: 2, three: 3});
+				expect(result).toEqual([["one", 1], ["two", 2], ["three", 3]]);
+			});
+
+			it('should an empty array when no pairs can be extracted', function ()
+			{
+				expect(k.utils.obj.pairs()).toEqual([]);
+				expect(k.utils.obj.pairs({})).toEqual([]);
+				expect(k.utils.obj.pairs([])).toEqual([]);
+				expect(k.utils.obj.pairs(false)).toEqual([]);
+				expect(k.utils.obj.pairs(true)).toEqual([]);
+				expect(k.utils.obj.pairs(22)).toEqual([]);
+			});
+		});
+
+		describe('matches', function ()
+		{
+			it('should return a function that mathc object like the passed one', function ()
+			{
+				var objMatching = {
+						name: 'John',
+						age: 27
+					},
+					resultFunction = k.utils.obj.matches(objMatching);
+
+				expect(resultFunction).toEqual(jasmine.any(Function));
+				expect(resultFunction(objMatching)).toEqual(true);
+				expect(resultFunction(false)).toEqual(false);
+				expect(resultFunction(123)).toEqual(false);
+				expect(resultFunction({name: 'John', age: 28})).toEqual(false);
+				expect(resultFunction({name: 'John2', age: 27})).toEqual(false);
+
+			});
+
+			it ('should return true if the function is generated with anything else rather than an object or an empty one', function ()
+			{
+				expect(k.utils.obj.matches(function (){})(false)).toEqual(true);
+				expect(k.utils.obj.matches(function (){})(true)).toEqual(true);
+				expect(k.utils.obj.matches(function (){})(function (){})).toEqual(true);
+				expect(k.utils.obj.matches(function (){})({})).toEqual(true);
+
+				expect(k.utils.obj.matches(false)({})).toEqual(true);
+				expect(k.utils.obj.matches(false)(false)).toEqual(true);
+				expect(k.utils.obj.matches(false)(true)).toEqual(true);
+				expect(k.utils.obj.matches(false)(12)).toEqual(true);
+			});
+		});
+
+		describe('values', function ()
+		{
+			it ('should return the values for each of the properties of the passed in object', function ()
+			{
+				expect(k.utils.obj.values({
+					prop1: 'rojo',
+					prop2: true,
+					prop3: 12,
+					prop5: {}
+				})).toEqual(['rojo', true, 12, {}]);
+
+
+				var result = k.utils.obj.values(
+					{
+						prop1:function (){}
+					}
+					)[0];
+
+				expect(result).toEqual(jasmine.any(Function));
+			});
 		});
 	});

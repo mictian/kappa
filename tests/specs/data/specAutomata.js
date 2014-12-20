@@ -3,7 +3,7 @@
 
 describe('automata', function()
 {
-	it('shoud override toString', function()
+	it('should override toString', function()
 	{
 		var a = new k.data.Automata({});
 		expect(Object.getPrototypeOf(a).hasOwnProperty('toString')).toBe(true);

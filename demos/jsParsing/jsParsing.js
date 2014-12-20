@@ -2,10 +2,13 @@ $(document).ready(function ()
 {
     var pContainer = kappa.parser.parserCreator.create(
 			    {
-					grammar: jsGrammar(kappa)
+					grammar: jsGrammar(kappa),
+					lexer: {
+					    usePriorities: true
+					}
 				});
 
-
+    $('#inputarea').focus();
     $('#inputarea').keypress(function (e)
     {
         if (e.which == 13)
@@ -14,14 +17,14 @@ $(document).ready(function ()
             pContainer.lexer.setStream($text.val());
 
             var parsingValue = pContainer.parser.parse(pContainer.lexer);
-            if (parsingValue)
+            if (!parsingValue.error)
             {
-                // $('#result').text(parsingValue.currentValue);
                 $('#result').text('RECOGNIZED');
             }
             else
             {
-                $('#result').text('Invalid input, please try again!');
+                $('#result').html('Invalid input, please try again!<br/>Line: ' + parsingValue.line + '<br/>Position: '+ parsingValue.character + '<br/>Type: ' + parsingValue.type
+                + '<br/>Extra: ' + JSON.stringify(parsingValue.extra));
             }
         }
     });

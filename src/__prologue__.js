@@ -7,7 +7,7 @@
 	} else if (typeof module === 'object' && module.exports) {
 		module.exports = init(/* require("dep'), ... */ ); // CommonJS module.
 	} else { // Browser or web worker (probably).
-		global.kappa = init(/* global.dep, ... */); // Assumes base is loaded.
+		global.k = global.kappa = init(/* global.dep, ... */); // Assumes base is loaded.
 	}
 })(this, function __init__() {
 

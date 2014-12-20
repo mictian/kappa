@@ -300,7 +300,6 @@ describe('Rule', function()
 
 describe('Grammar', function()
 {
-
 	var S,
 		EXPS1,
 		EXPS2,
@@ -345,7 +344,7 @@ describe('Grammar', function()
 			rules: [S, EXPS1, EXPS2, EXP, OPAREN, CPAREN]
 		});
 	});
-	
+
 	it ('should have .toString overridden', function(){
 		expect(k.data.Grammar.prototype.toString).toBeDefined();
 	});
@@ -427,19 +426,19 @@ describe('Grammar', function()
 			expect(terminal).toBe(CPAREN.tail[0]);
 
 		});
-		
+
 		it ('should expand the original grammar adding an extra initial rule', function (){
 			expect(g.rules.length).toBe(7);
 		});
-		
+
 		it ('should put the extra rule at first place', function (){
 			expect(g.rules[0].name).toBe(k.data.Grammar.constants.AugmentedRuleName);
 		});
-		
-		it ('shoud preserve the specified start symbol as specifiedStartSymbol', function (){
+
+		it ('should preserve the specified start symbol as specifiedStartSymbol', function (){
 			expect(g.specifiedStartSymbol).toBe(S.head);
 		});
-		
+
 		describe('un-productive rules detection', function ()
 		{
 			it ('shoud remove unproductive rules is nothing is specified', function ()
@@ -468,10 +467,10 @@ describe('Grammar', function()
 						startSymbol: Sa.head,
 						rules: [Sa, Sa1, Sa2, A, B]
 					});
-				
+
 				expect(g1.rules.length).toBe(2);
 			});
-			
+
 			it ('should convert the grammar to only generate epsilon if all the rules are non-productive', function ()
 			{
 					var Sa = new k.data.Rule({
@@ -490,13 +489,13 @@ describe('Grammar', function()
 							startSymbol: Sa.head,
 							rules: [Sa, Sa2, B]
 						});
-						
+
 					expect(g1.rules.length).toBe(1);
 					expect(g1.rules[0].name).toEqual(k.data.Grammar.constants.AugmentedRuleName);
 					expect(g1.rules[0].tail.length).toBe(2);
 					expect(g1.rules[0].tail[0].name).toEqual(k.data.specialSymbol.EMPTY);
 			});
-			
+
 			it ('should set as unproductive rules that are reachable but are cyclic', function ()
 			{
 				var Sa = new k.data.Rule({
@@ -519,21 +518,21 @@ describe('Grammar', function()
 						head: 'B',
 						tail: [new k.data.Terminal({name:'a_terminal', body: 'a'}), new k.data.NonTerminal({name: 'A'})]
 					});
-					
+
 				//Calling this constructor update the grammar's symbols!
 				new k.data.Grammar({
 					startSymbol: Sa.head,
 					rules: [Sa, Sa1, Sa2, A, B],
 					preserveNonProductiveRules: true
 				});
-				
+
 				expect(Sa.isProductive).toBe(true);
 				expect(Sa1.isProductive).toBe(false);
 				expect(Sa2.isProductive).toBe(false);
 				expect(A.isProductive).toBe(false);
 				expect(B.isProductive).toBe(false);
 			});
-			
+
 			it ('should consider empsilon rules as productive', function ()
 			{
 				var Sa = new k.data.Rule({
@@ -553,14 +552,14 @@ describe('Grammar', function()
 					rules: [Sa, Sa1, A],
 					preserveNonProductiveRules: true
 				});
-					
+
 				expect(Sa.isProductive).toBe(true);
 				expect(Sa1.isProductive).toBe(true);
 				expect(A.isProductive).toBe(true);
 			});
-			
+
 		});
-		
+
 		describe('epsilon rule tails remove process', function ()
 		{
 			it ('should remove epsilon in the middle of a rule when epsilon is not the only element in the rule', function ()
@@ -588,12 +587,12 @@ describe('Grammar', function()
 						startSymbol: Sa.head,
 						rules: [Sa, Sa1, Sa2, A, B]
 					});
-				
+
 				expect(g1.rules.length).toBe(6);
 				expect(Sa.tail.length).toBe(1);
 				expect(A.tail.length).toBe(1);
 			});
-			
+
 			it ('should preseve epsilon in the initial rule', function ()
 			{
 				var Sa = new k.data.Rule({
@@ -611,13 +610,13 @@ describe('Grammar', function()
 						startSymbol: Sa.head,
 						rules: [Sa, Sa2, B]
 					});
-					
+
 				expect(Sa.tail.length).toBe(1);
 				expect(Sa.tail[0].name).toBe(k.data.specialSymbol.EMPTY);
 				expect(g1.rules.length).toBe(4);
 				expect(B.tail.length).toBe(1);
 			});
-			
+
 			it ('should preseve epsilon in the initial GENERATED (when the specifeid rules are all removed) rule', function ()
 			{
 				var Sa = new k.data.Rule({
@@ -632,14 +631,14 @@ describe('Grammar', function()
 						startSymbol: Sa.head,
 						rules: [Sa, B]
 					});
-				
+
 				expect(g1.rules.length).toBe(1);
 				expect(g1.rules[0].tail.length).toBe(2);
 				expect(g1.rules[0].index).toBe(0);
 				expect(g1.rules[0].tail[0].name).toBe(k.data.specialSymbol.EMPTY);
 				expect(g1.rules[0].tail[1].name).toBe(k.data.specialSymbol.EOF);
 			});
-			
+
 			it ('should preserve epsilon in rules where it is the only element in the tail', function ()
 			{
 				var Sa = new k.data.Rule({
@@ -665,13 +664,13 @@ describe('Grammar', function()
 						startSymbol: Sa.head,
 						rules: [Sa, Sa1, Sa2, A, B]
 					});
-				
+
 				expect(g1.rules.length).toBe(6);
 				expect(B.tail.length).toBe(1);
 				expect(A.tail.length).toBe(1);
 			});
 		});
-		
+
 		describe('unrechable nonTerminal removal', function()
 		{
 			it('should remove all rules that are unrechable from the initial start symbol', function()
@@ -695,7 +694,7 @@ describe('Grammar', function()
 						startSymbol: Sa.head,
 						rules: [Sa, Sa2, A, B]
 					});
-				
+
 				expect(g1.rules.length).toBe(4);
 				expect(A.isProductive).toBe(true);
 				expect(A.isReachable).toBe(false);
@@ -703,7 +702,7 @@ describe('Grammar', function()
 				expect(Sa2.isReachable).toBe(true);
 				expect(B.isReachable).toBe(true);
 			});
-			
+
 			it('should preseve all rules even those that are unrechable from the initial start symbol if it is specified', function()
 			{
 				var Sa = new k.data.Rule({
@@ -726,11 +725,11 @@ describe('Grammar', function()
 						preserveUnReachableRules: true,
 						rules: [Sa, Sa2, A, B]
 					});
-				
+
 				expect(g1.rules.length).toBe(5);
 			});
 		});
-		
+
 		describe('determine nullable non terminals', function ()
 		{
 			it('should mark as nullable nontermials that are head of empty rules', function ()
@@ -758,15 +757,15 @@ describe('Grammar', function()
 						startSymbol: Sa.head,
 						rules: [Sa, Sa2, A, B, C]
 					});
-					
+
 				expect(A.head.isNullable).toBe(true);
-				
+
 				expect(Sa.head.isNullable).toBe(true);
 				expect(Sa2.head.isNullable).toBe(true);
-				
+
 				expect(g1.nullableNonTerminals.indexOf(A.head.name) >= 0).toBe(true);
 			});
-			
+
 			it('should mark as nullable item that are indirect nullable', function ()
 			{
 				var Sa = new k.data.Rule({
@@ -788,13 +787,13 @@ describe('Grammar', function()
 						startSymbol: Sa.head,
 						rules: [Sa, Sa2, A, B]
 					});
-				
+
 				expect(g1.rules.length).toBe(4);
 				expect(A.head.isNullable).toBe(false);
 				expect(B.head.isNullable).toBe(true);
 			});
 		});
-		
+
 		describe('pre calculate FIRST SETs', function ()
 		{
 			it('Should include terminal "a" with the simple rule A->"a"', function ()
@@ -807,12 +806,12 @@ describe('Grammar', function()
 						startSymbol: B.head,
 						rules: [B]
 					});
-				
+
 				expect(g1.rules.length).toBe(2);
 				expect(g1.firstSetsByHeader[B.head.name].length).toBe(1);
 				expect(g1.firstSetsByHeader[B.head.name][0].name).toBe('b_terminal');
 			});
-			
+
 			it('Should return epsilon for a simple rule S->EMPTY', function ()
 			{
 				var B = new k.data.Rule({
@@ -822,12 +821,12 @@ describe('Grammar', function()
 						startSymbol: B.head,
 						rules: [B]
 					});
-				
+
 				expect(g1.rules.length).toBe(2);
 				expect(g1.firstSetsByHeader[B.head.name].length).toBe(1);
 				expect(g1.firstSetsByHeader[B.head.name][0].name).toBe('EMPTY');
 			});
-			
+
 			it('Should return terminals and EMPTY if the non terminal is nullable', function ()
 			{
 				var B = new k.data.Rule({
@@ -841,26 +840,26 @@ describe('Grammar', function()
 						startSymbol: B.head,
 						rules: [B, B1]
 					});
-				
+
 				expect(g1.rules.length).toBe(3);
 				var head_firstset = g1.firstSetsByHeader[B.head.name];
 				expect(head_firstset.length).toBe(2);
 				expect(head_firstset[0].name).toBe('b_terminal');
 			});
-			
+
 			it('Should supprt valid recursions', function ()
 			{
 				//This grammar contains recursive rules: EXPS -> EXPS EXP
 				var g = sampleGrammars.idsList.g,
 					expsNT = sampleGrammars.idsList.EXPS1.head;
-				
+
 				expect(g.rules.length).toBe(7);
 				expect(g.firstSetsByHeader[expsNT.name].length).toBe(2);
 				var exps_firsset = g.firstSetsByHeader[expsNT.name];
 				expect(exps_firsset[0].name).toBe('id_terminal');
 				expect(exps_firsset[1].name).toBe('EMPTY');
 			});
-			
+
 			it('Should return multiples terminals when needed', function ()
 			{
 				var Sa = new k.data.Rule({
@@ -879,7 +878,7 @@ describe('Grammar', function()
 						startSymbol: Sa.head,
 						rules: [Sa, Sa2, B]
 					});
-				
+
 				var head_firstset = g1.firstSetsByHeader[Sa.head.name];
 				expect(head_firstset.length).toBe(2);
 				expect(head_firstset[0].name).toBe('a_terminal');

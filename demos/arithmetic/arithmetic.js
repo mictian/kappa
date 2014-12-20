@@ -2,7 +2,7 @@ $(document).ready(function ()
 {
     var pContainer = kappa.parser.parserCreator.create(
 			    {
-					grammar: sampleGrammarsFunction(kappa).arithmetic.g
+					grammar: sampleGrammars.arithmetic.g
 				});
 
     $('#inputarea').keypress(function (e)

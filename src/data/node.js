@@ -26,7 +26,7 @@ k.data.Node = (function () {
 		this.nodes = options.nodes || [];
 	};
 	
-	/* @function Returns the string ID of the current state
+	/* @method Returns the string ID of the current state
 	 * @returns {String} ID  */
 	node.prototype.getIdentity = function()
 	{
@@ -36,14 +36,14 @@ k.data.Node = (function () {
 		return this._id;
 	};
 	
-	/* @function Generates an ID that identify this node from any other state
+	/* @method Generates an ID that identify this node from any other state
 	 * @returns {String} Generated ID  */
 	node.prototype._generateIdentity = function()
 	{
 		return this.name || k.utils.obj.uniqueId('node_');
 	};
 	
-	/* @function Add a new transaction into the list of transactions of the current state
+	/* @method Add a new transaction into the list of transactions of the current state
 	 * @param {Object} transitionValue Object use to make the transition (i.e. symbol), description of the arista (like the name of the transition)
 	 * @param {Node} node Destination node (or state) arrived when moving with the specified tranisiotn
 	 * @returns {Void}  */
@@ -53,7 +53,7 @@ k.data.Node = (function () {
 		this.nodes.push(node);
 	};
 	
-	/* @function Function responsible the creation of new transition objects
+	/* @method Function responsible the creation of new transition objects
 	 * @param {Object} transitionValue Object use to make the transition, description of the arista (like the name of the transition)
 	 * @param {Node} node Destination node (or state) arrived when moving with the specified tranisiotn
 	 * @returns {Object} Transition object  */
@@ -65,7 +65,7 @@ k.data.Node = (function () {
 		};
 	};
 	
-	/* @function Gets the node identity
+	/* @method Gets the node identity
 	* @returns {String} A formatted string id of the node */
 	node.prototype.toString = function ()
 	{

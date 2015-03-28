@@ -1,5 +1,5 @@
 #Kappa.JS
----
+
 
 ##What is Kappa.js?
 Kappa.js is a parser generator, similar to [Jison](http://jison.org), where its focus is on the learning of the parsing techniques rather than a production ready product, as Jison is.
@@ -129,6 +129,7 @@ There are plenty of well-known and well documented tools out there, from Bison t
 
 #State of the Art (todo)
 Kappa is neither done or complete, by the contrary there is a lot of work to do.
+
 **IMPORTANT: Unfortunately at my job and my new role my free time to expend it on kappa is really limited, for that reason is there is anyone interested in following this project or take ownership of it, please let me know. Or if you want to use kappa for personal purpose and have any question please let me know.**
 
 Things that are missing:

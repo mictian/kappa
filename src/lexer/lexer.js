@@ -39,6 +39,8 @@ k.lexer.Lexer = (function() {
 
 		k.utils.obj.defineProperty(this, '_line');
 		k.utils.obj.defineProperty(this, '_character');
+		k.utils.obj.defineProperty(this, '_ignoredString'); //The characters that werre ignored based in the current configuration
+		//this cuold be spaced and/or enters and/or tabs
 
 		this.setStream(this.stream);
 	};
@@ -52,6 +54,7 @@ k.lexer.Lexer = (function() {
 
 		this._line = 0;
 		this._character = 0;
+		this._ignoredString = '';
 
 		this._clearStream();
 	};
@@ -68,8 +71,9 @@ k.lexer.Lexer = (function() {
 		{
 			if (!this.notIgnoreSpaces || !this.notIgnoreNewLines)
 			{
-				var original_inputString = this.inputStream,
-					difference_string;
+				var original_inputString = this.inputStream;
+				// ,
+				// 	difference_string;
 
 				if (!this.notIgnoreSpaces && !this.notIgnoreNewLines)
 				{
@@ -84,8 +88,8 @@ k.lexer.Lexer = (function() {
 					this.inputStream = k.utils.str.ltrimBreaks(this.inputStream);
 				}
 
-				difference_string = original_inputString.substr(0, original_inputString.indexOf(this.inputStream));
-				this._updatePosition(difference_string);
+				this._ignoredString = original_inputString.substr(0, original_inputString.indexOf(this.inputStream));
+				this._updatePosition(this._ignoredString);
 
 				// if ignoring spaces and the input string is empty, set the input as finished
 				if (this.inputStream === '')
@@ -181,7 +185,7 @@ k.lexer.Lexer = (function() {
 		{
 			result = k.utils.obj.sortBy(result, function (token)
 			{
-				return token.terminal.priority || 0;
+				return -(token.terminal.priority || 0);
 			});
 		}
 
@@ -301,6 +305,12 @@ k.lexer.Lexer = (function() {
 		else
 		{
 			//If there is a match
+			this._updatePosition(filter_result.string);
+
+			filter_result.line = this._line;
+			filter_result.character = this._character;
+			filter_result.ignoredString = this._ignoredString;
+
 			this.inputStream = this.inputStream.substr(filter_result.length);
 			this._clearStream();
 		}
@@ -316,14 +326,6 @@ k.lexer.Lexer = (function() {
 	* {Terminal} result.terminal matching terminal */
 	lexer.prototype._filterAndCleanSingleResult = function (result)
 	{
-		if (result.length > 0)
-		{
-			this._updatePosition(result.string);
-
-			result.line = this._line;
-			result.character = this._character;
-		}
-
 		return result;
 	};
 
@@ -400,18 +402,6 @@ k.lexer.Lexer = (function() {
 		{
 			result = this._searchNextToken();
 			result = this._filterAndCleanResult(result, validNextTerminals);
-
-			// if (result.length === -1)
-			// {
-			// 	//if there is no valid match, we return the current input stream as an error
-			// 	result = this._getErrorResult();
-			// }
-			// else
-			// {
-			// 	//If there is a match
-			// 	this.inputStream = this.inputStream.substr(result.length);
-			// 	this._clearStream();
-			// }
 		}
 
 		return result;

@@ -4,7 +4,8 @@ $(document).ready(function ()
 			    {
 					grammar: jsGrammar(kappa),
 					lexer: {
-					    usePriorities: true
+					    usePriorities: true,
+					    useMultipleMatching: true
 					}
 				});
 

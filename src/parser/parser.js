@@ -34,7 +34,7 @@ var Parser = k.parser.Parser = (function() {
 
 		k.utils.obj.defineProperty(this, 'actionTableFn');
 		k.utils.obj.defineProperty(this, 'stack');
-		k.utils.obj.defineProperty(this, 'currentInput');
+		k.utils.obj.defineProperty(this, 'currentToken');
 
 		if (!this.gotoTable) {
 			throw new Error('Invalid initialization values for a Parser, please provide a GOTO Table');
@@ -73,25 +73,32 @@ var Parser = k.parser.Parser = (function() {
 
 	/* @method Parse an input
 	* @param {Lexer} lexer The lexer which will lexically analize the input
-	* @returns {ASTNode|Error} The generated AST in case of sucess or an error object otherwise */
+	* @returns {ASTNode|Error} The generated AST in case of success or an error object otherwise. In the case of an ASTNode see the class ASTNoode, in case of error de format is:
+	* {Boolean} error.error Indicate the result is an error
+	* {Enum<k.parser.errorType>} error.type Type of occurred error
+	* {String} error.description A general description of the error (Just in english, no localization provided)
+	* {Number} error.character Character position where the last token was found
+	* {Number} error.line Line position where the last token was found
+	* {Object} error.extra Dependeing on the kind of error some extra information ce be provided */
 	parser.prototype.parse = function (lexer) {
 		//TODO TEST THIS!!!
-		//TODO DESCRIBE ERROR FORMAT!
 
 		var initialStackItem = new k.data.StackItem({
 				state: this.initialState
 			});
-		this.currentInput = lexer.getNext();
 
-		if (this.currentInput.error)
+		// this.currentToken = lexer.getNext();
+		this.currentToken = lexer.getNext(this._getExpectedLookAhead(this.initialState.getIdentity()));
+
+		if (this.currentToken.error)
 		{
 			return {
 				error: true,
 				type: k.parser.errorType.LEXER_NOTOKEN,
 				description: 'Invalid string to token. There were no valid next token',
-				line: this.currentInput.line,
-				character: this.currentInput.character,
-				extra: this.currentInput
+				line: this.currentToken.line,
+				character: this.currentToken.character,
+				extra: this.currentToken
 			};
 		}
 		this.stack.push(initialStackItem);
@@ -102,7 +109,7 @@ var Parser = k.parser.Parser = (function() {
 	/* @method Internal method to Parse an input. This method will loop through input analizyng the Goto and Action tables
 	* @param {Lexer} lexer The lexer which will lexically analize the input
 	* @returns {ASTNode|Error} The generated AST in case of success or an error object otherwise */
-	parser.prototype._parse = function(lexer) {
+	parser.prototype._parse = function (lexer) {
 		var stateToGo,
 			actionToDo,
 			lastItem = this.stack[this.stack.length-1];
@@ -118,7 +125,7 @@ var Parser = k.parser.Parser = (function() {
 
 		do {
 			//Action
-			actionToDo = this.actionTableFn(lastItem.state.getIdentity(), this.currentInput.terminal);
+			actionToDo = this.actionTableFn(lastItem.state.getIdentity(), this.currentToken.terminal);
 
 			if (actionToDo.action === k.parser.tableAction.ERROR)
 			{
@@ -126,33 +133,35 @@ var Parser = k.parser.Parser = (function() {
 					error: true,
 					type: k.parser.errorType.PARSER_NOCONTINUATION,
 					description: 'Invalid lookAhead. The current state does not allow the current lookAhead',
-					line: this.currentInput.line,
-					character: this.currentInput.character,
+					line: this.currentToken.line,
+					character: this.currentToken.character,
 					extra: {
-						terminal: this.currentInput.terminal,
-						string: this.currentInput.string,
+						terminal: this.currentToken.terminal,
+						string: this.currentToken.string,
 						validLookAhead: this._getExpectedLookAhead(lastItem.state.getIdentity())
 					}
 				};
 			}
 			else if (actionToDo.action === k.parser.tableAction.SHIFT)
 			{
-				lastItem.symbol = this.currentInput.terminal;
-				lastItem.currentValue = this.currentInput.string;
-				lastItem.stringValue = this.currentInput.string;
-				this.currentInput = lexer.getNext();
+				lastItem.symbol = this.currentToken.terminal;
+				lastItem.currentValue = this.currentToken.string;
+				lastItem.stringValue = this.currentToken.string;
 
-				if (this.currentInput.error)
-				{
-					return {
-						error: true,
-						type: k.parser.errorType.LEXER_NOTOKEN,
-						description: 'Invalid string to token. There were no valid next token',
-						line: this.currentInput.line,
-						character: this.currentInput.character,
-						extra: this.currentInput
-					};
-				}
+				lastItem.ignoredString = this.currentToken.ignoredString;
+				// this.currentToken = lexer.getNext();
+
+				// if (this.currentToken.error)
+				// {
+				// 	return {
+				// 		error: true,
+				// 		type: k.parser.errorType.LEXER_NOTOKEN,
+				// 		description: 'Invalid string to token. There were no valid next token',
+				// 		line: this.currentToken.line,
+				// 		character: this.currentToken.character,
+				// 		extra: this.currentToken
+				// 	};
+				// }
 
 			}
 			else if (actionToDo.action === k.parser.tableAction.REDUCE)
@@ -176,8 +185,8 @@ var Parser = k.parser.Parser = (function() {
 					error: true,
 					type: k.parser.errorType.PARSER_NOMOVEMENT,
 					description: 'Invalid state to go. The is no valid next state',
-					line: this.currentInput.line,
-					character: this.currentInput.character,
+					line: this.currentToken.line,
+					character: this.currentToken.character,
 					extra: {
 						lastState: lastItem.state.getIdentity(),
 						lastSymbol: lastItem.symbol
@@ -190,6 +199,24 @@ var Parser = k.parser.Parser = (function() {
 			}));
 
 			lastItem = this.stack[this.stack.length-1];
+
+			//Read next token
+			if (actionToDo.action === k.parser.tableAction.SHIFT)
+			{
+				this.currentToken = lexer.getNext(this._getExpectedLookAhead(lastItem.state.getIdentity()));
+
+				if (this.currentToken.error)
+				{
+					return {
+						error: true,
+						type: k.parser.errorType.LEXER_NOTOKEN,
+						description: 'Invalid string to token. There is no valid next token',
+						line: this.currentToken.line,
+						character: this.currentToken.character,
+						extra: this.currentToken
+					};
+				}
+			}
 
 		} while(true);
 	};
@@ -224,6 +251,11 @@ var Parser = k.parser.Parser = (function() {
 		{
 			return stackItem.currentValue || stackItem.symbol;
 		});
+		reduceFunctionParameters.ignoredStrings = k.utils.obj.map(stackRange, function (stackItem)
+		{
+			return stackItem.ignoredString;
+		});
+		reduceFunctionParameters.stackRange = stackRange;
 		reduceFunctionParameters.rule = rule;
 
 		//Shrink stack based on the reduce rule
@@ -234,7 +266,7 @@ var Parser = k.parser.Parser = (function() {
 		//Update last stack item
 		lastItem = this.stack[this.stack.length - 1];
 		lastItem.symbol = rule.head;
-		lastItem.currentValue = k.utils.obj.isFunction(rule.reduceFunc) ? rule.reduceFunc.call(this, reduceFunctionParameters) : lastItem.symbol;
+		lastItem.currentValue = k.utils.obj.isFunction(rule.reduceFunc) ? (rule.reduceFunc.call(this, reduceFunctionParameters) || lastItem.symbol) : lastItem.symbol;
 
 
 		// Update/Generate AST

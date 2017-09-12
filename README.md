@@ -1,26 +1,26 @@
-#Kappa.JS
+# Kappa.JS
 
 
-##What is Kappa.js?
+## What is Kappa.js?
 Kappa.js is a parser generator, similar to [Jison](http://jison.org), where its focus is on the learning of the parsing techniques rather than a production ready product, as Jison is.
 
 Its main generator produce LALR(1) parsers, but the code architecture is designed to produce from LR(0) to LALR/LR(k) parsers.
 
 The philosophy of the development is generate a dependency free, well-tested and well documented product. For this reason is that you will find that all the code is jsdoc'ed and tested.
 
-##Features
+##F eatures
 * Allow couple and decouple communication between the parser and the lexer. This refer to the options to allow the lexer to know what are the next valid token for the parser.
 * Grammars are auto-cleaned. Unreachable production and invalid epsilons values (like duplicated ones) are removed automatically when the grammar is created.
 * Auto detection of nullable non-terminals
 * First set calculation
 
 
-#Syntax
+# Syntax
 All the code was designed in an object-oriented way so for most of developers the syntax should be easy to understand and read.
 
 The following is a basic overview, for a full understanding of all options, methods and parameters please refer to the code. Although all the code use jsdoc, the documentation have not been generated yet (this is in the TODO list).
 
-##Symbols
+## Symbols
 Both terminal and non-terminal inherit from Symbol. Besides a there are special tokens that are represented by this class, End of File (EOF) and Epsilon (empty). To create any of this types specify the property isSpecial to true and set the name to one of the following values:
 ```javascript
 var specialSymbol = k.data.specialSymbol = {
@@ -36,28 +36,28 @@ var s = new k.data.Symbol({
 });
 ```
 
-##Terminals
+## Terminals
 
 ```javascript
 var t = new k.data.Terminal({name:'a_terminal', body: 'a'})
 ```
 In this case the body can be a simple string for a literal match or a regular expression.
 
-##Non-Terminals
+## Non-Terminals
 ```javascript
 var nonTerminal = new k.data.NonTerminal({
 	name: 'Test'
 });
 ```
 
-##Rule
+## Rule
 ```javascript
 var rule = new k.data.Rule({
 	head: 'Sa',
 	tail: [new k.data.Terminal({name:'aa_terminal', body: 'aa'})]
 }),
 ```
-##Grammar
+## Grammar
 
 ```javascript
 var g =new k.data.Grammar({
@@ -66,7 +66,7 @@ var g =new k.data.Grammar({
 });
 ```
 
-##Parser
+## Parser
 
 ```javascript
 var parser_Container = kappa.parser.parserCreator.create(
@@ -86,10 +86,10 @@ else
     // error
 }
 ```
-#Develop
+# Develop
 Currently there is no npm or bower package, you will need to clone the git repository. Anyway all the code is develop to work in the browser and in node/io.js.
 
-##Build/Install
+## Build/Install
 If you want to use the code, contribute or just test it, follow the next steps:
 1. Clone the repository
 2. run ```npm insall```
@@ -99,10 +99,10 @@ If you want to use the code, contribute or just test it, follow the next steps:
     * This allows you generate **kappa.js** file which is a dev friendly version. Besides the gen-tests gulp task generate the test to you to run it.
 6. Open with your favorite browser the file: _tests/SpecRunner.html_ to run all tests
 
-#License
+# License
 The MIT License (MIT)
 
-Copyright (c) 2015 Mictian
+Copyright (c) 2017 Mictian
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -122,12 +122,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-#Motivation
+#M otivation
 The principal aim of kappa is build a parse generator easy to understand.
 Everyone should be able to easily read the code, jump to any part of it and understand what the is it for.
 There are plenty of well-known and well documented tools out there, from Bison to Esprima, but none of them have the focus of providing a functional tool (I think this is the best way to learn something, seeing it working) where at the same time help understanding the theory and background behind it.
 
-#State of the Art (todo)
+# State of the Art (todo)
 Kappa is neither done or complete, by the contrary there is a lot of work to do.
 
 **IMPORTANT: Unfortunately at my job and my new role my free time to expend it on kappa is really limited, for that reason is there is anyone interested in following this project or take ownership of it, please let me know. Or if you want to use kappa for personal purpose and have any question please let me know.**
